@@ -1,6 +1,6 @@
 // Anonymní statistiky hraní (kolik lidí hrálo, jaký režim, jak dlouho).
 // Žádné cookies, žádné jméno, žádný obraz z kamery — jen počty událostí.
-// Poskytovatel: GoatCounter (zdarma, bez cookies). Prázdná adresa = statistiky VYPNUTÉ.
+// Poskytovatel: GoatCounter (bez cookies). Prázdná adresa = statistiky VYPNUTÉ.
 // Po založení účtu na https://www.goatcounter.com vyplň např. 'https://uhni-a-let.goatcounter.com/count'
 export const GOATCOUNTER = 'https://uhni-a-let.goatcounter.com/count';
 
@@ -33,11 +33,12 @@ const lv = i => (i < 0 ? 'nekonecny' : 'L' + (i + 1));
 let hra = null, tep = null;
 export const stats = {
   // hra opravdu začala (po odpočtu)
-  start(rezim, levelIndex, ovladani) {
+  start(rezim, levelIndex, ovladani, jazyk) {
     this.konec(null);
     hra = { rezim, level: lv(levelIndex), od: performance.now() };
     udalost(`start/${rezim}/${hra.level}`, `Start ${rezim} ${hra.level}`);
     udalost(`ovladani/${ovladani}`, `Ovládání ${ovladani}`);
+    if (jazyk) udalost(`jazyk/${jazyk}`, `Jazyk ${jazyk}`);
     // tep: každá odehraná minuta = 1 událost → součet = celkový čas hraní v minutách
     clearInterval(tep);
     tep = setInterval(() => { if (hra && !document.hidden) udalost(`minuta/${hra.rezim}`, `Odehraná minuta ${hra.rezim}`); }, 60000);

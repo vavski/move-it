@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Uhni a leť</title>
+<title>Move It – play with your whole body</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A6%96%3C/text%3E%3C/svg%3E">
-<meta name="description" content="Pohybová hra pro děti: hraje se celým tělem před kamerou notebooku. Uhýbej, skákej, leť.">
+<meta name="description" content="A motion game for kids: play with your whole body in front of your laptop camera. Dodge, jump, fly.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
 <style>
@@ -92,6 +92,9 @@
   #video { display:none; }
   #zvuk { position:fixed; right:14px; bottom:14px; width:52px; height:52px; font-size:24px; background:var(--panel); border-radius:50%; z-index:5; }
 
+  .jazyky { position:fixed; top:14px; left:16px; z-index:6; display:flex; background:var(--panel); border-radius:999px; padding:4px; gap:2px; }
+  .jazyky button { font-size:18px; padding:4px 12px; border-radius:999px; background:transparent; opacity:.75; }
+  .jazyky button.aktivni { background:var(--zluta); color:#3a2300; opacity:1; }
   @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(2,1fr); } .rezim { width:100%; } .horni h2 { font-size:34px; } }
 </style>
 <script type="importmap">
@@ -105,27 +108,28 @@
 
 <!-- DOMŮ -->
 <section class="obrazovka" id="domu">
-  <div class="logo">UHNI<br>A LEŤ<small>HRAJE SE CELÝM TĚLEM</small></div>
+  <div class="jazyky" role="group" aria-label="Language"><button data-jazyk="en" class="aktivni" lang="en">EN</button><button data-jazyk="cs" lang="cs">CZ</button></div>
+  <div class="logo">MOVE<br>IT<small data-i18n="logo.sub">PLAY WITH YOUR WHOLE BODY</small></div>
   <div class="rezimy">
-    <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev">BĚH</div><div class="popis">uhýbej, skákej, dřepej</div></button>
-    <button class="rezim" id="btnLet"><div class="ikona">🦅</div><div class="nazev">LET</div><div class="popis">mávej rukama a leť kruhy</div></button>
+    <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>
+    <button class="rezim" id="btnLet"><div class="ikona">🦅</div><div class="nazev" data-i18n="mode.let">FLY</div><div class="popis" data-i18n="mode.let.desc">flap your arms and fly through rings</div></button>
   </div>
-  <div class="soukromi">🔒 Obraz z kamery zůstává jen ve tvém prohlížeči, nikam se neodesílá.</div>
+  <div class="soukromi" data-i18n="privacy">🔒 Your camera picture stays in your browser and is never sent anywhere.</div>
 </section>
 
 <!-- LEVELY + POSTAVIČKA -->
 <section class="obrazovka skryt" id="levely">
-  <div class="horni"><button class="zpet" id="btnZpet">◀ Zpět</button><h2 id="levelyNadpis">BĚH</h2></div>
+  <div class="horni"><button class="zpet" id="btnZpet" data-i18n="back">◀ Back</button><h2 id="levelyNadpis">RUN</h2></div>
   <div class="levelySeznam" id="levelySeznam"></div>
   <div class="spodek">
     <div class="karta">
-      <div class="malyText">POSTAVIČKA</div>
-      <div class="skinVyber"><button class="sipka" id="skinPred" aria-label="Předchozí">◀</button><div class="skinJmeno" id="skinJmeno">Dino</div><button class="sipka" id="skinDal" aria-label="Další">▶</button></div>
+      <div class="malyText" data-i18n="skin.title">CHARACTER</div>
+      <div class="skinVyber"><button class="sipka" id="skinPred" aria-label="Previous" data-i18n-aria="skin.prev">◀</button><div class="skinJmeno" id="skinJmeno">Dino</div><button class="sipka" id="skinDal" aria-label="Next" data-i18n-aria="skin.next">▶</button></div>
       <div class="skinStav" id="skinStav"></div>
     </div>
     <div class="karta">
-      <div class="malyText">OVLÁDÁNÍ</div>
-      <div class="ovladaniPrepinac"><button id="ovlKamera" class="aktivni">📷 Kamera</button><button id="ovlKlavesy">⌨️ Klávesnice</button></div>
+      <div class="malyText" data-i18n="controls.title">CONTROLS</div>
+      <div class="ovladaniPrepinac"><button id="ovlKamera" class="aktivni" data-i18n="controls.camera">📷 Camera</button><button id="ovlKlavesy" data-i18n="controls.keys">⌨️ Keyboard</button></div>
       <div class="malyText" id="ovlChyba" style="color:#ffc2c2;max-width:260px"></div>
     </div>
   </div>
@@ -134,28 +138,28 @@
 <!-- ČEKÁNÍ NA RUCE -->
 <section class="obrazovka skryt" id="cekam">
   <div class="panel">
-    <h3>Postav se 2–3 metry od kamery</h3>
-    <p>Celé tělo musí být v okénku vlevo dole.</p>
-    <p style="font-size:28px;font-weight:800;color:var(--zluta)">Zvedni obě ruce = START</p>
+    <h3 data-i18n="wait.title">Stand 2–3 meters from the camera</h3>
+    <p data-i18n="wait.body">Your whole body must fit in the little window bottom left.</p>
+    <p style="font-size:28px;font-weight:800;color:var(--zluta)" data-i18n="wait.hands">Raise both hands = START</p>
     <div class="ruceBar"><div id="ruceBar1"></div></div>
-    <div class="tlacitka"><button class="tl tl-svetle" id="btnStartRucne">Start bez rukou</button><button class="tl tl-svetle" id="btnCekamZpet">Zpět</button></div>
+    <div class="tlacitka"><button class="tl tl-svetle" id="btnStartRucne" data-i18n="wait.manual">Start without hands</button><button class="tl tl-svetle" id="btnCekamZpet" data-i18n="back.plain">Back</button></div>
   </div>
 </section>
 
 <!-- VÝSLEDEK -->
 <section class="obrazovka skryt" id="vysledek">
   <div class="panel">
-    <h3 id="vysNadpis">HOTOVO!</h3>
+    <h3 id="vysNadpis">YOU DID IT!</h3>
     <div class="velkeHvezdy" id="vysHvezdy">★★★</div>
     <p id="vysDetail"></p>
     <div class="ziskano">+<span id="vysMince">0</span> <span class="minc"></span></div>
     <p id="vysRekord" style="color:var(--modra);font-weight:800"></p>
     <div class="tlacitka">
-      <button class="tl tl-zlute" id="btnDalsi">Další level ▶</button>
-      <button class="tl tl-svetle" id="btnZnovu">Znovu</button>
-      <button class="tl tl-svetle" id="btnNaLevely">Levely</button>
+      <button class="tl tl-zlute" id="btnDalsi" data-i18n="res.next">Next level ▶</button>
+      <button class="tl tl-svetle" id="btnZnovu" data-i18n="res.again">Again</button>
+      <button class="tl tl-svetle" id="btnNaLevely" data-i18n="res.levels">Levels</button>
     </div>
-    <p class="malyText" id="vysRuce">nebo zvedni obě ruce = znovu</p>
+    <p class="malyText" id="vysRuce" data-i18n="res.hands">or raise both hands = play again</p>
     <div class="ruceBar" id="ruceBarObal2"><div id="ruceBar2"></div></div>
   </div>
 </section>
@@ -163,15 +167,15 @@
 <!-- HUD -->
 <div id="hud" class="skryt stin-text"><div id="hudVlevo"></div><div id="hudStred">0<small></small></div><div style="width:120px"></div></div>
 <div id="postup" class="skryt"><div></div></div>
-<button id="konecHry" class="skryt" title="Konec (Esc)">✕</button>
+<button id="konecHry" class="skryt" title="Quit (Esc)" data-i18n-title="quit">✕</button>
 <div id="napoveda" class="skryt"></div>
 <div id="banner" class="stin-text"></div>
 <div id="odpocet" class="skryt stin-text"></div>
 <div id="zasah"></div>
 
-<div id="kam" class="skryt"><canvas id="kamCanvas" width="320" height="240"></canvas><div id="stavKam">NAČÍTÁM</div><select id="vyberKamery" title="Kamera"></select></div>
+<div id="kam" class="skryt"><canvas id="kamCanvas" width="320" height="240"></canvas><div id="stavKam">LOADING</div><select id="vyberKamery" title="Camera" data-i18n-title="camera"></select></div>
 <video id="video" playsinline muted></video>
-<button id="zvuk" title="Zvuk (M)">♪</button>
+<button id="zvuk" title="Sound (M)" data-i18n-title="sound">♪</button>
 
 <script type="module" src="js/main.js"></script>
 </body>

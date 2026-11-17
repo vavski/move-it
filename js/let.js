@@ -1,6 +1,7 @@
 // Režim LET: proleť kruhy na trati. Mávnutí = vzlet, náklon rukou = zatáčka, roztažené ruce = plachtění,
 // ruce u těla dolů = střemhlav, „kuře“ (dlaně u ramen, mávání lokty) = turbo.
 import { THREE, nahoda, omez, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX } from './zaklad.js';
+import { t } from './i18n.js';
 import { LETCI } from './postavy.js';
 
 // ---- šum pro krajinu ----
@@ -162,7 +163,7 @@ export function vytvorLet(ctx) {
   const kamPos = new THREE.Vector3();
 
   // ---- rozpoznávání pohybu ----
-  const poza = { zdvih: 0, nahoru: true, max: 0, min: 0, loket: 0, lNahoru: true, lMax: 0, lMin: 0, stav: 'LETÍŠ', videt: false };
+  const poza = { zdvih: 0, nahoru: true, max: 0, min: 0, loket: 0, lNahoru: true, lMax: 0, lMin: 0, stav: 'pose.fly', videt: false };
   const MAV = { prah: 0.5, zaklad: 14, zaKus: 6, navrat: 0.4 };
   function analyzuj(L, dt) {
     const ok = i => L[i] && (L[i].visibility ?? 1) > 0.3;
@@ -182,7 +183,7 @@ export function vytvorLet(ctx) {
       poza.loket = poza.loket * 0.4 + e * 0.6;
       if (poza.lNahoru) { poza.lMax = Math.max(poza.lMax, poza.loket); if (poza.lMax - poza.loket > 0.3) { turbo(); poza.lNahoru = false; poza.lMin = poza.loket; } }
       else { poza.lMin = Math.min(poza.lMin, poza.loket); if (poza.loket - poza.lMin > 0.25) { poza.lNahoru = true; poza.lMax = poza.loket; } }
-      vstup.plachti = false; vstup.strmhlav = false; vstup.kridla = 0.3 + Math.sin(cas * 30) * 0.5; poza.stav = 'TURBO!';
+      vstup.plachti = false; vstup.strmhlav = false; vstup.kridla = 0.3 + Math.sin(cas * 30) * 0.5; poza.stav = 'pose.turbo';
     } else {
       if (poza.nahoru) { poza.max = Math.max(poza.max, poza.zdvih); if (poza.max - poza.zdvih > MAV.prah) { mav(MAV.zaklad); poza.nahoru = false; poza.min = poza.zdvih; } }
       else { if (poza.zdvih < poza.min) { vstup.vzlet += (poza.min - poza.zdvih) * MAV.zaKus; poza.min = poza.zdvih; } if (poza.zdvih - poza.min > MAV.navrat) { poza.nahoru = true; poza.max = poza.zdvih; } }
@@ -194,7 +195,7 @@ export function vytvorLet(ctx) {
       // ruce dole u těla = střemhlav
       vstup.strmhlav = poza.zdvih < -1.1 && sirka < 1.8;
       vstup.kridla = vstup.strmhlav ? -0.9 : omez(poza.zdvih * 0.7, -0.9, 1.1);
-      poza.stav = vstup.mavT > 0 ? 'MÁVNUTÍ!' : vstup.strmhlav ? 'STŘEMHLAV' : vstup.plachti ? 'PLACHTÍŠ' : 'LETÍŠ';
+      poza.stav = vstup.mavT > 0 ? 'pose.flap' : vstup.strmhlav ? 'pose.dive' : vstup.plachti ? 'pose.glide' : 'pose.fly';
     }
   }
   function mav(sila) { vstup.vzlet += sila; vstup.mavT = 0.3; SFX.mav(); }
@@ -250,11 +251,11 @@ export function vytvorLet(ctx) {
       if (e.code === 'Space' && !e.repeat) { mav(12); mavKlT = 0.35; e.preventDefault(); }
       if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) turbo();
     },
-    stavKamery() { return poza.videt ? poza.stav : null; },
+    stavKamery() { return poza.videt ? t(poza.stav) : null; },
     vodítko() {},
     hud() {
-      if (level.typ === 'volny') return { vlevo: '◯ ' + sebrano, stred: sebrano, stredPopis: 'KRUHŮ', mince: sebrano * 3, postup: null };
-      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: 'POTŘEBUJEŠ ' + level.potreba, mince: sebrano * 3, postup: dalsiKruh / level.kruhu };
+      if (level.typ === 'volny') return { vlevo: '◯ ' + sebrano, stred: sebrano, stredPopis: t('hud.rings'), mince: sebrano * 3, postup: null };
+      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: t('hud.need', { n: level.potreba }), mince: sebrano * 3, postup: dalsiKruh / level.kruhu };
     },
     ukoncit() { if (level.typ === 'volny') vysledek(true); },
     ladeni: () => ({ y: hrac.pos.y, cilY: kruhy[dalsiKruh]?.mesh.position.y ?? null, sebrano, dalsiKruh }),

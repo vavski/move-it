@@ -1,5 +1,6 @@
 // Režim BĚH: tři dráhy, uhýbání, skok, dřep, sbírání. Ovládání kamerou nebo klávesnicí.
 import { THREE, nahoda, vyber, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX } from './zaklad.js';
+import { t, tn } from './i18n.js';
 import { BEZCI } from './postavy.js';
 
 export const SVETY = [
@@ -322,17 +323,17 @@ export function vytvorBeh(ctx) {
     },
     stavKamery() {
       if (!P.videt) return null;
-      if (P.kalibrace) return 'STŮJ ROVNĚ…';
-      if (P.nahore) return 'SKOK!';
-      if (P.drep) return 'DŘEP';
-      return ['VLEVO', 'STŘED', 'VPRAVO'][P.draha] + (P.ruka ? ' · RUKA' : '');
+      if (P.kalibrace) return t('pose.calib');
+      if (P.nahore) return t('pose.jump');
+      if (P.drep) return t('pose.duck');
+      return t(['pose.left', 'pose.mid', 'pose.right'][P.draha]) + (P.ruka ? t('pose.hand') : '');
     },
     vodítko(kctx, w, h) { const cx = P.baseX * w, s = P.sw * w * PRAH.draha; kctx.fillStyle = 'rgba(79,243,255,.15)'; kctx.fillRect(cx - s, 0, s * 2, h); },
     hud() {
       return {
         vlevo: '❤'.repeat(Math.max(0, hrac.srdce)) + '♡'.repeat(Math.max(0, 3 - hrac.srdce)),
         stred: level.nekonecny ? Math.floor(vzdalenost) + mince * 5 : Math.floor(vzdalenost) + ' m',
-        stredPopis: level.nekonecny ? 'BODŮ' : 'CÍL ' + level.cil + ' m',
+        stredPopis: level.nekonecny ? t('hud.points') : t('hud.goal', { n: level.cil }),
         mince, postup: level.nekonecny ? null : Math.min(1, vzdalenost / level.cil),
       };
     },
@@ -381,7 +382,7 @@ export function vytvorBeh(ctx) {
         }
         if (level.nekonecny) {
           const ns = Math.floor(vzdalenost / 350) % SVETY.length;
-          if (ns !== svetIndex) { prepniSvet(ns); SFX.svet(); ctx.banner(svet.jmeno, '#ffffff'); }
+          if (ns !== svetIndex) { prepniSvet(ns); SFX.svet(); ctx.banner(tn(svet.jmeno), '#ffffff'); }
         }
         jiskry.aktualizuj(dt, dz);
       } else jiskry.aktualizuj(dt, 0);

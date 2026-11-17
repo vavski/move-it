@@ -4,6 +4,7 @@ import { BEZCI, LETCI } from './postavy.js';
 import { vytvorBeh, LEVELY as LV_BEH, NEKONECNY } from './beh.js';
 import { vytvorLet, LEVELY as LV_LET, VOLNY } from './let.js';
 import { stats } from './stats.js';
+import { t, tn, jazyk, nastavJazyk, poZmene } from './i18n.js';
 
 const ctx = {
   konec: v => konecHry(v),
@@ -13,12 +14,10 @@ const ctx = {
 const beh = vytvorBeh(ctx);
 const lt = vytvorLet(ctx);
 const REZIMY = {
-  beh: { api: beh, levely: LV_BEH, extra: NEKONECNY, skiny: BEZCI, nazev: 'BĚH', hudba: 'beh',
-    napovedaKamera: 'krok do strany = uhni · výskok = skok · dřep = podlez · ruka nahoru = hvězda',
-    napovedaKlavesy: '← → uhni · ↑ skok · ↓ dřep' },
-  let: { api: lt, levely: LV_LET, extra: VOLNY, skiny: LETCI, nazev: 'LET', hudba: 'let',
-    napovedaKamera: 'mávni dolů = nahoru · nakloň ruce = zatáčka · roztáhni = plachti · ruce u těla = střemhlav · dlaně u ramen + mávej lokty = TURBO',
-    napovedaKlavesy: 'mezerník = mávnutí · ← → zatáčka · ↑ plachti · ↓ střemhlav · Shift = turbo' },
+  beh: { api: beh, levely: LV_BEH, extra: NEKONECNY, skiny: BEZCI, nazev: 'mode.beh', hudba: 'beh',
+    napovedaKamera: 'hint.beh.cam', napovedaKlavesy: 'hint.beh.keys' },
+  let: { api: lt, levely: LV_LET, extra: VOLNY, skiny: LETCI, nazev: 'mode.let', hudba: 'let',
+    napovedaKamera: 'hint.let.cam', napovedaKlavesy: 'hint.let.keys' },
 };
 
 let stav = 'domu';            // domu | levely | cekam | odpocet | hra | vysledek
@@ -52,7 +51,7 @@ function naDomu() {
 function naLevely(rz = rezimHry) {
   stav = 'levely'; rezimHry = rz; ztisHudbu();
   const r = R();
-  $('levelyNadpis').textContent = r.nazev;
+  $('levelyNadpis').textContent = t(r.nazev);
   const seznam = $('levelySeznam'); seznam.innerHTML = '';
   const hv = ulozene.hvezdy[rz] || [];
   r.levely.forEach((lv, i) => {
@@ -60,13 +59,13 @@ function naLevely(rz = rezimHry) {
     const odemceno = i < ulozene.odemceno[rz];
     b.disabled = !odemceno;
     const h = hv[i] || 0;
-    b.innerHTML = `<div class="cislo">${odemceno ? i + 1 : '🔒'}</div><div class="jm">${lv.jmeno}</div><div class="hv">${'★'.repeat(h)}${'☆'.repeat(3 - h)}</div>`;
+    b.innerHTML = `<div class="cislo">${odemceno ? i + 1 : '🔒'}</div><div class="jm">${tn(lv.jmeno)}</div><div class="hv">${'★'.repeat(h)}${'☆'.repeat(3 - h)}</div>`;
     b.onclick = () => { SFX.klik(); spustLevel(i); };
     seznam.appendChild(b);
   });
   const b = document.createElement('button'); b.className = 'lvl nekonecny';
   const rek = ulozene.rekord[rz] || 0;
-  b.innerHTML = `<div class="cislo">∞</div><div class="jm">${r.extra.jmeno}</div><div class="hv" style="font-size:15px">${rek ? 'rekord ' + rek : '&nbsp;'}</div>`;
+  b.innerHTML = `<div class="cislo">∞</div><div class="jm">${tn(r.extra.jmeno)}</div><div class="hv" style="font-size:15px">${rek ? t('lvl.record', { n: rek }) : '&nbsp;'}</div>`;
   b.onclick = () => { SFX.klik(); spustLevel(-1); };
   seznam.appendChild(b);
   skinIndex = Math.max(0, r.skiny.findIndex(s => s.id === ulozene.vybrany[rz]));
@@ -79,16 +78,16 @@ function naLevely(rz = rezimHry) {
 function ukazSkin() {
   const r = R(), s = r.skiny[skinIndex];
   r.api.nahled(s.id);
-  $('skinJmeno').textContent = s.jmeno;
+  $('skinJmeno').textContent = tn(s.jmeno);
   const ma = ulozene.skiny.includes(s.id), vybrany = ulozene.vybrany[rezimHry] === s.id;
   const st = $('skinStav'); st.innerHTML = '';
   const b = document.createElement('button'); b.className = 'tl';
-  if (vybrany) { b.textContent = '✔ Hraješ s ním'; b.className += ' tl-svetle'; b.disabled = true; }
-  else if (ma) { b.textContent = 'Vybrat'; b.className += ' tl-zelene'; b.onclick = () => { ulozene.vybrany[rezimHry] = s.id; uloz(); SFX.klik(); ukazSkin(); }; }
+  if (vybrany) { b.textContent = t('skin.selected'); b.className += ' tl-svetle'; b.disabled = true; }
+  else if (ma) { b.textContent = t('skin.pick'); b.className += ' tl-zelene'; b.onclick = () => { ulozene.vybrany[rezimHry] = s.id; uloz(); SFX.klik(); ukazSkin(); }; }
   else if (ulozene.mince >= s.cena) {
-    b.innerHTML = `Koupit za ${s.cena} <span class="minc"></span>`; b.className += ' tl-zlute';
-    b.onclick = () => { ulozene.mince -= s.cena; ulozene.skiny.push(s.id); ulozene.vybrany[rezimHry] = s.id; uloz(); SFX.koupe(); obnovPenezenku(); banner('NOVÁ POSTAVIČKA!', '#ffd23f'); ukazSkin(); };
-  } else { b.innerHTML = `🔒 ${s.cena} <span class="minc"></span> · chybí ${s.cena - ulozene.mince}`; b.className += ' tl-svetle'; b.disabled = true; }
+    b.innerHTML = `${t('skin.buy', { n: s.cena })} <span class="minc"></span>`; b.className += ' tl-zlute';
+    b.onclick = () => { ulozene.mince -= s.cena; ulozene.skiny.push(s.id); ulozene.vybrany[rezimHry] = s.id; uloz(); SFX.koupe(); obnovPenezenku(); banner(t('skin.new'), '#ffd23f'); ukazSkin(); };
+  } else { b.innerHTML = `🔒 ${s.cena} <span class="minc"></span> · ${t('skin.missing', { n: s.cena - ulozene.mince })}`; b.className += ' tl-svetle'; b.disabled = true; }
   st.appendChild(b);
 }
 $('skinPred').onclick = () => { audio(); const n = R().skiny.length; skinIndex = (skinIndex - 1 + n) % n; SFX.klik(); ukazSkin(); };
@@ -107,14 +106,14 @@ async function spustLevel(i) {
   audio();
   levelIndex = i;
   if (ovladani === 'kamera' && !kamera.zapnuta) {
-    $('ovlChyba').textContent = 'Povol kameru v okně prohlížeče…';
+    $('ovlChyba').textContent = t('cam.allow');
     try { await kamera.zapni(); $('ovlChyba').textContent = ''; }
-    catch (e) { $('ovlChyba').textContent = 'Kamera nejde (' + (e.message || e) + '). Přepínám na klávesnici.'; ovladani = 'klavesy'; obnovOvladani(); return; }
+    catch (e) { $('ovlChyba').textContent = t('cam.fail', { e: e.message || e }); ovladani = 'klavesy'; obnovOvladani(); return; }
   }
   $('kam').classList.toggle('skryt', ovladani !== 'kamera');
   const r = R(), lv = i < 0 ? r.extra : r.levely[i];
   r.api.pripravit(lv, ulozene.vybrany[rezimHry], ovladani);
-  $('napoveda').textContent = ovladani === 'kamera' ? r.napovedaKamera : r.napovedaKlavesy;
+  $('napoveda').textContent = t(ovladani === 'kamera' ? r.napovedaKamera : r.napovedaKlavesy);
   if (ovladani === 'kamera') { stav = 'cekam'; ukaz('cekam'); }
   else zacniOdpocet();
 }
@@ -139,15 +138,15 @@ function konecHry(v) {
   }
   if (levelIndex < 0) {
     const body = rezimHry === 'beh' ? Math.floor(v.vzdalenost) + v.mince * 5 : v.kruhy;
-    if (body > (ulozene.rekord[rezimHry] || 0)) { ulozene.rekord[rezimHry] = body; rekordText = 'NOVÝ REKORD: ' + body; }
-    else rekordText = 'Rekord: ' + ulozene.rekord[rezimHry];
+    if (body > (ulozene.rekord[rezimHry] || 0)) { ulozene.rekord[rezimHry] = body; rekordText = t('res.newRecord', { n: body }); }
+    else rekordText = t('res.record', { n: ulozene.rekord[rezimHry] });
   }
   uloz();
-  $('vysNadpis').textContent = levelIndex < 0 ? 'KONEC!' : v.vyhra ? 'HOTOVO!' : 'SKORO!';
+  $('vysNadpis').textContent = t(levelIndex < 0 ? 'res.end' : v.vyhra ? 'res.done' : 'res.almost');
   $('vysHvezdy').innerHTML = levelIndex < 0 ? '' : '★'.repeat(hvezdy) + `<span class="prazdna">${'★'.repeat(3 - hvezdy)}</span>`;
   $('vysDetail').textContent = rezimHry === 'beh'
-    ? (levelIndex < 0 ? `${Math.floor(v.vzdalenost)} m · ${v.mince} mincí` : v.vyhra ? `${lv.jmeno} zvládnuto!` : `Došla srdíčka po ${Math.floor(v.vzdalenost)} m z ${lv.cil} m`)
-    : (levelIndex < 0 ? `${v.kruhy} kruhů` : `${v.kruhy} z ${lv.kruhu} kruhů` + (v.vyhra ? '' : ` · potřebuješ ${lv.potreba}`));
+    ? (levelIndex < 0 ? t('res.runEndless', { m: Math.floor(v.vzdalenost), c: v.mince }) : v.vyhra ? t('res.runWin', { lvl: tn(lv.jmeno) }) : t('res.runLose', { m: Math.floor(v.vzdalenost), cil: lv.cil }))
+    : (levelIndex < 0 ? t('res.flyEndless', { k: v.kruhy }) : t('res.fly', { k: v.kruhy, n: lv.kruhu }) + (v.vyhra ? '' : t('res.flyNeed', { n: lv.potreba })));
   $('vysMince').textContent = v.mince;
   $('vysRekord').textContent = rekordText;
   const dalsiOk = levelIndex >= 0 && v.vyhra && levelIndex + 1 < r.levely.length;
@@ -194,8 +193,8 @@ addEventListener('keydown', e => {
 // ================= SMYČKA =================
 let posledni = performance.now();
 const mereni = { cas: 0, n: 0, hotovo: false };
-function smycka(t) {
-  const dtS = (t - posledni) / 1000, dt = Math.min(0.05, dtS); posledni = t;
+function smycka(cas) {
+  const dtS = (cas - posledni) / 1000, dt = Math.min(0.05, dtS); posledni = cas;
   const api = R().api;
   // kamera
   let snimek = null;
@@ -204,7 +203,7 @@ function smycka(t) {
     if (snimek.novy) zpracujRuce(snimek.L, 1 / 30);
     if (stav === 'hra' || stav === 'odpocet') kamera.kresli((k, w, h) => api.vodítko(k, w, h));
     const s = api.stavKamery();
-    kamera.stav(ruce.obe && stav !== 'hra' ? 'OBĚ RUCE NAHOŘE' : s || (kamera.cerny() ? 'ČERNÝ OBRAZ — KRYTKA NEBO TMA' : 'NEVIDÍM TĚ — COUVNI'));
+    kamera.stav(ruce.obe && stav !== 'hra' ? t('cam.bothHands') : s || t(kamera.cerny() ? 'cam.black' : 'cam.noSee'));
   }
   // start zvednutím rukou
   if (ovladani === 'kamera' && (stav === 'cekam' || stav === 'vysledek')) {
@@ -219,15 +218,15 @@ function smycka(t) {
     api.behemOdpoctu(odpocetT);
     const ted = Math.ceil(odpocetT);
     $('odpocet').classList.remove('skryt');
-    $('odpocet').textContent = ted > 0 ? ted : 'START!';
+    $('odpocet').textContent = ted > 0 ? ted : t('countdown.start');
     if (ted !== pred && ted > 0) SFX.tik();
     if (odpocetT <= 0) {
-      if (!api.konecOdpoctu()) { odpocetT = 1.5; banner('COUVNI, NEVIDÍM TĚ', '#ffd23f'); }
+      if (!api.konecOdpoctu()) { odpocetT = 1.5; banner(t('step.back'), '#ffd23f'); }
       else {
         stav = 'hra';
-        stats.start(rezimHry, levelIndex, ovladani);
+        stats.start(rezimHry, levelIndex, ovladani, jazyk);
         const lv = levelIndex < 0 ? R().extra : R().levely[levelIndex];
-        setTimeout(() => { $('odpocet').classList.add('skryt'); banner(lv.jmeno.toUpperCase()); }, 500);
+        setTimeout(() => { $('odpocet').classList.add('skryt'); banner(tn(lv.jmeno).toUpperCase()); }, 500);
       }
     }
   } else $('odpocet').classList.add('skryt');
@@ -244,6 +243,9 @@ function smycka(t) {
   renderer.render(api.scene, api.camera);
   requestAnimationFrame(smycka);
 }
+// přepínač jazyka (EN | CZ)
+document.querySelectorAll('[data-jazyk]').forEach(b => b.onclick = () => { SFX.klik(); nastavJazyk(b.dataset.jazyk); });
+poZmene(() => { if (stav === 'levely') naLevely(); });
 window.__hra = { beh, let: lt, ulozene, stav: () => stav, spustLevel, naLevely, konecHry };
 naDomu();
 requestAnimationFrame(smycka);

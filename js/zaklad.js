@@ -1,5 +1,6 @@
 // Společný základ: grafika (toon styl, obrysy, nebe, částice), uložení postupu, zvuk a kamera.
 import * as THREE from 'three';
+import { t } from './i18n.js';
 export { THREE };
 
 export const nahoda = (a, b) => a + Math.random() * (b - a);
@@ -220,7 +221,7 @@ export const kamera = {
     try { ulozena = localStorage.getItem('uhni-kamera') || localStorage.getItem('mavani-kamera'); } catch {}
     try { await spustStream(ulozena); } catch (e) { if (!ulozena) throw e; await spustStream(null); }
     $('kam').classList.remove('skryt');
-    stavKam.textContent = 'NAČÍTÁM ROZPOZNÁVÁNÍ';
+    stavKam.textContent = t('cam.loadingAi');
     const { PoseLandmarker, FilesetResolver } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
     const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
     landmarker = await PoseLandmarker.createFromOptions(vision, {
@@ -271,9 +272,9 @@ async function naplnVyber() {
   const kamery = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
   const aktualni = stream && stream.getVideoTracks()[0].getSettings().deviceId;
   vyberKamery.innerHTML = '';
-  kamery.forEach((k, i) => { const o = document.createElement('option'); o.value = k.deviceId; o.textContent = '📷 ' + (k.label || 'Kamera ' + (i + 1)); o.selected = k.deviceId === aktualni; vyberKamery.add(o); });
+  kamery.forEach((k, i) => { const o = document.createElement('option'); o.value = k.deviceId; o.textContent = '📷 ' + (k.label || t('camera.n', { n: i + 1 })); o.selected = k.deviceId === aktualni; vyberKamery.add(o); });
 }
-vyberKamery.onchange = () => spustStream(vyberKamery.value).catch(() => { naplnVyber(); stavKam.textContent = 'TAHLE KAMERA NEJDE'; });
+vyberKamery.onchange = () => spustStream(vyberKamery.value).catch(() => { naplnVyber(); stavKam.textContent = t('cam.bad'); });
 
 // Obě ruce nad hlavou (start / znovu) — společné pro oba režimy.
 export const ruce = { t: 0, obe: false, jedna: false };
