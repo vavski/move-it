@@ -2,7 +2,7 @@
 // Žádné cookies, žádné jméno, žádný obraz z kamery — jen počty událostí.
 // Poskytovatel: GoatCounter (zdarma, bez cookies). Prázdná adresa = statistiky VYPNUTÉ.
 // Po založení účtu na https://www.goatcounter.com vyplň např. 'https://uhni-a-let.goatcounter.com/count'
-export const GOATCOUNTER = '';
+export const GOATCOUNTER = 'https://uhni-a-let.goatcounter.com/count';
 
 const zapnuto = !!GOATCOUNTER && !/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname);
 let fronta = [], nacteno = false;
