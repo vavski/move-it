@@ -4,7 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Move It – play with your whole body</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A6%96%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#350873">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Move It">
 <meta name="description" content="A motion game for kids: play with your whole body in front of your laptop camera. Dodge, jump, fly.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
@@ -95,10 +101,22 @@
   .jazyky { position:fixed; top:14px; left:16px; z-index:6; display:flex; background:var(--panel); border-radius:999px; padding:4px; gap:2px; }
   .jazyky button { font-size:18px; padding:4px 12px; border-radius:999px; background:transparent; opacity:.75; }
   .jazyky button.aktivni { background:var(--zluta); color:#3a2300; opacity:1; }
+  .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
+  .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
+  .instalovat:hover { border-color:#b8fd04; }
   @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(2,1fr); } .rezim { width:100%; } .horni h2 { font-size:34px; } }
 </style>
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script>
+// Catch the install prompt early so it is not missed while modules load.
+window.__pwaInstall = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+  try { e.preventDefault(); } catch (err) {}
+  window.__pwaInstall = e;
+  try { window.dispatchEvent(new Event('moveit-installable')); } catch (err) {}
+});
 </script>
 </head>
 <body>
@@ -113,6 +131,10 @@
   <div class="rezimy">
     <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>
     <button class="rezim" id="btnLet"><div class="ikona">🦅</div><div class="nazev" data-i18n="mode.let">FLY</div><div class="popis" data-i18n="mode.let.desc">flap your arms and fly through rings</div></button>
+  </div>
+  <div class="pwaAkce">
+    <button id="btnInstalovat" class="instalovat skryt" data-i18n="install">Install app</button>
+    <button id="btnNoveOkno" class="instalovat skryt" data-i18n="embed.window">Open in a new window</button>
   </div>
   <div class="soukromi" data-i18n="privacy">🔒 Your camera picture stays in your browser and is never sent anywhere.</div>
 </section>

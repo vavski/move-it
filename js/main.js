@@ -5,6 +5,7 @@ import { vytvorBeh, LEVELY as LV_BEH, NEKONECNY } from './beh.js';
 import { vytvorLet, LEVELY as LV_LET, VOLNY } from './let.js';
 import { stats } from './stats.js';
 import { t, tn, jazyk, nastavJazyk, poZmene } from './i18n.js';
+import './pwa.js';
 
 const ctx = {
   konec: v => konecHry(v),

@@ -4,10 +4,25 @@
 // Po založení účtu na https://www.goatcounter.com vyplň např. 'https://uhni-a-let.goatcounter.com/count'
 export const GOATCOUNTER = 'https://uhni-a-let.goatcounter.com/count';
 
+// itch.io slouží hru z html-classic.itch.zone; cesty jinak splynou s GitHub Pages.
+export function jeItch() {
+  try { return /\.itch\.(zone|io)$/i.test(location.hostname) || location.hostname === 'itch.io'; }
+  catch { return false; }
+}
+
+function sPrefixem(path) {
+  if (!jeItch()) return path;
+  const p = String(path || '/').replace(/^\/+/, '');
+  return '/itch/' + p;
+}
+
 const zapnuto = !!GOATCOUNTER && !/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname);
 let fronta = [], nacteno = false;
 
 if (zapnuto) {
+  window.goatcounter = Object.assign(window.goatcounter || {}, {
+    path: p => sPrefixem(p || (location.pathname + location.search)),
+  });
   const s = document.createElement('script');
   s.async = true; s.src = 'https://gc.zgo.at/count.js';
   s.dataset.goatcounter = GOATCOUNTER;
@@ -18,8 +33,8 @@ if (zapnuto) {
 
 function posli(u) { try { window.goatcounter && window.goatcounter.count(u); } catch {} }
 function udalost(path, title = path) {
-  const u = { path, title, event: true };
-  if (!zapnuto) { console.debug('[stats vypnuté]', path); return; }
+  const u = { path: sPrefixem(path), title, event: true };
+  if (!zapnuto) { console.debug('[stats vypnuté]', u.path); return; }
   if (nacteno) posli(u); else fronta.push(u);
 }
 
