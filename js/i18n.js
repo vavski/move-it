@@ -107,6 +107,7 @@ const JMENA_EN = {
   'Karatista': 'Karate Boy', 'Karatistka': 'Karate Girl', 'Modrásek': 'Blue Hero', 'Pejsek': 'Doggo', 'Slepice': 'Chicken',
   'Liška': 'Fox', 'Ninja': 'Ninja', 'Zombík': 'Zombie', 'Viking': 'Viking', 'Čaroděj': 'Wizard', 'Čarodějnice': 'Witch',
   'Zlatý rytíř': 'Golden Knight', 'Mech Stan': 'Mech Stan', 'Mech Mike': 'Mech Mike',
+  'Holoubek': 'Pigeon', 'Včelka': 'Bee', 'Duch': 'Ghost', 'Pterodaktyl': 'Pterodactyl', 'Dráček': 'Little Dragon', 'Ohnivý drak': 'Fire Dragon',
   'Orel': 'Eagle', 'Vážka': 'Dragonfly', 'Fénix': 'Phoenix', 'Létající drak': 'Flying Dragon',
   'Papoušek': 'Parrot', 'Netopýr': 'Bat', 'Sněžná sova': 'Snowy Owl', 'Zlatý drak': 'Golden Dragon',
 };

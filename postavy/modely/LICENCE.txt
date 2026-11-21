@@ -6,7 +6,8 @@ Modely v této složce: licence CC0 1.0 (volné dílo, i komerčně, bez uvádě
 - ShibaInu, Fox: "Ultimate Animated Animals" (July 2021), tamtéž.
 - Chicken: Quaternius "Cube World Kit" (zrcadlo chongdashu/threejs-forest-census).
 - PlatformHero: "Ultimate Platformer Pack" (Dec 2021), itch.io quaternius.
-- Dragon, Bat: "LowPoly Animated Monsters", itch.io quaternius.
-- Trex, Parasaurolophus: "Animated LowPoly Dinosaurs", itch.io quaternius.
+- Dragon, Bat: "LowPoly Animated Monsters", itch.io quaternius (Dragon = běžec Drak i letec Ohnivý drak, Bat = letec Netopýr).
+- Parasaurolophus: "Animated LowPoly Dinosaurs", itch.io quaternius.
+- M_Pigeon, M_Armabee, M_Ghost, M_Dragon_Evolved (letci), M_Dino, M_Alien (běžci): "Ultimate Monsters", zrcadlo mlflabs/brain (licence v balíku: CC0).
 - RobotExpressive: Tomás Laulhé (Quaternius), úpravy Don McCurdy, z ukázek three.js r160.
 Převedeno do GLB (21. 11. 2026): ponechány jen potřebné animace, textury mechů zmenšeny na 1024 px. Barvy nastavuje hra.

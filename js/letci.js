@@ -176,7 +176,8 @@ function blana(body, barva1, barva2) {
 }
 export function drak2(o) {
   const g = new THREE.Group();
-  const net = !!o.netopyr;
+  const pt = !!o.ptero;              // pterodaktyl: tělo jako netopýr, dlouhý zobák a hřebínek, skoro bez ocasu
+  const net = !!o.netopyr || pt;
   // tělo
   const profil = (net ? [[0, -0.9], [0.4, -0.6], [0.55, 0], [0.45, 0.6], [0.2, 1.0], [0, 1.1]] : [[0, -1.3], [0.38, -1.0], [0.6, -0.3], [0.62, 0.4], [0.45, 1.1], [0.22, 1.6], [0, 1.75]]).map(([r, y]) => new THREE.Vector2(r, y));
   const tg = new THREE.LatheGeometry(profil, 16); tg.rotateX(Math.PI / 2); tg.scale(0.95, 0.85, 1);
@@ -192,7 +193,8 @@ export function drak2(o) {
     const bel = new THREE.Mesh(new THREE.SphereGeometry(net ? 0.14 : 0.12, 12, 10), toon(o.oci || '#ffe14d')); bel.position.set(sx * 0.22, 0.12, -0.3); hlava.add(bel);
     const zor = new THREE.Mesh(new THREE.SphereGeometry(net ? 0.08 : 0.06, 8, 6), toon('#1a1020')); zor.scale.set(net ? 1 : 0.5, 1, 1); zor.position.set(sx * 0.25, 0.13, -0.41); hlava.add(zor);
     const odl = new THREE.Mesh(new THREE.SphereGeometry(0.022, 6, 5), new THREE.MeshBasicMaterial({ color: '#ffffff' })); odl.position.set(sx * 0.27, 0.17, -0.45); odl.userData.bezObrysu = true; hlava.add(odl);
-    if (net) {   // velké uši a zoubky
+    if (pt) { /* pterodaktyl: hlava se dodělá pod smyčkou */ }
+    else if (net) {   // velké uši a zoubky
       const ucho = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.55, 4), toon(o.telo)); ucho.position.set(sx * 0.25, 0.45, 0.05); ucho.rotation.z = -sx * 0.35; hlava.add(ucho);
       const vnitrek = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.35, 4), toon(o.blana)); vnitrek.position.set(sx * 0.25, 0.42, -0.04); vnitrek.rotation.z = -sx * 0.35; hlava.add(vnitrek);
       const zub = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.1, 4), toon('#ffffff')); zub.rotation.x = Math.PI; zub.position.set(sx * 0.07, -0.2, -0.45); hlava.add(zub);
@@ -200,11 +202,15 @@ export function drak2(o) {
       const roh = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.6, 6), toon(o.rohy)); roh.position.set(sx * 0.2, 0.32, 0.22); roh.rotation.x = 0.9; roh.rotation.z = -sx * 0.25; hlava.add(roh);
     }
   }
+  if (pt) {
+    const zobak = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1.15, 8), toon(o.zobak || '#f2c66a')); zobak.rotation.x = -Math.PI / 2; zobak.scale.set(1, 1, 0.6); zobak.position.set(0, -0.1, -0.85); hlava.add(zobak);
+    const hreb = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.95, 6), toon(o.hrebinek || '#e8434e')); hreb.rotation.x = Math.PI / 2 - 0.35; hreb.scale.set(0.45, 1, 1); hreb.position.set(0, 0.32, 0.45); hlava.add(hreb);
+  }
   // ostny po zádech
   if (!net) for (let i = 0; i < 6; i++) { const os = new THREE.Mesh(new THREE.ConeGeometry(0.13 - i * 0.012, 0.36, 5), toon(o.ostny)); os.position.set(0, 0.55 - i * 0.03, -0.7 + i * 0.42); os.rotation.x = -0.5; g.add(os); }
   // ocas z článků (vlní se), na konci šipka
   const ocas = []; let rodic = g;
-  const clanku = net ? 2 : 6;
+  const clanku = pt ? 1 : net ? 2 : 6;
   for (let i = 0; i < clanku; i++) {
     const c = new THREE.Group(); c.position.set(0, i ? 0 : 0.05, i ? 0.5 : (net ? 0.95 : 1.6)); rodic.add(c);
     const m = new THREE.Mesh(new THREE.CylinderGeometry(0.22 - i * 0.03, 0.26 - i * 0.03, 0.55, 8), toon(o.telo)); m.rotation.x = Math.PI / 2; m.position.z = 0.25; c.add(m);
@@ -301,4 +307,19 @@ export function vazka2(o = {}) {
     g, stopa: o.stopa || null,
     kridla(u, cas = 0) { for (const w of kridla) w.k.rotation.z = w.sx * (u * 0.45 + Math.sin(cas * 48 + w.faze) * 0.38); },
   };
+}
+
+// ---- létající postavy s hotovou animací (Quaternius, CC0) ----
+// Křídla se nehýbou podle rukou kloub po kloubu, ale animace zrychlí, když dítě mává, a zpomalí, když plachtí.
+import { model, hrajAnimaci } from './bezci.js';
+export function letecModel(soubor, opt = {}) {
+  const p = model('modely/' + soubor + '.glb', { vyska: 2.4, mapa: { idle: 'Flying_Idle', sprint: 'Fast_Flying', jump: null }, ...opt });
+  let posledni = null, predU = 0, mavani = 0;
+  p.kridla = (u, cas = 0) => {
+    const dt = posledni === null ? 0 : Math.min(0.1, Math.max(0, cas - posledni)); posledni = cas;
+    mavani = Math.max(mavani * Math.exp(-dt * 3), Math.min(3, Math.abs(u - predU) / Math.max(dt, 0.001) * 0.4)); predU = u;
+    hrajAnimaci(p, mavani > 0.6 ? 'sprint' : 'idle', 0.25);
+    if (p.mixer) p.mixer.update(dt * (0.7 + Math.min(1.5, mavani * 0.5)));
+  };
+  return p;
 }

@@ -70,3 +70,20 @@ export function kus(nazev, { vyska = null, sirka = null, barvy = null, sviti = n
   const g = new THREE.Group(); g.add(m);
   return g;
 }
+
+// Pro velké množství (stromy pod tratí v letu): díly modelu jako samostatné geometrie s výškou 1 a patou v nule,
+// aby z nich šly udělat InstancedMesh (tisíc stromů = pár volání kreslení).
+export function dilyProInstance(nazev, barvy = null) {
+  const t = sablony[nazev];
+  if (!t) return null;
+  const v = t.box.max.y - t.box.min.y || 1, cx = (t.box.min.x + t.box.max.x) / 2, cz = (t.box.min.z + t.box.max.z) / 2;
+  const posun = new THREE.Matrix4().makeTranslation(-cx, -t.box.min.y, -cz), mer = new THREE.Matrix4().makeScale(1 / v, 1 / v, 1 / v);
+  const dily = [];
+  t.s.traverse(o => {
+    if (!o.isMesh) return;
+    const g = o.geometry.clone(); g.applyMatrix4(o.matrixWorld); g.applyMatrix4(posun); g.applyMatrix4(mer);
+    const j = o.material.userData.jmeno;
+    dily.push({ geo: g, mat: barvy && barvy[j] ? toonZ(o.material, barvy[j]) : o.material });
+  });
+  return dily;
+}

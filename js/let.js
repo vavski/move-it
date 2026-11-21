@@ -1,6 +1,7 @@
 // Režim LET: proleť kruhy na trati. Mávnutí = vzlet, náklon rukou = zatáčka, roztažené ruce = plachtění,
 // ruce u těla dolů = střemhlav, „kuře“ (dlaně u ramen, mávání lokty) = turbo.
 import { THREE, nahoda, omez, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX } from './zaklad.js';
+import { dilyProInstance } from './priroda.js';
 import { LETCI } from './postavy.js';
 import { t } from './i18n.js';
 
@@ -112,22 +113,38 @@ export function vytvorLet(ctx) {
     geo.setAttribute('color', new THREE.BufferAttribute(barvy, 3)); geo.computeVertexNormals();
     const teren = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true })); teren.receiveShadow = true;
     svetSkupina.add(teren);
-    // stromy
+    // stromy: modely přírody od Kenney (několik druhů, každý jako InstancedMesh); bez nich staré kužely
     const N = lv.kanon ? 300 : 1600;
-    const stromy = new THREE.InstancedMesh(new THREE.ConeGeometry(2.8, 10, 6), toon(lv.kanon ? '#4d8a3a' : '#2f7a33'), N);
-    const kmeny = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.5, 0.7, 3, 5), toon('#6b4423'), N);
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), v = new THREE.Vector3();
-    let n = 0, pokus = 0;
-    while (n < N && pokus < 50000) {
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), v = new THREE.Vector3(), osaY = new THREE.Vector3(0, 1, 0);
+    const mista = []; let pokus = 0;
+    while (mista.length < N && pokus < 50000) {
       pokus++;
       const x = (hash(pokus + o, 1) - 0.5) * 2600, z = (hash(pokus + o, 2) - 0.5) * 2600, h = vyskaTerenu(x, z);
       if (h < 3 || h > 75) continue;
       if (lv.jeskyne && Math.abs(x - drahaX(z)) < 40 && z < 800 && z > -1200) continue;   // stromy nesmí prorůst do trubice
-      const k = 0.7 + hash(pokus, 3) * 0.9;
-      m4.compose(v.set(x, h + 6 * k, z), q, s.set(k, k, k)); stromy.setMatrixAt(n, m4);
-      m4.compose(v.set(x, h + 1.2 * k, z), q, s.set(k, k, k)); kmeny.setMatrixAt(n, m4); n++;
+      mista.push([x, h, z, 0.7 + hash(pokus, 3) * 0.9, hash(pokus, 4), hash(pokus, 5)]);
     }
-    stromy.count = kmeny.count = n; svetSkupina.add(stromy, kmeny);
+    const druhy = (lv.kanon
+      ? [['cactus_tall', 13], ['tree_palmTall', 16], ['rock_tallB', 7, { dirt: '#c96f3c', grass: '#e0a060', _defaultMat: '#b05a30' }]]
+      : [['tree_default', 15], ['tree_oak', 12], ['tree_pineRoundA', 16], ['tree_detailed', 13], ['tree_plateau_fall', 13]])
+      .map(([n, vys, barvy]) => ({ dily: dilyProInstance(n, barvy || null), vys })).filter(d => d.dily);
+    if (druhy.length) {
+      const sady = druhy.map(d => ({ ...d, mista: [] }));
+      mista.forEach((m, i) => sady[Math.floor(m[4] * sady.length) % sady.length].mista.push(m));
+      for (const sada of sady) for (const dil of sada.dily) {
+        const im = new THREE.InstancedMesh(dil.geo, dil.mat, Math.max(1, sada.mista.length));
+        sada.mista.forEach(([x, h, z, k, , r], j) => { q.setFromAxisAngle(osaY, r * 6.28); const vel = sada.vys * k; m4.compose(v.set(x, h - 0.3, z), q, s.set(vel, vel, vel)); im.setMatrixAt(j, m4); });
+        im.count = sada.mista.length; svetSkupina.add(im);
+      }
+    } else {
+      const stromy = new THREE.InstancedMesh(new THREE.ConeGeometry(2.8, 10, 6), toon(lv.kanon ? '#4d8a3a' : '#2f7a33'), N);
+      const kmeny = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.5, 0.7, 3, 5), toon('#6b4423'), N);
+      mista.forEach(([x, h, z, k], n) => {
+        m4.compose(v.set(x, h + 6 * k, z), q, s.set(k, k, k)); stromy.setMatrixAt(n, m4);
+        m4.compose(v.set(x, h + 1.2 * k, z), q, s.set(k, k, k)); kmeny.setMatrixAt(n, m4);
+      });
+      stromy.count = kmeny.count = mista.length; svetSkupina.add(stromy, kmeny);
+    }
     // mraky
     const mrakMat = toon('#ffffff');
     for (let i = 0; i < 70; i++) {
@@ -319,7 +336,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
     zacatekOdpoctu() {}, behemOdpoctu() {}, konecOdpoctu: () => true,
     klavesa(e) {
       klavesy[e.code] = true;
-      if (e.code === 'Space' && !e.repeat) { mav(12); mavKlT = 0.35; e.preventDefault(); }
+      if (e.code === 'Space' && !e.repeat) { mav(12); mavKlT = 0.55; e.preventDefault(); }
       if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) turbo();
     },
     stavKamery() { return poza.videt ? t(poza.stav) : null; },
@@ -345,7 +362,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
           vstup.plachti = !!(klavesy.ArrowUp || klavesy.KeyW);
           vstup.strmhlav = !!(klavesy.ArrowDown || klavesy.KeyS);
           mavKlT = Math.max(0, mavKlT - dt);
-          vstup.kridla = vstup.strmhlav ? -0.9 : mavKlT > 0 ? Math.cos((0.35 - mavKlT) / 0.35 * Math.PI * 2) * 0.9 : vstup.plachti ? 0 : 0.15 + Math.sin(cas * 3) * 0.1;
+          vstup.kridla = vstup.strmhlav ? -0.9 : mavKlT > 0 ? Math.cos((0.55 - mavKlT) / 0.55 * Math.PI * 2) * 0.9 : vstup.plachti ? 0 : 0.15 + Math.sin(cas * 3) * 0.1;
         }
       }
       if (stav === 'nahled' || stav === 'odpocet') {
