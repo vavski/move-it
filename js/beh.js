@@ -3,14 +3,18 @@ import { THREE, nahoda, vyber, toon, svit, obrys, stin, vytvorNebe, svetla, cast
 import { BEZCI } from './postavy.js';
 import { t, tn } from './i18n.js';
 import { hrajAnimaci } from './bezci.js';
+import { nactiPrirodu, kus } from './priroda.js';
 
 export const SVETY = [
-  { jmeno: 'ŠUMAVA', nahore: '#3f9cff', dole: '#cdeeff', zem: '#78c850', cesta: '#d9b37c', okraj: '#a87b4f', cara: '#fff3d0', nizky: '#8a5a2b', vysoky: '#ff4d5e', bedna: '#c98a4b', hory: '#5f8f6a', mlha: '#cdeeff' },
-  { jmeno: 'SAHARA', nahore: '#ff9e3d', dole: '#ffe3a8', zem: '#f0c26a', cesta: '#e3ab62', okraj: '#b97f3c', cara: '#fff0c8', nizky: '#a8763f', vysoky: '#2fb7a6', bedna: '#d69a52', hory: '#d99a55', mlha: '#ffe3a8' },
-  { jmeno: 'ALPY', nahore: '#6fb6ff', dole: '#eef7ff', zem: '#f5f9ff', cesta: '#a9d1ef', okraj: '#7fb0d6', cara: '#ffffff', nizky: '#7fc8ff', vysoky: '#ff6b3d', bedna: '#9ab7d6', hory: '#9fb8d6', mlha: '#eef7ff' },
-  { jmeno: 'SOPKA', nahore: '#4a1530', dole: '#ff8a4a', zem: '#4a3a3a', cesta: '#6e5550', okraj: '#2e2222', cara: '#ffb000', nizky: '#2e2222', vysoky: '#ffd23f', bedna: '#7a5a50', hory: '#3a2a2a', mlha: '#c25a3a' },
-  { jmeno: 'MĚSÍC', nahore: '#0b0a24', dole: '#3a2f6e', zem: '#5e5c74', cesta: '#7c7a93', okraj: '#4a4860', cara: '#c9b8ff', nizky: '#9aa0b8', vysoky: '#ff3dd2', bedna: '#6c7aa0', hory: '#3d3b55', mlha: '#3a2f6e' },
-  { jmeno: 'NOC', nahore: '#050818', dole: '#1a2550', zem: '#2a3a3a', cesta: '#55556a', okraj: '#2a2a38', cara: '#ffe680', nizky: '#a07a4a', vysoky: '#ff4d5e', bedna: '#b0884f', hory: '#141a30', mlha: '#0d1430' },
+  { jmeno: 'ŠUMAVA', nahore: '#3f9cff', dole: '#cdeeff', zem: '#78c850', cesta: '#d9b37c', okraj: '#a87b4f', cara: '#fff3d0', nizky: '#8a5a2b', vysoky: '#ff4d5e', bedna: '#c98a4b', hory: '#5f8f6a', mlha: '#cdeeff', vzor: 'hlina' },
+  { jmeno: 'SAHARA', nahore: '#ff9e3d', dole: '#ffe3a8', zem: '#f0c26a', cesta: '#e3ab62', okraj: '#b97f3c', cara: '#fff0c8', nizky: '#a8763f', vysoky: '#2fb7a6', bedna: '#d69a52', hory: '#d99a55', mlha: '#ffe3a8', vzor: 'pisek' },
+  { jmeno: 'ALPY', nahore: '#6fb6ff', dole: '#eef7ff', zem: '#f5f9ff', cesta: '#a9d1ef', okraj: '#7fb0d6', cara: '#ffffff', nizky: '#7fc8ff', vysoky: '#ff6b3d', bedna: '#9ab7d6', hory: '#9fb8d6', mlha: '#eef7ff', vzor: 'snih', snih: true },
+  { jmeno: 'SOPKA', nahore: '#4a1530', dole: '#ff8a4a', zem: '#4a3a3a', cesta: '#6e5550', okraj: '#2e2222', cara: '#ffb000', nizky: '#2e2222', vysoky: '#ffd23f', bedna: '#7a5a50', hory: '#3a2a2a', mlha: '#c25a3a', vzor: 'lava', tmavy: true },
+  { jmeno: 'MĚSÍC', nahore: '#0b0a24', dole: '#3a2f6e', zem: '#5e5c74', cesta: '#7c7a93', okraj: '#4a4860', cara: '#c9b8ff', nizky: '#9aa0b8', vysoky: '#ff3dd2', bedna: '#6c7aa0', hory: '#3d3b55', mlha: '#3a2f6e', vzor: 'panely', tmavy: true },
+  { jmeno: 'NOC', nahore: '#050818', dole: '#1a2550', zem: '#2a3a3a', cesta: '#55556a', okraj: '#2a2a38', cara: '#ffe680', nizky: '#a07a4a', vysoky: '#ff4d5e', bedna: '#b0884f', hory: '#141a30', mlha: '#0d1430', vzor: 'asfalt', tmavy: true },
+  // nové světy (21. 11.): Les a Šumava už nevypadají stejně, Ledovec má vlastní led
+  { jmeno: 'LES', nahore: '#5aa0b8', dole: '#e2f4d0', zem: '#4c8a3c', cesta: '#9a7650', okraj: '#5e4229', cara: '#e8d6a0', nizky: '#7a4a25', vysoky: '#ff9b2f', bedna: '#9a6a3a', hory: '#2f5a3a', mlha: '#cfe8c0', vzor: 'listi' },
+  { jmeno: 'LEDOVEC', nahore: '#5fb4ff', dole: '#effaff', zem: '#e4f4ff', cesta: '#bfe6ff', okraj: '#8fc4e8', cara: '#ffffff', nizky: '#9fe0ff', vysoky: '#3d8bff', bedna: '#b8e4ff', hory: '#a9c8ea', mlha: '#e8f6ff', vzor: 'led', snih: true },
 ];
 // Každý level přidá jednu novinku: nejdřív jen uhýbání, pak skok, dřep, nízká gravitace, jezdící bedny, tma, dvojité řady.
 // typy = jaké řady překážek se losují, hustota < 1 = řady blíž u sebe, navod = pohyb, který se v levelu naučí s panáčkem.
@@ -23,10 +27,10 @@ export const LEVELY = [
   { ...ZB, jmeno: 'Alpy', svet: 2, cil: 450, rychlost: [8.5, 12], hustota: 1.05, typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysokyVse', 'vysoky1', 'mix'] },
   { ...ZB, jmeno: 'Sopka', svet: 3, cil: 550, rychlost: [9.5, 13.5], typy: T_VSE },
   { ...ZB, jmeno: 'Měsíc', svet: 4, cil: 600, rychlost: [10, 14], typy: T_VSE, gravitace: 16 },
-  { ...ZB, jmeno: 'Les', svet: 0, cil: 650, rychlost: [10.5, 15], typy: [...T_VSE, 'jezdi', 'jezdi', 'jezdi'] },
+  { ...ZB, jmeno: 'Les', svet: 6, cil: 650, rychlost: [10.5, 15], typy: [...T_VSE, 'jezdi', 'jezdi', 'jezdi'] },
   { ...ZB, jmeno: 'Noc', svet: 5, cil: 700, rychlost: [11, 15.5], typy: [...T_VSE, 'jezdi'], tma: 55 },
-  { ...ZB, jmeno: 'Písečná bouře', svet: 1, cil: 750, rychlost: [11.5, 16], typy: T_VSE, dvojita: 0.45, hustota: 0.9 },
-  { ...ZB, jmeno: 'Ledovec', svet: 2, cil: 850, rychlost: [13, 18], typy: [...T_VSE, 'jezdi', 'jezdi'], dvojita: 0.3, hustota: 0.85 },
+  { ...ZB, jmeno: 'Písečná bouře', svet: 1, cil: 750, rychlost: [11.5, 16], typy: T_VSE, dvojita: 0.45, hustota: 0.9, tma: 110 },   // tma = písečný opar
+  { ...ZB, jmeno: 'Ledovec', svet: 7, cil: 850, rychlost: [13, 18], typy: [...T_VSE, 'jezdi', 'jezdi'], dvojita: 0.3, hustota: 0.85 },
   { ...ZB, jmeno: 'Finále', svet: 3, cil: 1000, rychlost: [13, 19], typy: [...T_VSE, 'jezdi', 'jezdi'], dvojita: 0.4, hustota: 0.8, tma: 85 },
 ];
 export const NEKONECNY = { ...ZB, typy: T_VSE, jmeno: 'Nekonečný běh', svet: 0, cil: Infinity, rychlost: [8.5, 18], nekonecny: true };
@@ -34,6 +38,8 @@ const DRAHY = [-2.3, 0, 2.3];
 
 export function vytvorBeh(ctx) {
   const scene = new THREE.Scene();
+  // modely přírody se načtou na pozadí; jakmile jsou, okolí se postaví znovu už z nich
+  nactiPrirodu().then(() => { if (dekorace.length) vycistiDekorace(); });
   scene.fog = new THREE.Fog('#cdeeff', 45, 150);
   const camera = novaKamera(62);
   const KAM = new THREE.Vector3(0, 3.6, 6.6);
@@ -68,9 +74,20 @@ export function vytvorBeh(ctx) {
   let svet = SVETY[0], svetIndex = 0;
   const cil = { nahore: new THREE.Color(), dole: new THREE.Color(), zem: new THREE.Color(), mlha: new THREE.Color() };
   function nakresliCestu() {
-    const c = platno.getContext('2d');
+    const c = platno.getContext('2d'), R = Math.random;
     c.fillStyle = svet.cesta; c.fillRect(0, 0, 256, 512);
-    for (let i = 0; i < 300; i++) { c.fillStyle = `rgba(0,0,0,${Math.random() * 0.07})`; c.fillRect(Math.random() * 256, Math.random() * 512, 7, 7); }
+    const flek = (barva, n, w, h = w) => { c.fillStyle = barva; for (let i = 0; i < n; i++) c.fillRect(R() * 256, R() * 512, w * (0.5 + R()), h * (0.5 + R())); };
+    switch (svet.vzor) {
+      case 'hlina': flek('rgba(0,0,0,.07)', 260, 7); flek('rgba(255,255,255,.12)', 60, 5); break;            // udusaná hlína s kamínky
+      case 'pisek': for (let y = 0; y < 512; y += 18) { c.fillStyle = 'rgba(160,100,40,.12)'; c.fillRect(0, y + R() * 6, 256, 4); } flek('rgba(255,255,255,.15)', 80, 3); break;   // písečné vlnky
+      case 'snih': flek('rgba(255,255,255,.55)', 160, 10); flek('rgba(120,170,220,.18)', 50, 14, 4); break;   // ujetý sníh
+      case 'lava': c.strokeStyle = '#ff7a1a'; c.lineWidth = 3; for (let i = 0; i < 14; i++) { c.beginPath(); let x = R() * 256, y = R() * 512; c.moveTo(x, y); for (let k = 0; k < 4; k++) { x += R() * 40 - 20; y += R() * 40 - 10; c.lineTo(x, y); } c.stroke(); } flek('rgba(0,0,0,.15)', 120, 9); break;   // čedič s rozžhavenými prasklinami
+      case 'panely': c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 3; for (let y = 0; y < 512; y += 64) { c.beginPath(); c.moveTo(0, y); c.lineTo(256, y); c.stroke(); } flek('rgba(255,255,255,.18)', 40, 6); break;   // kovové panely
+      case 'asfalt': flek('rgba(255,255,255,.06)', 400, 3); flek('rgba(0,0,0,.12)', 120, 6); break;
+      case 'listi': flek('rgba(0,0,0,.08)', 200, 7); for (const b of ['#e0892c', '#c9561e', '#e8c03a', '#7aa83a']) flek(b, 22, 7, 5); break;   // cestička s listím
+      case 'led': c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 2; for (let i = 0; i < 18; i++) { c.beginPath(); const x = R() * 256, y = R() * 512; c.moveTo(x, y); c.lineTo(x + R() * 60 - 30, y + R() * 60 - 30); c.stroke(); } flek('rgba(255,255,255,.35)', 40, 18, 6); break;   // led s odlesky a prasklinkami
+      default: flek('rgba(0,0,0,.07)', 300, 7);
+    }
     c.fillStyle = svet.okraj; c.fillRect(0, 0, 16, 512); c.fillRect(240, 0, 16, 512);
     c.fillStyle = svet.cara;
     for (const x of [256 / 3, 512 / 3]) for (let y = 0; y < 512; y += 128) c.fillRect(x - 4, y + 20, 8, 70);
@@ -85,7 +102,7 @@ export function vytvorBeh(ctx) {
       const v = nahoda(40, 110);
       const h = new THREE.Mesh(new THREE.ConeGeometry(nahoda(35, 60), v, 6), m);
       h.position.set(x, v / 2 - 5, nahoda(-330, -270)); h.rotation.y = Math.random() * 3; kulisy.add(h);
-      if (svetIndex === 2 || (svetIndex === 0 && v > 90)) { const s = new THREE.Mesh(new THREE.ConeGeometry(v * 0.18, v * 0.3, 6), toon('#ffffff', { fog: false })); s.position.set(x, v - 5 - v * 0.15, h.position.z); kulisy.add(s); }
+      if (svet.snih || (svetIndex === 0 && v > 90)) { const s = new THREE.Mesh(new THREE.ConeGeometry(v * 0.18, v * 0.3, 6), toon('#ffffff', { fog: false })); s.position.set(x, v - 5 - v * 0.15, h.position.z); kulisy.add(s); }
     }
     if (svetIndex === 3) {
       const sopka = new THREE.Mesh(new THREE.CylinderGeometry(30, 110, 150, 8), toon('#2a1c1c', { fog: false })); sopka.position.set(-40, 70, -360); kulisy.add(sopka);
@@ -95,14 +112,14 @@ export function vytvorBeh(ctx) {
       const planeta = new THREE.Mesh(new THREE.SphereGeometry(60, 24, 16), toon('#6d8bff', { fog: false })); planeta.position.set(120, 140, -420); kulisy.add(planeta);
       const prstenec = new THREE.Mesh(new THREE.TorusGeometry(95, 5, 4, 40), toon('#c9b8ff', { fog: false })); prstenec.position.copy(planeta.position); prstenec.rotation.x = 1.2; kulisy.add(prstenec);
     }
-    hvezdy.visible = svetIndex >= 3;
+    hvezdy.visible = !!svet.tmavy;
   }
   function prepniSvet(i, hned = false) {
     svetIndex = i % SVETY.length; svet = SVETY[svetIndex];
     cil.nahore.set(svet.nahore); cil.dole.set(svet.dole); cil.zem.set(svet.zem); cil.mlha.set(svet.mlha);
     nakresliCestu(); postavKulisy(); obrubaMat.color.set(svet.okraj);
-    hemi.groundColor.set(svetIndex >= 3 ? '#5a3a6a' : '#6a8a5a');
-    hemi.intensity = svetIndex >= 3 ? 0.95 : 1.25;
+    hemi.groundColor.set(svet.tmavy ? '#5a3a6a' : '#6a8a5a');
+    hemi.intensity = svet.tmavy ? 0.95 : 1.25;
     if (hned) { nebe.nastav(svet.nahore, svet.dole); zemMat.color.copy(cil.zem); scene.fog.color.copy(cil.mlha); }
   }
 
@@ -111,6 +128,8 @@ export function vytvorBeh(ctx) {
     kmen: new THREE.CylinderGeometry(0.42, 0.42, 2.0, 12).rotateZ(Math.PI / 2),
     sloup: new THREE.CylinderGeometry(0.1, 0.1, 2.5, 8),
     tyc: new THREE.BoxGeometry(2.05, 0.42, 0.3),
+    tram: new THREE.CylinderGeometry(0.24, 0.24, 2.15, 10).rotateZ(Math.PI / 2),
+    rampouch: new THREE.ConeGeometry(0.07, 0.36, 5).rotateX(Math.PI),
     bedna: new THREE.BoxGeometry(1.85, 1.95, 1.85),
     mince: new THREE.CylinderGeometry(0.36, 0.36, 0.12, 20).rotateX(Math.PI / 2),
     branaSloup: new THREE.BoxGeometry(0.5, 5, 0.5),
@@ -130,6 +149,16 @@ export function vytvorBeh(ctx) {
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
   const bednaMat = {};
+  // záře kolem mincí a hvězd, aby byly vidět i z dálky a na světlé cestě
+  const zareTex = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+    const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,240,150,1)'); g.addColorStop(0.35, 'rgba(255,200,40,.55)'); g.addColorStop(1, 'rgba(255,170,0,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  const zareMat = new THREE.SpriteMaterial({ map: zareTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false });
+  const zare = velikost => { const z = new THREE.Sprite(zareMat); z.scale.setScalar(velikost); z.userData.bezObrysu = true; return z; };
 
   // ---- stav ----
   const hrac = { draha: 1, x: 0, y: 0, vy: 0, drep: false, drepKlavesa: 0, nesmrtelny: 0, srdce: 3, faze: 0 };
@@ -138,18 +167,67 @@ export function vytvorBeh(ctx) {
   const objekty = [], dekorace = [];
   let dalsiDekorace = 0;
 
+  // ---- překážky podle světa ----
+  // Tvar říká, co dělat: vysoká věc = uhni, nízká věc přes celou dráhu = skoč, tyč nahoře = dřepni.
+  // Modely přírody (Kenney); dokud se nenačtou, jednoduché tvary z kódu.
+  const SAND = { dirt: '#d9a35a', grass: '#e8c07a', _defaultMat: '#c98f4f', stone: '#e0b070', stoneDark: '#b8803f' };
+  const LAVA = { barvy: { dirt: '#2a1f1f', _defaultMat: '#3a2a2a' }, sviti: { grass: '#ff6a00' } };
+  const MESIC = { barvy: { dirt: '#7c7a93', _defaultMat: '#5e5c74' }, sviti: { grass: '#c58bff' } };
+  const LED = { stone: '#bfe6ff', _defaultMat: '#ffffff' };
+  const SNIH = { stone: '#dfe9f5', _defaultMat: '#ffffff' };
+  const ledMat = toon('#a9ddff'), snihMat = toon('#ffffff');
+  const obal = m => { const g = new THREE.Group(); g.add(m); return g; };
+  function bednaSveta() {
+    const a = Math.random() < 0.5;
+    switch (svetIndex) {
+      case 0: return a ? kus('rock_tallA', { vyska: 1.95, sirka: 1.9 }) : kus('stump_oldTall', { vyska: 1.95, sirka: 1.6 });
+      case 1: return a ? kus('cactus_tall', { vyska: 2.5, sirka: 1.6 }) : kus('rock_tallB', { vyska: 1.95, sirka: 1.9, barvy: SAND });
+      case 2: if (a) return kus('stone_tallA', { vyska: 1.95, sirka: 1.9, barvy: SNIH }); else { const g = snehulak(); g.scale.setScalar(1.05); return g; }
+      case 3: return kus('rock_tallB', { vyska: 1.95, sirka: 1.9, ...LAVA });
+      case 4: if (a) return kus('rock_tallA', { vyska: 1.95, sirka: 1.9, ...MESIC }); else { const g = krystal(); g.scale.setScalar(1.25); return g; }
+      case 5: return a ? null : kus('tent_detailedClosed', { vyska: 1.7, sirka: 1.95 });   // null = klasická bedna
+      case 6: return a ? kus('stump_oldTall', { vyska: 1.95, sirka: 1.7, barvy: { woodBark: '#6a4a2a' } }) : kus('mushroom_redTall', { vyska: 2.3, sirka: 1.8 });
+      case 7: if (a) return kus('stone_tallA', { vyska: 1.95, sirka: 1.9, barvy: LED }); else { const m = new THREE.Mesh(G.bedna, ledMat); m.position.y = 0.97; return obal(m); }
+    }
+    return null;
+  }
+  function nizkySveta() {
+    switch (svetIndex) {
+      case 0: case 5: case 6: return kus('log_large', { vyska: 0.84, sirka: 2.1 });
+      case 1: return kus('stone_largeC', { vyska: 0.7, sirka: 2.1, barvy: SAND });
+      case 2: { const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.45, 1.2, 4, 10), snihMat); m.rotation.z = Math.PI / 2; m.position.y = 0.3; m.scale.y = 1.15; return obal(m); }   // sněhová závěj
+      case 3: return kus('rock_largeB', { vyska: 0.8, sirka: 2.1, ...LAVA });
+      case 4: return kus('rock_largeB', { vyska: 0.8, sirka: 2.1, ...MESIC });
+      case 7: { const m = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.75, 0.9), ledMat); m.position.y = 0.375; return obal(m); }   // ledová kra
+    }
+    return null;
+  }
+  // tyč na dřep: dřevěná v lese, ledová s rampouchy v horách, rozžhavená na sopce, neonová na Měsíci
+  const STYL_TYCE = { 0: 'drevo', 6: 'drevo', 5: 'drevo', 2: 'led', 7: 'led', 3: 'lava', 4: 'neon', 1: 'pisek' };
+  function vysokySveta() {
+    const styl = STYL_TYCE[svetIndex] || 'klasik', m = new THREE.Group();
+    const sloupBarva = { drevo: '#6a4325', led: '#ffffff', lava: '#2a1f1f', neon: '#c9b8ff', pisek: '#c98f4f' }[styl] || '#f4f4f4';
+    for (const sx of [-1, 1]) { const s = new THREE.Mesh(G.sloup, toon(sloupBarva)); s.position.set(sx * 1.0, 1.25, 0); m.add(s); }
+    if (styl === 'drevo') {
+      const t = new THREE.Mesh(G.tram, toon('#a8743f')); t.position.y = 1.66; m.add(t);
+    } else {
+      const barva = { led: '#3d8bff', lava: '#ff6a00', neon: '#ff3dd2', pisek: svet.vysoky }[styl] || svet.vysoky;
+      const t = new THREE.Mesh(G.tyc, styl === 'lava' || styl === 'neon' ? svit(barva, 0.9) : toon(barva)); t.position.y = 1.66; m.add(t);
+      if (styl === 'led') for (let i = 0; i < 7; i++) { const r = new THREE.Mesh(G.rampouch, toon('#e6f6ff')); r.position.set(-0.9 + i * 0.3, 1.3, 0); r.scale.y = nahoda(0.7, 1.3); m.add(r); }
+      if (styl === 'klasik' || styl === 'pisek') { const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.43, 0.31), toon('#ffffff')); p.position.y = 1.66; m.add(p); }
+    }
+    return m;
+  }
+
   function pridej(typ, draha, z, navic = null) {
     let m;
-    if (typ === 'nizky') { m = new THREE.Mesh(G.kmen, toon(svet.nizky)); m.position.y = 0.42; }
-    else if (typ === 'vysoky') {
-      m = new THREE.Group();
-      for (const sx of [-1, 1]) { const s = new THREE.Mesh(G.sloup, toon('#f4f4f4')); s.position.set(sx * 1.0, 1.25, 0); m.add(s); }
-      const t = new THREE.Mesh(G.tyc, toon(svet.vysoky)); t.position.y = 1.66; m.add(t);
-      const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.43, 0.31), toon('#ffffff')); p.position.y = 1.66; m.add(p);
-    } else if (typ === 'bedna') {
-      m = new THREE.Mesh(G.bedna, bednaMat[svet.bedna] ??= new THREE.MeshToonMaterial({ map: bednaTex, color: svet.bedna })); m.position.y = 0.97;
-    } else if (typ === 'mince') { m = new THREE.Mesh(G.mince, svit('#ffc928', 0.45)); m.position.y = 0.8; }
-    else if (typ === 'hvezda') { m = new THREE.Mesh(hvezdaGeo, svit('#ffe14d', 0.7)); m.position.y = 2.75; }
+    if (typ === 'nizky') { m = nizkySveta(); if (!m) { m = new THREE.Mesh(G.kmen, toon(svet.nizky)); m.position.y = 0.42; } }
+    else if (typ === 'vysoky') m = vysokySveta();
+    else if (typ === 'bedna') {
+      m = bednaSveta();
+      if (!m) { m = new THREE.Mesh(G.bedna, bednaMat[svet.bedna] ??= new THREE.MeshToonMaterial({ map: bednaTex, color: svet.bedna })); m.position.y = 0.97; }
+    } else if (typ === 'mince') { m = new THREE.Mesh(G.mince, svit('#ffc928', 0.45)); m.position.y = 0.85; m.scale.setScalar(1.2); m.add(zare(2.0)); }
+    else if (typ === 'hvezda') { m = new THREE.Mesh(hvezdaGeo, svit('#ffe14d', 0.7)); m.position.y = 2.75; m.scale.setScalar(1.15); m.add(zare(3.2)); }
     else if (typ === 'brana') {
       m = new THREE.Group();
       for (const sx of [-1, 1]) { const s = new THREE.Mesh(G.branaSloup, toon('#ffffff')); s.position.set(sx * 4.2, 2.5, 0); m.add(s); }
@@ -236,22 +314,46 @@ export function vytvorBeh(ctx) {
     for (let i = 0; i < 5; i++) { const k = new THREE.Mesh(new THREE.IcosahedronGeometry(0.16, 0), M(vyber(['#ff6b9a', '#ffd23f', '#ffffff', '#b06bff']))); k.position.set(nahoda(-0.8, 0.8), 0.25, nahoda(-0.8, 0.8)); g.add(k); }
     return g;
   }
+  // okolí trati: [funkce, váha]; kd = model přírody s náhodnou výškou. Bez načtených modelů staré tvary z kódu.
+  const kd = (n, v, opt = {}) => () => kus(n, { vyska: v * nahoda(0.85, 1.2), ...opt });
+  const taborak = () => { const g = kus('campfire_logs', { vyska: 0.35 }); if (!g) return null; const p = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.9, 6), svit('#ffb000', 1)); p.position.y = 0.5; g.add(p); return g; };
+  const ledKrystal = () => { const g = new THREE.Group(); for (let i = 0; i < 3; i++) { const k = new THREE.Mesh(new THREE.OctahedronGeometry(nahoda(0.4, 0.9), 0), toon(vyber(['#bfe9ff', '#ffffff', '#8fd0ff']))); k.scale.y = 2; k.position.set(nahoda(-0.6, 0.6), 0.8, nahoda(-0.6, 0.6)); k.rotation.y = Math.random() * 3; g.add(k); } return g; };
+  const DEKORACE = {
+    0: [[kd('tree_default', 4.4), 3], [kd('tree_oak', 3.8), 3], [kd('tree_detailed', 4.2), 2], [kd('tree_pineRoundA', 4.6), 2], [kd('plant_bushLarge', 0.9), 2], [kd('flower_redA', 0.7), 1], [kd('flower_yellowA', 0.55), 1], [kd('flower_purpleA', 0.6), 1], [kd('rock_smallA', 0.7), 1], [kd('mushroom_red', 0.6), 1]],
+    1: [[kd('cactus_tall', 3.2), 3], [kd('cactus_short', 1.8), 2], [kd('tree_palmTall', 5.5), 2], [kd('tree_palmBend', 5), 1], [kd('rock_largeA', 1.0, { barvy: SAND }), 2], [kd('statue_obelisk', 4.5, { barvy: SAND }), 1], [kd('statue_columnDamaged', 2.6, { barvy: SAND }), 1]],
+    2: [[() => strom('#2f7a4a', true), 4], [kd('tree_pineTallA', 5, { barvy: { leafsDark: '#2f6a4a' } }), 2], [() => snehulak(), 1], [kd('stone_tallA', 2.2, { barvy: SNIH }), 1]],
+    3: [[() => lavovyKamen(), 2], [kd('rock_tallB', 2.6, LAVA), 2], [kd('stump_oldTall', 2, { barvy: { woodBark: '#241a1a' } }), 1], [() => kamen('#3a2a2a'), 1]],
+    4: [[() => krystal(), 3], [kd('rock_tallA', 2.2, MESIC), 2], [() => kamen('#6d6b82'), 1]],
+    5: [[kd('tree_cone_dark', 5.2), 3], [kd('tree_pineTallC', 5.6), 2], [kd('tent_detailedClosed', 1.9), 1], [taborak, 1], [() => kamen('#3a3a4a'), 1]],
+    6: [[kd('tree_tall_dark', 6.2), 3], [kd('tree_thin_dark', 5.2), 2], [kd('tree_fat', 4.2), 2], [kd('tree_plateau_fall', 4.6), 2], [kd('tree_default_fall', 5), 1], [kd('mushroom_redGroup', 1.1), 2], [kd('mushroom_tanTall', 1.4), 1], [kd('stump_roundDetailed', 0.6), 1], [kd('log_stack', 0.9), 1], [kd('grass_large', 0.6), 2]],
+    7: [[kd('tree_pineSmallA', 3.2, { barvy: { leafsDark: '#cfe8f5', woodBarkDark: '#8aa8c0' } }), 2], [kd('stone_tallA', 2.4, { barvy: LED }), 2], [ledKrystal, 2], [() => snehulak(), 1]],
+  };
   function dekorace1() {
+    const seznam = DEKORACE[svetIndex];
+    if (seznam) {
+      let los = Math.random() * seznam.reduce((s, x) => s + x[1], 0);
+      for (const [fn, vaha] of seznam) {
+        los -= vaha;
+        if (los <= 0) { const d = fn(); if (d) { if (d.children.length === 1 && d.children[0].isGroup) d.userData.model = true; return d; } break; }
+      }
+    }
     switch (svetIndex) {
       case 0: { const r = Math.random(); return r < 0.45 ? strom() : r < 0.75 ? listnac() : r < 0.9 ? kvetiny() : kamen('#8d8d8d'); }
       case 1: return Math.random() < 0.6 ? kaktus() : kamen('#c98f4f');
       case 2: return Math.random() < 0.78 ? strom('#2f7a4a', true) : snehulak();
       case 3: return Math.random() < 0.5 ? lavovyKamen() : kamen('#3a2a2a');
       case 5: return Math.random() < 0.7 ? strom('#1f4a3a') : kamen('#3a3a4a');
+      case 6: return Math.random() < 0.7 ? listnac() : strom('#2f6a3a');
+      case 7: return Math.random() < 0.7 ? strom('#9ec4dc', true) : ledKrystal();
       default: return Math.random() < 0.55 ? krystal() : kamen('#6d6b82');
     }
   }
   function pridejDekoraci(z) {
     for (const strana of [-1, 1]) {
       const d = dekorace1();
-      if (!d.userData.kvetiny) obrys(d, 1.05);
+      if (!d.userData.kvetiny && !d.userData.model) obrys(d, 1.05);   // modely od Kenney obrys nepotřebují (šetří výkon)
       stin(d);
-      d.scale.multiplyScalar(nahoda(0.8, 1.4));
+      if (!d.userData.model) d.scale.multiplyScalar(nahoda(0.8, 1.4));
       d.position.set(strana * nahoda(5.2, 18), d.position.y, z + nahoda(-1.5, 1.5));
       d.rotation.y = Math.random() * Math.PI * 2;
       scene.add(d); dekorace.push(d);
