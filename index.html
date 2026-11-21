@@ -233,6 +233,25 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <video id="video" playsinline muted></video>
 <button id="zvuk" title="Sound (M)" data-i18n-title="sound">♪</button>
 
+<script>
+// Kdo hrál první verzi Move It, má v prohlížeči starý service worker, který kód hry dává z mezipaměti
+// (= po nahrání nové verze by viděl starou hru). Najdeme jeho mezipaměť, smažeme ji, odregistrujeme ho a jednou načteme znovu.
+(function () {
+  try {
+    if (!('caches' in window) || !navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+    if (sessionStorage.getItem('mi-sw-oprava')) return;
+    caches.keys().then(function (klice) {
+      var stare = klice.filter(function (k) { return /^move-it-(shell|runtime)-v1$/.test(k); });
+      if (!stare.length) return;
+      sessionStorage.setItem('mi-sw-oprava', '1');
+      return Promise.all(stare.map(function (k) { return caches.delete(k); }))
+        .then(function () { return navigator.serviceWorker.getRegistrations(); })
+        .then(function (r) { return Promise.all(r.map(function (x) { return x.unregister(); })); })
+        .then(function () { location.reload(); });
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
