@@ -70,7 +70,8 @@ async function networkFirst(request) {
     }
     return fresh;
   } catch (err) {
-    const cached = await cache.match(request) || await cache.match('./index.html') || await cache.match('./');
+    // náhradní stránku jen pro otevření stránky, ne pro skripty (jinak by se místo skriptu vrátilo HTML)
+    const cached = await cache.match(request) || (request.mode === 'navigate' ? await cache.match('./index.html') || await cache.match('./') : null);
     if (cached) return cached;
     throw err;
   }

@@ -23,6 +23,7 @@ import { BEZCI, LETCI } from './js/postavy.js';
 import { tn } from './js/i18n.js';
 const q = new URLSearchParams(location.search);
 let seznam = q.get('skupina') === 'bezci' ? BEZCI : q.get('skupina') === 'vse' ? [...BEZCI, ...LETCI] : LETCI;
+if (q.get('soubory')) { const { model } = await import('./js/bezci.js'); seznam = q.get('soubory').split(',').map(f => ({ id: f, jmeno: f, vytvor: () => model('modely/' + f + '.glb', { vyska: 2.3, barvy: { Skin: '#f3c7a1' } }) })); }   // jen pro výběr nových modelů
 if (q.get('ids')) { const ids = q.get('ids').split(','); seznam = [...BEZCI, ...LETCI].filter(s => ids.includes(s.id)); }
 const sloupcu = Math.ceil(Math.sqrt(seznam.length * 1.6)), radku = Math.ceil(seznam.length / sloupcu);
 const popisky = document.getElementById('popisky');

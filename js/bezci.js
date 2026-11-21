@@ -135,7 +135,7 @@ function kenney(id) {
 // mapa = jak se jmenuje animace v souboru; dřep většina nemá – hra pak postavu jen přimáčkne k zemi.
 // barvy = přebarvení materiálů podle jména (varianty jako Lávový dino nebo Zlatý robot).
 const modely = {};
-export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = {}, toonStyl = true, skok = 0.75 } = {}) {
+export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = {}, toonStyl = true, skok = 0.75, vznasi = 0 } = {}) {
   const g = new THREE.Group();
   const p = { g, nohy: [], ruce: [], kenney: true, mixer: null, akce: {}, anim: null, vyska };
   (modely[soubor] ??= loader.loadAsync(CESTA_POSTAV + soubor)).then(gltf => {
@@ -158,7 +158,7 @@ export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = 
     const box = new THREE.Box3().setFromObject(m), v = box.max.y - box.min.y || 1;
     const obal = new THREE.Group(); obal.add(m);
     m.scale.multiplyScalar(vyska / v); m.position.y = -box.min.y * (vyska / v);
-    obal.rotation.y = otoc;
+    obal.rotation.y = otoc; obal.position.y = vznasi;   // vznáší = létající postava se drží nad zemí
     g.add(obal); stin(g);
     p.mixer = new THREE.AnimationMixer(m);
     for (const [nase, jejich] of Object.entries({ idle: 'Idle', sprint: 'Run', jump: 'Jump', ...mapa })) {

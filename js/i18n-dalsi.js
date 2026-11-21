@@ -132,6 +132,7 @@ export const DALSI_SLOVNIK = {
 // Jména levelů a světů. Postavičky mají ve všech třech jazycích anglická jména (chybějící = angličtina).
 export const DALSI_JMENA = {
   de: {
+    'Karatista': 'Karate-Junge', 'Karatistka': 'Karate-Mädchen', 'Modrásek': 'Blauer Held', 'Pejsek': 'Hündchen', 'Slepice': 'Huhn', 'Liška': 'Fuchs', 'Zombík': 'Zombie', 'Pirát': 'Pirat', 'Čaroděj': 'Zauberer', 'Čarodějnice': 'Hexe', 'Zlatý rytíř': 'Goldritter',
     'Šumava': 'Wald', 'Sahara': 'Sahara', 'Alpy': 'Alpen', 'Sopka': 'Vulkan', 'Měsíc': 'Mond', 'Noc': 'Nacht',
     'Nekonečný běh': 'Endloslauf', 'Les': 'Dickicht', 'Písečná bouře': 'Sandsturm', 'Ledovec': 'Gletscher', 'Finále': 'Finale',
     'Údolí': 'Tal', 'Jezera': 'Seen', 'Kaňon': 'Schlucht', 'Jeskyně': 'Höhle', 'Sloupy': 'Säulen', 'Vítr': 'Wind',
@@ -141,6 +142,7 @@ export const DALSI_JMENA = {
     'Sněžná sova': 'Schneeeule', 'Létající drak': 'Flugdrache', 'Zlatý drak': 'Golddrache',
   },
   es: {
+    'Karatista': 'Chico kárate', 'Karatistka': 'Chica kárate', 'Modrásek': 'Héroe azul', 'Pejsek': 'Perrito', 'Slepice': 'Gallina', 'Liška': 'Zorro', 'Zombík': 'Zombi', 'Pirát': 'Pirata', 'Viking': 'Vikingo', 'Čaroděj': 'Mago', 'Čarodějnice': 'Bruja', 'Zlatý rytíř': 'Caballero dorado',
     'Šumava': 'Bosque', 'Sahara': 'Sáhara', 'Alpy': 'Alpes', 'Sopka': 'Volcán', 'Měsíc': 'Luna', 'Noc': 'Noche',
     'Nekonečný běh': 'Carrera infinita', 'Les': 'Arboleda', 'Písečná bouře': 'Tormenta de arena', 'Ledovec': 'Glaciar', 'Finále': 'Final',
     'Údolí': 'Valle', 'Jezera': 'Lagos', 'Kaňon': 'Cañón', 'Jeskyně': 'Cueva', 'Sloupy': 'Columnas', 'Vítr': 'Viento',
@@ -150,6 +152,7 @@ export const DALSI_JMENA = {
     'Sněžná sova': 'Búho nival', 'Létající drak': 'Dragón volador', 'Zlatý drak': 'Dragón dorado',
   },
   fr: {
+    'Karatista': 'Karatéka', 'Karatistka': 'Karatéka fille', 'Modrásek': 'Héros bleu', 'Pejsek': 'Toutou', 'Slepice': 'Poule', 'Liška': 'Renard', 'Zombík': 'Zombie', 'Pirát': 'Pirate', 'Čaroděj': 'Sorcier', 'Čarodějnice': 'Sorcière', 'Zlatý rytíř': 'Chevalier doré',
     'Šumava': 'Forêt', 'Sahara': 'Sahara', 'Alpy': 'Alpes', 'Sopka': 'Volcan', 'Měsíc': 'Lune', 'Noc': 'Nuit',
     'Nekonečný běh': 'Course infinie', 'Les': 'Bois', 'Písečná bouře': 'Tempête de sable', 'Ledovec': 'Glacier', 'Finále': 'Finale',
     'Údolí': 'Vallée', 'Jezera': 'Lacs', 'Kaňon': 'Canyon', 'Jeskyně': 'Grotte', 'Sloupy': 'Colonnes', 'Vítr': 'Vent',

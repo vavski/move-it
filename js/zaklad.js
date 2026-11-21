@@ -130,7 +130,7 @@ export function castice(scene, max = 120, velikost = 0.12, gravitace = 6) {
 
 // ================= ULOŽENÍ POSTUPU =================
 const KLIC = 'uhni-a-let-v1';
-const vychozi = () => ({ mince: 0, skiny: ['k-male-a', 'k-female-a', 'orel'], vybrany: { beh: 'k-male-a', let: 'orel' }, odemceno: { beh: 1, let: 1 }, hvezdy: { beh: [], let: [] }, rekord: { beh: 0, let: 0 }, ovladani: null, zvuk: true });
+const vychozi = () => ({ mince: 0, skiny: ['karate', 'karatistka', 'orel'], vybrany: { beh: 'karate', let: 'orel' }, odemceno: { beh: 1, let: 1 }, hvezdy: { beh: [], let: [] }, rekord: { beh: 0, let: 0 }, ovladani: null, zvuk: true });
 export const ulozene = (() => {
   let d = vychozi();
   try { const s = JSON.parse(localStorage.getItem(KLIC)); if (s) d = { ...d, ...s, vybrany: { ...d.vybrany, ...s.vybrany }, odemceno: { ...d.odemceno, ...s.odemceno }, hvezdy: { ...d.hvezdy, ...s.hvezdy }, rekord: { ...d.rekord, ...s.rekord } }; } catch {}
