@@ -1,6 +1,8 @@
-// Jednoduchý překlad hry: angličtina (výchozí) a čeština.
-// Volba se pamatuje v localStorage. Statické texty mají v HTML data-i18n="klíč".
+// Jednoduchý překlad hry: angličtina (výchozí), čeština a v nastavení němčina, španělština, francouzština.
+// Volba se pamatuje v localStorage; bez volby podle jazyka prohlížeče. Statické texty mají v HTML data-i18n="klíč".
+import { DALSI_SLOVNIK, DALSI_JMENA } from './i18n-dalsi.js';
 const KLIC = 'moveit-jazyk';
+export const JAZYKY = { en: 'English', cs: 'Čeština', de: 'Deutsch', es: 'Español', fr: 'Français' };
 
 const SLOVNIK = {
   en: {
@@ -37,7 +39,8 @@ const SLOVNIK = {
     'cam.bad': 'THIS CAMERA DOESN’T WORK',
     'hint.beh.cam': 'step sideways = dodge · jump = jump · squat = duck under · hand up = grab star',
     'hint.beh.keys': '← → dodge · ↑ jump · ↓ duck',
-    'hint.let.cam': 'flap down = go up · tilt arms = turn · arms wide = glide · arms at sides = dive · hands at shoulders + flap elbows = TURBO',
+    'hint.let.cam': 'flap down = go up · lean to the side = turn · arms wide = glide · arms down = rest and sink · hands at shoulders + flap elbows = TURBO',
+    'settings': 'Settings', 'settings.lang': 'Language',
     'hint.let.keys': 'space = flap · ← → turn · ↑ glide · ↓ dive · Shift = turbo',
     'pose.calib': 'STAND STILL…', 'pose.jump': 'JUMP!', 'pose.duck': 'DUCK',
     'pose.left': 'LEFT', 'pose.mid': 'MIDDLE', 'pose.right': 'RIGHT', 'pose.hand': ' · HAND',
@@ -78,13 +81,15 @@ const SLOVNIK = {
     'cam.bad': 'TAHLE KAMERA NEJDE',
     'hint.beh.cam': 'krok do strany = uhni · výskok = skok · dřep = podlez · ruka nahoru = hvězda',
     'hint.beh.keys': '← → uhni · ↑ skok · ↓ dřep',
-    'hint.let.cam': 'mávni dolů = nahoru · nakloň ruce = zatáčka · roztáhni = plachti · ruce u těla = střemhlav · dlaně u ramen + mávej lokty = TURBO',
+    'hint.let.cam': 'mávni dolů = nahoru · nakloň se do strany = zatáčka · roztáhni ruce = plachti · ruce dole = odpočinek, klesáš · dlaně u ramen + mávej lokty = TURBO',
+    'settings': 'Nastavení', 'settings.lang': 'Jazyk',
     'hint.let.keys': 'mezerník = mávnutí · ← → zatáčka · ↑ plachti · ↓ střemhlav · Shift = turbo',
     'pose.calib': 'STŮJ ROVNĚ…', 'pose.jump': 'SKOK!', 'pose.duck': 'DŘEP',
     'pose.left': 'VLEVO', 'pose.mid': 'STŘED', 'pose.right': 'VPRAVO', 'pose.hand': ' · RUKA',
     'pose.fly': 'LETÍŠ', 'pose.flap': 'MÁVNUTÍ!', 'pose.dive': 'STŘEMHLAV', 'pose.glide': 'PLACHTÍŠ', 'pose.turbo': 'TURBO!',
     'hud.points': 'BODŮ', 'hud.goal': 'CÍL {n} m', 'hud.rings': 'KRUHŮ', 'hud.need': 'POTŘEBUJEŠ {n}',
   },
+  ...DALSI_SLOVNIK,
 };
 
 // Jména levelů, světů a postaviček (v kódu jsou česky) → angličtina.
@@ -102,11 +107,15 @@ const JMENA_EN = {
   'Orel': 'Eagle', 'Vážka': 'Dragonfly', 'Fénix': 'Phoenix', 'Létající drak': 'Flying Dragon',
   'Papoušek': 'Parrot', 'Netopýr': 'Bat', 'Sněžná sova': 'Snowy Owl', 'Zlatý drak': 'Golden Dragon',
 };
-const JMENA_EN_VELKA = Object.fromEntries(Object.entries(JMENA_EN).map(([k, v]) => [k.toUpperCase(), v.toUpperCase()]));
+// jména v jednotlivých jazycích (chybějící = angličtina); světy jsou v kódu velkými písmeny
+const velka = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k.toUpperCase(), v.toUpperCase()]));
+const JMENA = {};
+for (const j of ['en', 'de', 'es', 'fr']) { const o = { ...JMENA_EN, ...(DALSI_JMENA[j] || {}) }; JMENA[j] = { ...o, ...velka(o) }; }
 
 let ulozeny = null;
 try { ulozeny = localStorage.getItem(KLIC); } catch {}
-export let jazyk = ulozeny === 'cs' ? 'cs' : 'en';
+const prohlizec = (navigator.language || 'en').slice(0, 2).toLowerCase();
+export let jazyk = JAZYKY[ulozeny] ? ulozeny : JAZYKY[prohlizec] ? prohlizec : 'en';
 
 export function t(klic, prom = {}) {
   const s = SLOVNIK[jazyk][klic] ?? SLOVNIK.en[klic] ?? klic;
@@ -115,7 +124,7 @@ export function t(klic, prom = {}) {
 // přeloží jméno levelu / světa / postavičky
 export function tn(jmeno) {
   if (jazyk === 'cs') return jmeno;
-  return JMENA_EN[jmeno] ?? JMENA_EN_VELKA[jmeno] ?? jmeno;
+  return JMENA[jazyk][jmeno] ?? JMENA.en[jmeno] ?? jmeno;
 }
 
 const posluchaci = [];
@@ -129,10 +138,13 @@ export function prelozStranku() {
   document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
   document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
   document.querySelectorAll('[data-jazyk]').forEach(el => el.classList.toggle('aktivni', el.dataset.jazyk === jazyk));
+  // ozubené kolečko ukáže zkratku, když je zapnutý jazyk z nastavení
+  const kolo = document.getElementById('btnNastaveni');
+  if (kolo) { const jiny = jazyk !== 'en' && jazyk !== 'cs'; kolo.textContent = jiny ? jazyk.toUpperCase() + ' ⚙' : '⚙'; kolo.classList.toggle('aktivni', jiny); }
 }
 
 export function nastavJazyk(j) {
-  jazyk = j === 'cs' ? 'cs' : 'en';
+  jazyk = JAZYKY[j] ? j : 'en';
   try { localStorage.setItem(KLIC, jazyk); } catch {}
   prelozStranku();
   posluchaci.forEach(fn => fn(jazyk));

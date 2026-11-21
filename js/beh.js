@@ -17,9 +17,10 @@ export const SVETY = [
 const T_VSE = ['blok1', 'blok1', 'blok2', 'nizkyVse', 'nizkyVse', 'vysokyVse', 'vysokyVse', 'nizky1', 'vysoky1', 'mince', 'mix'];
 const ZB = { hustota: 1, gravitace: 31, jezdi: 0, dvojita: 0, tma: 0, navod: [], lehke: ['mince', 'blok1'] };
 export const LEVELY = [
-  { ...ZB, jmeno: 'Šumava', svet: 0, cil: 250, rychlost: [7.5, 10], typy: ['mince', 'blok1', 'blok1', 'blok2'], hustota: 1.15, navod: ['krok'] },
-  { ...ZB, jmeno: 'Sahara', svet: 1, cil: 350, rychlost: [8.5, 11.5], typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizkyVse', 'nizky1'], navod: ['skok'] },
-  { ...ZB, jmeno: 'Alpy', svet: 2, cil: 450, rychlost: [8.5, 11.5], hustota: 1.1, typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysokyVse', 'vysoky1'], navod: ['drep'] },
+  // 1. level hned naučí všechny čtyři pohyby (doleva/doprava, skok, dřep), ale pomalu a s velkými mezerami
+  { ...ZB, jmeno: 'Šumava', svet: 0, cil: 300, rychlost: [7.5, 10], typy: ['mince', 'blok1', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysoky1'], hustota: 1.25, navod: ['krok', 'skok', 'drep'] },
+  { ...ZB, jmeno: 'Sahara', svet: 1, cil: 380, rychlost: [8.5, 11.5], hustota: 1.1, typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysoky1'] },
+  { ...ZB, jmeno: 'Alpy', svet: 2, cil: 450, rychlost: [8.5, 12], hustota: 1.05, typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysokyVse', 'vysoky1', 'mix'] },
   { ...ZB, jmeno: 'Sopka', svet: 3, cil: 550, rychlost: [9.5, 13.5], typy: T_VSE },
   { ...ZB, jmeno: 'Měsíc', svet: 4, cil: 600, rychlost: [10, 14], typy: T_VSE, gravitace: 16 },
   { ...ZB, jmeno: 'Les', svet: 0, cil: 650, rychlost: [10.5, 15], typy: [...T_VSE, 'jezdi', 'jezdi', 'jezdi'] },
@@ -397,7 +398,7 @@ export function vytvorBeh(ctx) {
           if (o.typ === 'brana') { if (o.z > 0 && !konecHlasen) { konecHlasen = true; SFX.vyhra(); jiskry.vystrel(new THREE.Vector3(hrac.x, 2, -1), '#ffd23f', 40, 7, 1.2); ctx.konec({ vyhra: true, mince, srdce: hrac.srdce, vzdalenost }); } }
           else if (!o.hotovo && Math.abs(o.z) < 0.7 && Math.abs(hrac.x - o.mesh.position.x) < 1.0) {
             if (o.typ === 'mince' && hrac.y < 1.6) { o.hotovo = true; mince++; SFX.mince(); jiskry.vystrel(o.mesh.position, '#ffd23f', 6, 3, 0.4); scene.remove(o.mesh); }
-            else if (o.typ === 'hvezda' && (hrac.y > 0.7 || ruka)) { o.hotovo = true; mince += 5; SFX.hvezda(); jiskry.vystrel(o.mesh.position, '#fff3a0', 16, 5, 0.7); scene.remove(o.mesh); ctx.banner('+5', '#ffe14d'); }
+            else if (o.typ === 'hvezda' && (hrac.y > 0.7 || ruka)) { o.hotovo = true; mince += 3; SFX.hvezda(); jiskry.vystrel(o.mesh.position, '#fff3a0', 16, 5, 0.7); scene.remove(o.mesh); ctx.banner('+3', '#ffe14d'); }
             else if (o.typ === 'nizky' || o.typ === 'vysoky' || o.typ === 'bedna') {
               const narazil = o.typ === 'nizky' ? hrac.y < 0.82 : o.typ === 'vysoky' ? !hrac.drep || hrac.y > 0.3 : true;
               if (narazil && hrac.nesmrtelny === 0) {

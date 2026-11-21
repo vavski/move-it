@@ -11,6 +11,7 @@ const SHELL_URLS = [
   './manifest.webmanifest',
   './js/main.js',
   './js/i18n.js',
+  './js/i18n-dalsi.js',
   './js/stats.js',
   './js/zaklad.js',
   './js/beh.js',

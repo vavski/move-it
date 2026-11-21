@@ -89,11 +89,36 @@ function pizza() {
 const loader = new GLTFLoader();
 const cache = {};
 const VYSKA_KENNEY = 2.3;
+// Tomík a Anička mají v původním modelu tmavou pleť; v kopii barevné mapy ji přebarvíme na světlou.
+const SVETLA_KUZE = new Set(['male-a', 'female-a']);
+let svetlaTex = null;
+function texSvetlaKuze(puvodni) {
+  if (svetlaTex) return svetlaTex;
+  const img = puvodni.image, c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+  for (let i = 0; i < p.length; i += 4) {
+    // tmavá pleť je v mapě přechod od (134,85,66) do (182,101,69); zachováme stínování přechodu
+    const r = p[i], g = p[i + 1], b = p[i + 2];
+    if (r >= 128 && r <= 188 && g >= 82 && g <= 104 && b >= 62 && b <= 71) {
+      const f = Math.min(1, Math.max(0, (r - 134) / 48));
+      p[i] = 214 + f * 36; p[i + 1] = 163 + f * 47; p[i + 2] = 128 + f * 50;
+    }
+  }
+  x.putImageData(d, 0, 0);
+  svetlaTex = new THREE.CanvasTexture(c);
+  for (const k of ['flipY', 'colorSpace', 'magFilter', 'minFilter', 'wrapS', 'wrapT', 'channel']) svetlaTex[k] = puvodni[k];
+  return svetlaTex;
+}
 function kenney(id) {
   const g = new THREE.Group();
   const p = { g, nohy: [], ruce: [], kenney: true, mixer: null, akce: {}, anim: null, vyska: 2.1 };
   (cache[id] ??= loader.loadAsync(CESTA_POSTAV + 'character-' + id + '.glb')).then(gltf => {
     const model = SkeletonUtils.clone(gltf.scene);
+    if (SVETLA_KUZE.has(id)) model.traverse(o => {
+      if (o.isMesh && o.material && o.material.map) { o.material = o.material.clone(); o.material.map = texSvetlaKuze(o.material.map); }
+    });
     model.scale.setScalar(VYSKA_KENNEY); model.rotation.y = Math.PI;   // model kouká k nám, hráč běží od kamery
     g.add(model); stin(g);
     p.mixer = new THREE.AnimationMixer(model);
@@ -114,12 +139,13 @@ export function hrajAnimaci(p, jmeno, prechod = 0.15) {
 }
 
 export const DALSI_BEZCI = [
-  { id: 'kafino', jmeno: 'Kafíno Běžíno', cena: 0, vytvor: kafino },
-  { id: 'banano', jmeno: 'Banáno Sportivo', cena: 120, vytvor: banano },
-  { id: 'zraloko', jmeno: 'Žraloko Tenisko', cena: 220, vytvor: zraloko },
-  { id: 'pizza', jmeno: 'Pizza Miauzza', cena: 350, vytvor: pizza },
-  ...[['female-a', 'Anička', 60], ['male-a', 'Tomík', 60], ['female-c', 'Bára', 150], ['male-c', 'Kuba', 150],
-    ['worker', 'Stavař', 250], ['soldier', 'Voják', 300], ['raider', 'Pirát', 400], ['zombie', 'Zombík', 500],
-    ['robot', 'Plecháč', 650], ['knight', 'Rytíř', 800], ['alien', 'Ufoň', 1000]]
+  // Kafíno, Bára a Kuba (21. 11.) vyřazeni – nikomu nic neříkali. Funkce kafino() v souboru zůstala, kdyby se hodila.
+  { id: 'banano', jmeno: 'Banáno Sportivo', cena: 250, vytvor: banano },
+  { id: 'zraloko', jmeno: 'Žraloko Tenisko', cena: 600, vytvor: zraloko },
+  { id: 'pizza', jmeno: 'Pizza Miauzza', cena: 900, vytvor: pizza },
+  // Tomík a Anička = výchozí postavy zdarma (se světlou pletí, viz SVETLA_KUZE)
+  ...[['male-a', 'Tomík', 0], ['female-a', 'Anička', 0],
+    ['worker', 'Stavař', 380], ['soldier', 'Voják', 450], ['raider', 'Pirát', 520], ['zombie', 'Zombík', 800],
+    ['robot', 'Plecháč', 1000], ['knight', 'Rytíř', 1400], ['alien', 'Ufoň', 1600]]
     .map(([soubor, jmeno, cena]) => ({ id: 'k-' + soubor, jmeno, cena, vytvor: () => kenney(soubor) })),
 ];

@@ -19,16 +19,16 @@ const smooth = (a, b, x) => { const t = omez((x - a) / (b - a), 0, 1); return t 
 // pomoc = jak moc hra sama stáčí k dalšímu kruhu (1 = hodně), navod = pohyby, které se v levelu naučí s panáčkem.
 const Z = { typ: 'kruhy', more: 0, vlny: 14, vitr: 0, pohyb: 0, velikost: 1, pomoc: 1, rychlost: 30, navod: [] };
 export const LEVELY = [
-  { ...Z, jmeno: 'Údolí', kruhu: 10, potreba: 6, posun: 0, nahore: '#3f9cff', dole: '#d6f0ff', amp: 22, vyska: 55, velikost: 1.25, rychlost: 28, navod: ['mav', 'zatacka'] },
-  { ...Z, jmeno: 'Jezera', kruhu: 12, potreba: 7, posun: 37, more: 22, nahore: '#4a8dff', dole: '#e2f3ff', amp: 40, vyska: 42, vlny: 24, velikost: 1.1, pomoc: 0.9, navod: ['strmhlav'] },
-  { ...Z, jmeno: 'Kaňon', kanon: true, kruhu: 14, potreba: 10, posun: 81, nahore: '#ff9e5a', dole: '#ffe1b8', amp: 14, vyska: 32, velikost: 1.05, pomoc: 0.85 },
-  { ...Z, jmeno: 'Jeskyně', jeskyne: true, kruhu: 14, potreba: 10, posun: 120, nahore: '#7a6cff', dole: '#e0dcff', amp: 0, vyska: 45, vlny: 0, pomoc: 0.8 },
-  { ...Z, jmeno: 'Sloupy', sloupy: true, kruhu: 16, potreba: 12, posun: 201, more: 8, nahore: '#2f86ff', dole: '#cfeaff', amp: 35, vyska: 50, pomoc: 0.7, navod: ['kure'] },
-  { ...Z, jmeno: 'Vítr', kruhu: 16, potreba: 12, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 9, pomoc: 0.6 },
-  { ...Z, jmeno: 'Tančící kruhy', kruhu: 16, potreba: 12, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55 },
-  { ...Z, jmeno: 'Malé kruhy', kruhu: 18, potreba: 13, posun: 410, more: 10, nahore: '#2b7bff', dole: '#d3ecff', amp: 38, vyska: 48, velikost: 0.8, pomoc: 0.45, rychlost: 33 },
-  { ...Z, jmeno: 'Bouře', kanon: true, kruhu: 16, potreba: 13, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45 },
-  { ...Z, jmeno: 'Finále', sloupy: true, jeskyne: true, kruhu: 20, potreba: 16, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, vitr: 6, pohyb: 7, velikost: 0.85, pomoc: 0.35, rychlost: 34 },
+  { ...Z, jmeno: 'Údolí', kruhu: 8, potreba: 5, posun: 0, nahore: '#3f9cff', dole: '#d6f0ff', amp: 22, vyska: 55, velikost: 1.25, rychlost: 28, navod: ['mav', 'zatacka'] },
+  { ...Z, jmeno: 'Jezera', kruhu: 10, potreba: 6, posun: 37, more: 22, nahore: '#4a8dff', dole: '#e2f3ff', amp: 40, vyska: 42, vlny: 24, velikost: 1.1, pomoc: 0.9, navod: ['strmhlav'] },
+  { ...Z, jmeno: 'Kaňon', kanon: true, kruhu: 11, potreba: 8, posun: 81, nahore: '#ff9e5a', dole: '#ffe1b8', amp: 14, vyska: 32, velikost: 1.05, pomoc: 0.85 },
+  { ...Z, jmeno: 'Jeskyně', jeskyne: true, kruhu: 11, potreba: 8, posun: 120, nahore: '#7a6cff', dole: '#e0dcff', amp: 0, vyska: 45, vlny: 0, pomoc: 0.8 },
+  { ...Z, jmeno: 'Sloupy', sloupy: true, kruhu: 12, potreba: 9, posun: 201, more: 8, nahore: '#2f86ff', dole: '#cfeaff', amp: 35, vyska: 50, pomoc: 0.7, navod: ['kure'] },
+  { ...Z, jmeno: 'Vítr', kruhu: 12, potreba: 9, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 9, pomoc: 0.6 },
+  { ...Z, jmeno: 'Tančící kruhy', kruhu: 12, potreba: 9, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55 },
+  { ...Z, jmeno: 'Malé kruhy', kruhu: 14, potreba: 10, posun: 410, more: 10, nahore: '#2b7bff', dole: '#d3ecff', amp: 38, vyska: 48, velikost: 0.8, pomoc: 0.45, rychlost: 33 },
+  { ...Z, jmeno: 'Bouře', kanon: true, kruhu: 13, potreba: 10, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45 },
+  { ...Z, jmeno: 'Finále', sloupy: true, jeskyne: true, kruhu: 15, potreba: 12, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, vitr: 6, pohyb: 7, velikost: 0.85, pomoc: 0.35, rychlost: 34 },
 ];
 export const VOLNY = { ...Z, jmeno: 'Volný let', typ: 'volny', kruhu: Infinity, potreba: 0, posun: 0, more: 0, nahore: '#3f9cff', dole: '#d6f0ff', amp: 0, vyska: 70 };
 
@@ -218,7 +218,9 @@ export function vytvorLet(ctx) {
 
   // ---- rozpoznávání pohybu ----
   const poza = { zdvih: 0, nahoru: true, max: 0, min: 0, loket: 0, lNahoru: true, lMax: 0, lMin: 0, stav: 'pose.fly', videt: false };
-  const MAV = { prah: 0.5, zaklad: 14, zaKus: 6, navrat: 0.4 };
+  // méně náročné na ruce: stačí menší mávnutí a jedno mávnutí unese ptáka déle
+const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
+  const TIZE = 10, PLACHTI = -3.5, DOLU = -11;   // klesání bez mávání, při plachtění a s rukama dole
   function analyzuj(L, dt) {
     const ok = i => L[i] && (L[i].visibility ?? 1) > 0.3;
     poza.videt = ok(11) && ok(12);
@@ -243,10 +245,12 @@ export function vytvorLet(ctx) {
       else { if (poza.zdvih < poza.min) { vstup.vzlet += (poza.min - poza.zdvih) * MAV.zaKus; poza.min = poza.zdvih; } if (poza.zdvih - poza.min > MAV.navrat) { poza.nahoru = true; poza.max = poza.zdvih; } }
       const [iL, iR] = ok(15) && ok(16) ? [15, 16] : [13, 14];
       let n = ((L[iR].y - L[iL].y) / sw) * (iL === 15 ? 0.9 : 1.6);
+      // zatáčet jde i nakloněním těla (ramena), takže ruce nemusí být pořád ve vzduchu
+      n += ((L[12].y - L[11].y) / sw) * 2.6;
       vstup.naklon = omez(n, -1, 1);
       const sirka = Math.abs(L[iL].x - L[iR].x) / sw;
       vstup.plachti = sirka > (iL === 15 ? 2.2 : 1.5) && Math.abs(poza.zdvih) < 0.7;
-      // ruce dole u těla = střemhlav
+      // ruce dole u těla = odpočinek: pták klesá (ne střemhlav jako dřív), dítě si může ruce spustit
       vstup.strmhlav = poza.zdvih < -1.1 && sirka < 1.8;
       vstup.kridla = vstup.strmhlav ? -0.9 : omez(poza.zdvih * 0.7, -0.9, 1.1);
       poza.stav = vstup.mavT > 0 ? 'pose.flap' : vstup.strmhlav ? 'pose.dive' : vstup.plachti ? 'pose.glide' : 'pose.fly';
@@ -281,7 +285,7 @@ export function vytvorLet(ctx) {
     const zbytek = pocet - level.potreba;
     const hvezdy = !vyh ? 0 : sebrano >= pocet ? 3 : sebrano >= level.potreba + Math.ceil(zbytek / 2) ? 2 : 1;
     // výhra: chvíli ohňostroj a postavička udělá kotrmelec, pak teprve obrazovka s výsledkem
-    cekaVysledek = { data: { vyhra: vyh, mince: sebrano * 3, kruhy: sebrano, hvezdy }, za: vyh && level.typ !== 'volny' ? 2.8 : 1.0 };
+    cekaVysledek = { data: { vyhra: vyh, mince: sebrano * 2, kruhy: sebrano, hvezdy }, za: vyh && level.typ !== 'volny' ? 2.8 : 1.0 };
   }
   function rachejtle() {
     const barvy = ['#ffd23f', '#ff4d8d', '#4ff3ff', '#7dff6b', '#ff8a1f', '#b06bff'];
@@ -321,8 +325,8 @@ export function vytvorLet(ctx) {
     stavKamery() { return poza.videt ? t(poza.stav) : null; },
     vodítko() {},
     hud() {
-      if (level.typ === 'volny') return { vlevo: '◯ ' + sebrano, stred: sebrano, stredPopis: t('hud.rings'), mince: sebrano * 3, postup: null };
-      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: t('hud.need', { n: level.potreba }), mince: sebrano * 3, postup: dalsiKruh / level.kruhu };
+      if (level.typ === 'volny') return { vlevo: '◯ ' + sebrano, stred: sebrano, stredPopis: t('hud.rings'), mince: sebrano * 2, postup: null };
+      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: t('hud.need', { n: level.potreba }), mince: sebrano * 2, postup: dalsiKruh / level.kruhu };
     },
     ukoncit() { if (level.typ === 'volny') vysledek(true); },
     // jen pro zkoušení: přeskoč na místo z (a nastav počet sebraných kruhů)
@@ -355,8 +359,8 @@ export function vytvorLet(ctx) {
       if (stav === 'hra' && api.trenink) {
         // návod: pták visí na místě, ale na pohyby reaguje (nahoru, dolů, náklon, turbo), ať dítě vidí, co dělá
         const vz = Math.min(vstup.vzlet, 30); vstup.vzlet = 0;
-        hrac.vy += vz - 15 * dt;
-        if (vstup.strmhlav) hrac.vy += (-22 - hrac.vy) * Math.min(1, dt * 3); else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, -5.5);
+        hrac.vy += vz - TIZE * dt;
+        if (vstup.strmhlav) hrac.vy += (DOLU - hrac.vy) * Math.min(1, dt * 3); else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, PLACHTI);
         hrac.vy = omez(hrac.vy, -30, 24); hrac.pos.y += hrac.vy * dt;
         const y0 = drahaY(hrac.pos.z);
         if (hrac.pos.y > y0 + 9) { hrac.pos.y = y0 + 9; hrac.vy = Math.min(hrac.vy, 0); }
@@ -371,9 +375,9 @@ export function vytvorLet(ctx) {
       if (stav === 'hra' && konecT < 0 && !api.trenink) {
         const vz = Math.min(vstup.vzlet, 30); vstup.vzlet = 0;
         hrac.vy += vz; hrac.rychlost += vz * 0.12;
-        hrac.vy -= 15 * dt;                                   // rychlejší klesání než dřív
-        if (vstup.strmhlav) { hrac.vy += (-22 - hrac.vy) * Math.min(1, dt * 3); hrac.rychlost += 14 * dt; }
-        else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, -5.5);
+        hrac.vy -= TIZE * dt;
+        if (vstup.strmhlav) { hrac.vy += (DOLU - hrac.vy) * Math.min(1, dt * 3); hrac.rychlost += 8 * dt; }
+        else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, PLACHTI);
         hrac.vy = omez(hrac.vy, -30, 24);
         hrac.turbo = Math.max(0, hrac.turbo - dt);
         hrac.rychlost += ((level.rychlost || 30) - hrac.rychlost) * dt * (hrac.turbo > 0 ? 0.05 : 0.45);

@@ -333,7 +333,9 @@ function smycka(cas) {
 }
 window.__hra = { beh, let: lt, ulozene, stav: () => stav, spustLevel, naLevely, konecHry };
 // přepínač jazyka (EN | CZ)
-document.querySelectorAll('[data-jazyk]').forEach(b => b.onclick = () => { SFX.klik(); nastavJazyk(b.dataset.jazyk); });
+document.querySelectorAll('[data-jazyk]').forEach(b => b.onclick = () => { SFX.klik(); nastavJazyk(b.dataset.jazyk); $('nastaveni').classList.add('skryt'); });
+$('btnNastaveni').onclick = e => { e.stopPropagation(); audio(); SFX.klik(); $('nastaveni').classList.toggle('skryt'); };
+addEventListener('pointerdown', e => { if (!e.target.closest('#nastaveni, #btnNastaveni')) $('nastaveni').classList.add('skryt'); });
 poZmene(() => { if (stav === 'levely') naLevely(); });
 naDomu();
 requestAnimationFrame(smycka);

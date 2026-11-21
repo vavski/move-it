@@ -130,6 +130,10 @@
   .jazyky { position:fixed; top:14px; left:16px; z-index:6; display:flex; background:var(--panel); border-radius:999px; padding:4px; gap:2px; }
   .jazyky button { font-size:18px; padding:4px 12px; border-radius:999px; background:transparent; opacity:.75; }
   .jazyky button.aktivni { background:var(--zluta); color:#3a2300; opacity:1; }
+  #nastaveni { position:fixed; top:62px; left:16px; z-index:7; background:var(--panel); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:6px; min-width:180px; }
+  #nastaveni h3 { margin:0 0 4px; font-size:16px; opacity:.8; }
+  #nastaveni button { font-size:18px; padding:8px 14px; border-radius:12px; background:transparent; text-align:left; }
+  #nastaveni button.aktivni { background:var(--zluta); color:#3a2300; }
   .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
   .instalovat:hover { border-color:#b8fd04; }
@@ -155,7 +159,9 @@ window.addEventListener('beforeinstallprompt', function (e) {
 
 <!-- DOMŮ -->
 <section class="obrazovka" id="domu">
-  <div class="jazyky" role="group" aria-label="Language"><button data-jazyk="en" class="aktivni" lang="en">EN</button><button data-jazyk="cs" lang="cs">CZ</button></div>
+  <div class="jazyky" role="group" aria-label="Language"><button data-jazyk="en" class="aktivni" lang="en">EN</button><button data-jazyk="cs" lang="cs">CZ</button><button id="btnNastaveni" title="Settings" data-i18n-title="settings" aria-haspopup="true">⚙</button></div>
+  <div id="nastaveni" class="skryt" role="dialog" aria-label="Settings"><h3 data-i18n="settings.lang">Language</h3>
+    <button data-jazyk="en" lang="en">English</button><button data-jazyk="cs" lang="cs">Čeština</button><button data-jazyk="de" lang="de">Deutsch</button><button data-jazyk="es" lang="es">Español</button><button data-jazyk="fr" lang="fr">Français</button></div>
   <div class="logo">MOVE<br>IT<small data-i18n="logo.sub">PLAY WITH YOUR WHOLE BODY</small></div>
   <div class="rezimy">
     <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>
