@@ -1,7 +1,7 @@
 // Postavičky. Běžci se vidí zezadu, letci taky. Všechno z jednoduchých tvarů v kresleném stylu.
 import { THREE, toon, svit, pruhledny, obrys, stin } from './zaklad.js';
 import { ptak2, drak2, vazka2 } from './letci.js';
-import { DALSI_BEZCI } from './bezci.js';
+import { DALSI_BEZCI, model } from './bezci.js';
 
 const S = (r, w = 14, h = 12) => new THREE.SphereGeometry(r, w, h);
 const B = (x, y, z) => new THREE.BoxGeometry(x, y, z);
@@ -88,11 +88,18 @@ function robot(o) {
 }
 
 export const BEZCI = [
-  { id: 'dino', jmeno: 'Dino', cena: 120, vytvor: () => dino({ telo: '#5cc85c', bricho: '#c4f29a', ostny: '#ff9b2f' }) },
-  { id: 'robo', jmeno: 'Robo', cena: 180, vytvor: () => robot({ telo: '#2f6bff', kov: '#d5dbe6', svetlo: '#4ff3ff' }) },
-  { id: 'lava', jmeno: 'Lávový dino', cena: 320, vytvor: () => dino({ telo: '#3a1c1c', bricho: '#ff7a1a', ostny: '#ffb000', ostnySviti: true, oci: '#ff3b00' }) },
-  { id: 'zlaty', jmeno: 'Zlatý robot', cena: 700, vytvor: () => robot({ telo: '#f2b600', kov: '#fff1b0', svetlo: '#ff3dd2', anten: '#4ff3ff', ploutve: true }) },
-  { id: 'drak', jmeno: 'Drak', cena: 1200, vytvor: () => dino({ telo: '#7b3fe4', bricho: '#f3d36b', ostny: '#38e0c1', ostnySviti: true, rohy: true, kridla: '#c8a6ff' }) },
+  // Dinosauři a robot = hotové modely s animacemi od Quaternius (CC0, postavy/modely/). Barvy vlastní, veselejší.
+  // Původní dino a robot z kódu (funkce dino(), robot()) zůstaly v souboru, ve hře už nejsou.
+  { id: 'dino', jmeno: 'Dino', cena: 120, vytvor: () => model('modely/Trex.glb', { vyska: 2.15, barvy: { Green: '#4cc35a', LightGreen: '#b9ee8a', LightYellow: '#ffd86b', Red: '#e8434e', Black: '#1a1a1a' } }) },
+  { id: 'robo', jmeno: 'Robo', cena: 180, vytvor: () => model('modely/RobotExpressive.glb', { vyska: 2.3, mapa: { sprint: 'Running' }, barvy: { Main: '#2f6bff', Grey: '#d5dbe6', Black: '#222831' } }) },
+  { id: 'raptor', jmeno: 'Raptor', cena: 250, vytvor: () => model('modely/Velociraptor.glb', { vyska: 2.0, barvy: { Brown: '#e0812b', LightBrown: '#f7cd86', Black: '#1a1a1a' } }) },
+  { id: 'lava', jmeno: 'Lávový dino', cena: 320, vytvor: () => model('modely/Trex.glb', { vyska: 2.15, barvy: { Green: '#3a1c1c', LightGreen: '#ff7a1a', LightYellow: '#ffb000', Red: '#ff3b00', Black: '#111111' } }) },
+  { id: 'triceratops', jmeno: 'Triceratops', cena: 600, vytvor: () => model('modely/Triceratops.glb', { vyska: 2.2, barvy: { Brown: '#3a8fd8', LightBrown: '#a8dcff', Purple: '#ffcf3f' } }) },
+  { id: 'zlaty', jmeno: 'Zlatý robot', cena: 700, vytvor: () => model('modely/RobotExpressive.glb', { vyska: 2.3, mapa: { sprint: 'Running' }, barvy: { Main: '#f2b600', Grey: '#fff1b0', Black: '#3a2a00' } }) },
+  { id: 'stego', jmeno: 'Stegosaurus', cena: 900, vytvor: () => model('modely/Stegosaurus.glb', { vyska: 2.0, barvy: { Brown: '#5fb04a', DarkBrown: '#ff6a3d', LightBrown: '#dcf2a6' } }) },
+  { id: 'para', jmeno: 'Parasaurus', cena: 1100, vytvor: () => model('modely/Parasaurolophus.glb', { vyska: 2.4, barvy: { Green: '#f08a2c', LightGreen: '#ffd38a', LightYellow: '#fff0c8', Red: '#c2331e' } }) },
+  { id: 'drak', jmeno: 'Drak', cena: 1200, vytvor: () => model('modely/Trex.glb', { vyska: 2.15, barvy: { Green: '#7b3fe4', LightGreen: '#38e0c1', LightYellow: '#f3d36b', Red: '#ff3dd2', Black: '#1a1030' } }) },
+  { id: 'bronto', jmeno: 'Brontosaurus', cena: 2000, vytvor: () => model('modely/Apatosaurus.glb', { vyska: 2.4, barvy: { Brown: '#8a6ad8', Material: '#d9ccff' } }) },
   ...DALSI_BEZCI,
 ].sort((a, b) => a.cena - b.cena);
 

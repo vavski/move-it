@@ -1,0 +1,5 @@
+Modely v této složce: licence CC0 1.0 (volné dílo, i komerčně, bez uvádění autora).
+- Trex, Velociraptor, Triceratops, Stegosaurus, Parasaurolophus, Apatosaurus:
+  Quaternius, "Animated LowPoly Dinosaurs" (https://quaternius.itch.io/animated-lowpoly-dinosaurs), CC0 1.0.
+  Převedeno z FBX do GLB (21. 11. 2026), barvy nastavuje hra.
+- RobotExpressive: Tomás Laulhé (Quaternius), úpravy Don McCurdy, z ukázek three.js r160, CC0 1.0.

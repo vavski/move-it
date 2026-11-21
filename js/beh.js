@@ -297,6 +297,11 @@ export function vytvorBeh(ctx) {
       else { g.rotation.set(0, 0, (DRAHY[hrac.draha] - hrac.x) * -0.13); g.position.set(hrac.x, hrac.y, 0); g.visible = hrac.nesmrtelny > 0 ? Math.floor(hrac.nesmrtelny * 12) % 2 === 0 : true; }
       hrajAnimaci(postava, stav === 'nahled' ? 'idle' : stav !== 'hra' ? 'idle' : hrac.y > 0.05 ? 'jump' : hrac.drep ? 'crouch' : 'sprint', 0.12);
       if (postava.mixer) postava.mixer.update(dt * (stav === 'hra' ? Math.max(1, rychlost / 9) : 1));
+      // modely bez animace dřepu (dinosauři, robot) se při dřepu přimáčknou k zemi
+      if (!postava.akce.crouch) {
+        const cv = stav === 'hra' && hrac.drep && hrac.y < 0.3 ? 0.55 : 1;
+        g.scale.y += (cv - g.scale.y) * Math.min(1, dt * 25); g.scale.x = g.scale.z = 1 + (1 - g.scale.y) * 0.35;
+      }
       return;
     }
     if (stav === 'nahled') { g.position.set(0, 0, 0); g.rotation.set(0, g.rotation.y + dt * 0.9, 0); g.scale.setScalar(1); g.visible = true; hrac.faze += dt * 5; }

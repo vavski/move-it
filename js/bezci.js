@@ -1,6 +1,6 @@
 // Další běžci: čtyři vlastní ztřeštěné postavičky (převzaté ze starší hry Uhni!) a 11 postav od Kenney.nl
 // (licence CC0 — volně i komerčně, soubory v ../postavy/, mají animace běhu, skoku a dřepu).
-import { THREE, toon, svit, obrys, stin } from './zaklad.js';
+import { THREE, toon, svit, obrys, stin, gradient } from './zaklad.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
@@ -131,6 +131,49 @@ function kenney(id) {
   }).catch(() => {});
   return p;
 }
+// ---- hotové modely s animacemi (Quaternius, CC0): dinosauři a robot ----
+// mapa = jak se jmenuje animace v souboru; dřep většina nemá – hra pak postavu jen přimáčkne k zemi.
+// barvy = přebarvení materiálů podle jména (varianty jako Lávový dino nebo Zlatý robot).
+const modely = {};
+export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = {}, toonStyl = true, skok = 0.75 } = {}) {
+  const g = new THREE.Group();
+  const p = { g, nohy: [], ruce: [], kenney: true, mixer: null, akce: {}, anim: null, vyska };
+  (modely[soubor] ??= loader.loadAsync(CESTA_POSTAV + soubor)).then(gltf => {
+    const m = SkeletonUtils.clone(gltf.scene);
+    m.traverse(o => {
+      if (!o.isMesh) return;
+      const prevod = mt => {
+        const barva = barvy[mt.name] ?? '#' + mt.color.getHexString();
+        if (!toonStyl && !barvy[mt.name]) return mt;
+        const n = toonStyl ? new THREE.MeshToonMaterial({ color: barva, gradientMap: gradient }) : mt.clone();
+        if (!toonStyl) n.color.set(barva);
+        n.name = mt.name; if (mt.map) n.map = mt.map;
+        return n;
+      };
+      o.material = Array.isArray(o.material) ? o.material.map(prevod) : prevod(o.material);
+      o.frustumCulled = false;
+    });
+    // výška a postavení na zem podle skutečné velikosti modelu
+    m.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(m), v = box.max.y - box.min.y || 1;
+    const obal = new THREE.Group(); obal.add(m);
+    m.scale.multiplyScalar(vyska / v); m.position.y = -box.min.y * (vyska / v);
+    obal.rotation.y = otoc;
+    g.add(obal); stin(g);
+    p.mixer = new THREE.AnimationMixer(m);
+    for (const [nase, jejich] of Object.entries({ idle: 'Idle', sprint: 'Run', jump: 'Jump', ...mapa })) {
+      if (!jejich) continue;
+      const clip = gltf.animations.find(a => a.name === jejich || a.name.endsWith('|' + jejich) || a.name.toLowerCase().endsWith(jejich.toLowerCase()));
+      if (!clip) continue;
+      const ak = p.mixer.clipAction(clip);
+      if (nase === 'jump' || nase === 'crouch') { ak.setLoop(THREE.LoopOnce); ak.clampWhenFinished = true; }
+      if (nase === 'jump') ak.timeScale = clip.duration / skok;   // skok ve hře trvá asi 0,75 s
+      p.akce[nase] = ak;
+    }
+  }).catch(e => console.warn('model', soubor, e));
+  return p;
+}
+
 export function hrajAnimaci(p, jmeno, prechod = 0.15) {
   if (!p.mixer || p.anim === jmeno || !p.akce[jmeno]) return;
   p.akce[jmeno].reset().fadeIn(prechod).play();
@@ -140,9 +183,7 @@ export function hrajAnimaci(p, jmeno, prechod = 0.15) {
 
 export const DALSI_BEZCI = [
   // Kafíno, Bára a Kuba (21. 11.) vyřazeni – nikomu nic neříkali. Funkce kafino() v souboru zůstala, kdyby se hodila.
-  { id: 'banano', jmeno: 'Banáno Sportivo', cena: 250, vytvor: banano },
-  { id: 'zraloko', jmeno: 'Žraloko Tenisko', cena: 600, vytvor: zraloko },
-  { id: 'pizza', jmeno: 'Pizza Miauzza', cena: 900, vytvor: pizza },
+  // Banáno, Žraloko a Pizza (21. 11.) vyřazeni – vypadali nedodělaně; funkce zůstaly v souboru.
   // Tomík a Anička = výchozí postavy zdarma (se světlou pletí, viz SVETLA_KUZE)
   ...[['male-a', 'Tomík', 0], ['female-a', 'Anička', 0],
     ['worker', 'Stavař', 380], ['soldier', 'Voják', 450], ['raider', 'Pirát', 520], ['zombie', 'Zombík', 800],
