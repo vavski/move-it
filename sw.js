@@ -115,6 +115,8 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (url.origin === self.location.origin) {
+    // hudbu prohlížeč stahuje po kouscích (přehrávač) – necháme ji jít rovnou, mimo service worker
+    if (/\/hudba\//.test(url.pathname)) return;
     // velké neměnné soubory (knihovny, model kamery, postavy, ikony) z mezipaměti; kód hry vždy čerstvý,
     // aby se po nahrání nové verze nepomíchala stará a nová část hry
     if (/\/(vendor|postavy|icons)\//.test(url.pathname)) event.respondWith(cacheFirst(request));

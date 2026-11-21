@@ -143,11 +143,13 @@ let ac = null, hlavni = null;
 export function audio() {
   if (!ac) { ac = new AudioContext(); hlavni = ac.createGain(); hlavni.gain.value = ulozene.zvuk ? 0.9 : 0; hlavni.connect(ac.destination); }
   if (ac.state === 'suspended') ac.resume();
+  if (chtena && !hraje) pouzijHudbu();
   return ac;
 }
 export function prepniZvuk() {
   ulozene.zvuk = !ulozene.zvuk; uloz();
   if (hlavni) hlavni.gain.value = ulozene.zvuk ? 0.9 : 0;
+  pozastavHudbu(!ulozene.zvuk);
   return ulozene.zvuk;
 }
 const hz = midi => 440 * Math.pow(2, (midi - 69) / 12);
@@ -274,8 +276,61 @@ setInterval(() => {
   if (dalsi < ac.currentTime - 0.5) dalsi = ac.currentTime + 0.05;   // po uspání karty nedohánět zpožděné noty
   while (dalsi < ac.currentTime + 0.15) { hrajKrok(hudba, krok, dalsi, K); krok++; dalsi += K; }
 }, 30);
-export function hrajHudbu(jmeno) { audio(); pripravHudbu(); if (hudba !== HUDBY[jmeno]) { hudba = HUDBY[jmeno]; krok = 0; dalsi = ac.currentTime + 0.05; } }
-export function ztisHudbu() { hudba = null; }
+// (výše je původní hudba generovaná v kódu, zůstává jen pro zkusHudbu; ve hře hrají skladby ze složky hudba/)
+
+// ================= HUDBA ZE SOUBORŮ =================
+// Skladby z Gemini. Lobby = skladba letu potichu; při startu letu se jen zesílí a hraje dál.
+// Výhra začne hrát už v cíli a hraje dokola, dokud je vidět výsledek.
+const SKLADBY = { beh: 'beh.mp3', let: 'let.mp3', vyhra: 'vyhra.mp3' };
+const HLASITOST = { beh: 0.3, let: 0.3, vyhra: 0.35, lobby: 0.12 };   // hudba vůči zvukům ve hře (0.3 ≈ hlasitost původní hudby z kódu)
+const prehravace = {};
+let chtena = null, hraje = null;   // { stopa, hl }
+function prehravac(stopa) {
+  if (!prehravace[stopa]) {
+    const el = new Audio(new URL('hudba/' + SKLADBY[stopa], document.baseURI).href);
+    el.loop = true; el.preload = 'auto';
+    const g = ac.createGain(); g.gain.value = 0;
+    ac.createMediaElementSource(el).connect(g).connect(hlavni);
+    prehravace[stopa] = { el, g, zastav: null };
+  }
+  return prehravace[stopa];
+}
+function prolni(g, cil, s) {
+  const t = ac.currentTime;
+  g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(cil, t + s);
+}
+function spust(p) { if (ulozene.zvuk && !document.hidden) p.el.play().catch(() => {}); }
+function pouzijHudbu() {
+  if (!ac) return;   // zvuk ještě nepovolen (žádné kliknutí) – začne při prvním kliknutí
+  if (chtena && hraje && chtena.stopa === hraje.stopa && chtena.hl === hraje.hl) return;
+  if (hraje && (!chtena || chtena.stopa !== hraje.stopa)) {
+    const st = prehravace[hraje.stopa];
+    prolni(st.g, 0, 0.8); clearTimeout(st.zastav); st.zastav = setTimeout(() => st.el.pause(), 900);
+  }
+  if (!chtena) { hraje = null; return; }
+  const p = prehravac(chtena.stopa), stejna = hraje && hraje.stopa === chtena.stopa;
+  clearTimeout(p.zastav);
+  if (!stejna) p.el.currentTime = 0;
+  spust(p);
+  prolni(p.g, chtena.hl, stejna ? 1.2 : 0.3);
+  hraje = { ...chtena };
+}
+export function hrajHudbu(jmeno) {
+  chtena = jmeno === 'lobby' ? { stopa: 'let', hl: HLASITOST.lobby } : { stopa: jmeno, hl: HLASITOST[jmeno] };
+  pouzijHudbu();
+}
+export function ztisHudbu() { chtena = null; pouzijHudbu(); }
+// jen pro kontrolu z konzole: co hraje, jak nahlas a kde
+export const stavHudby = () => ({ chtena, hraje, prehravace: Object.fromEntries(Object.entries(prehravace).map(([k, p]) =>
+  [k, { cas: +p.el.currentTime.toFixed(1), hraje: !p.el.paused, hl: +p.g.gain.value.toFixed(2), chyba: p.el.error && p.el.error.code }])) });
+function pozastavHudbu(ano) {
+  if (!hraje) return;
+  const p = prehravace[hraje.stopa];
+  if (ano) p.el.pause(); else spust(p);
+}
+document.addEventListener('visibilitychange', () => pozastavHudbu(document.hidden));
+// první kliknutí nebo klávesa kdekoliv povolí zvuk a pustí hudbu do lobby
+['pointerdown', 'keydown'].forEach(u => addEventListener(u, () => { if (chtena && !hraje) audio(); }, true));
 // jen pro kontrolu: vyrenderuje písničku potichu do paměti a vrátí hlasitost (špička, průměr)
 export async function zkusHudbu(jmeno, sekundy = 20) {
   const puvodni = [ac, hlavni, hudbaBus, ozvena];
@@ -297,7 +352,7 @@ export const SFX = {
   turbo() { if (!ac) return; ton(200, ac.currentTime, 0.4, 'sawtooth', 0.07, 900); },
   zasah() { if (!ac) return; const t = ac.currentTime; ton(160, t, 0.35, 'sawtooth', 0.15, 50); sum(t, 0.2, 0.18, 400); },
   svet() { if (!ac) return; const t = ac.currentTime; [60, 64, 67, 72, 76].forEach((n, i) => ton(hz(n), t + i * 0.07, 0.18, 'square', 0.06)); },
-  vyhra() { if (!ac) return; const t = ac.currentTime; [60, 64, 67, 72, 67, 72, 76, 79].forEach((n, i) => ton(hz(n), t + i * 0.09, 0.2, 'square', 0.07)); },
+  vyhra() { if (!ac) return; hrajHudbu('vyhra'); const t = ac.currentTime; [60, 64, 67, 72, 67, 72, 76, 79].forEach((n, i) => ton(hz(n), t + i * 0.09, 0.2, 'square', 0.07)); },
   prohra() { if (!ac) return; const t = ac.currentTime; [67, 64, 60, 55].forEach((n, i) => ton(hz(n), t + i * 0.16, 0.25, 'triangle', 0.14)); },
   koupe() { if (!ac) return; const t = ac.currentTime; [72, 79, 84, 91].forEach((n, i) => ton(hz(n), t + i * 0.06, 0.15, 'square', 0.07)); },
   klik() { if (!ac) return; ton(880, ac.currentTime, 0.05, 'square', 0.05); },

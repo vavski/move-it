@@ -1,5 +1,5 @@
 // Řízení celé hry: domů → levely a postavičky → (čekání na ruce) → odpočet → hra → výsledek.
-import { renderer, $, ulozene, uloz, audio, prepniZvuk, hrajHudbu, ztisHudbu, SFX, kamera, ruce, zpracujRuce } from './zaklad.js';
+import { renderer, $, ulozene, uloz, audio, prepniZvuk, hrajHudbu, SFX, kamera, ruce, zpracujRuce } from './zaklad.js';
 import { BEZCI, LETCI } from './postavy.js';
 import { vytvorBeh, LEVELY as LV_BEH, NEKONECNY } from './beh.js';
 import { vytvorLet, LEVELY as LV_LET, VOLNY } from './let.js';
@@ -46,12 +46,12 @@ function banner(text, barva = '#ffffff') {
 }
 
 function naDomu() {
-  stav = 'domu'; rezimHry = 'beh'; ztisHudbu();
+  stav = 'domu'; rezimHry = 'beh'; hrajHudbu('lobby');
   beh.nahled(ulozene.vybrany.beh);
   ukaz('domu'); obnovPenezenku();
 }
 function naLevely(rz = rezimHry) {
-  stav = 'levely'; rezimHry = rz; ztisHudbu();
+  stav = 'levely'; rezimHry = rz; hrajHudbu('lobby');
   const r = R();
   $('levelyNadpis').textContent = t(r.nazev);
   const seznam = $('levelySeznam'); seznam.innerHTML = '';
@@ -191,7 +191,7 @@ function konecHry(v) {
   if (stav !== 'hra') return;
   konecNavodu(false);
   stats.konec(v);
-  stav = 'vysledek'; ztisHudbu();
+  stav = 'vysledek';
   const r = R(), lv = levelIndex < 0 ? r.extra : r.levely[levelIndex];
   let hvezdy = 0, rekordText = '';
   if (rezimHry === 'beh') hvezdy = v.vyhra ? v.srdce : 0; else hvezdy = v.hvezdy || 0;
@@ -212,6 +212,7 @@ function konecHry(v) {
   const vyhral = levelIndex < 0 || v.vyhra;
   const ik = $('vysIkona'); ik.textContent = vyhral ? (hvezdy === 3 || levelIndex < 0 ? '🏆' : '🥇') : '💪'; ik.classList.toggle('vyhra', vyhral);
   if (vyhral) konfety();
+  hrajHudbu(vyhral ? 'vyhra' : 'lobby');
   $('vysDetail').textContent = rezimHry === 'beh'
     ? (levelIndex < 0 ? t('res.runEndless', { m: Math.floor(v.vzdalenost), c: v.mince }) : v.vyhra ? t('res.runWin', { lvl: tn(lv.jmeno) }) : t('res.runLose', { m: Math.floor(v.vzdalenost), cil: lv.cil }))
     : (levelIndex < 0 ? t('res.flyEndless', { k: v.kruhy }) : t('res.fly', { k: v.kruhy, n: lv.kruhu }) + (v.vyhra ? '' : t('res.flyNeed', { n: lv.potreba })));
@@ -265,7 +266,7 @@ function ukonci() {
   // nekonečný režim: křížek = konec s výsledkem a mincemi
   if (stav === 'hra' && levelIndex < 0) { R().api.ukoncit(); return; }
   if (stav === 'hra') stats.konec(null);
-  ztisHudbu(); naLevely();
+  naLevely();
 }
 addEventListener('keydown', e => {
   if (e.code === 'KeyM') { audio(); $('zvuk').textContent = prepniZvuk() ? '♪' : '✕'; return; }
