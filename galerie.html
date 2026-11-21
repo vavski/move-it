@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galerie postaviček</title>
+<style>
+  html,body { margin:0; height:100%; background:#7cc4ff; font-family:"Trebuchet MS",system-ui,sans-serif; color:#fff; }
+  canvas { display:block; position:fixed; inset:0; width:100%; height:100%; }
+  #popisky { position:fixed; inset:0; display:grid; pointer-events:none; }
+  #popisky div { display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px; font-weight:800; font-size:20px; text-shadow:0 2px 4px rgba(0,0,0,.45); }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+<canvas id="svet"></canvas>
+<div id="popisky"></div>
+<video id="video" style="display:none"></video><canvas id="kamCanvas" style="display:none"></canvas><div id="stavKam" style="display:none"></div><select id="vyberKamery" style="display:none"></select>
+<script type="module">
+// Ukázka postaviček: ?skupina=letci | bezci, ?ids=orel,fenix (jen vybrané). Každá postavička ve vlastním okénku, točí se a mává.
+import { THREE, renderer, svetla, toon } from './js/zaklad.js';
+import { BEZCI, LETCI } from './js/postavy.js';
+import { tn } from './js/i18n.js';
+const q = new URLSearchParams(location.search);
+let seznam = q.get('skupina') === 'bezci' ? BEZCI : q.get('skupina') === 'vse' ? [...BEZCI, ...LETCI] : LETCI;
+if (q.get('ids')) { const ids = q.get('ids').split(','); seznam = [...BEZCI, ...LETCI].filter(s => ids.includes(s.id)); }
+const sloupcu = Math.ceil(Math.sqrt(seznam.length * 1.6)), radku = Math.ceil(seznam.length / sloupcu);
+const popisky = document.getElementById('popisky');
+popisky.style.gridTemplateColumns = `repeat(${sloupcu},1fr)`; popisky.style.gridTemplateRows = `repeat(${radku},1fr)`;
+const okna = seznam.map(s => {
+  const scene = new THREE.Scene(); svetla(scene);
+  const p = s.vytvor(); scene.add(p.g);
+  const letec = typeof p.kridla === 'function'; const box = new THREE.Box3().setFromObject(p.g); let vel = box.getSize(new THREE.Vector3()).length();
+  if (box.isEmpty() || vel < 0.5) { vel = 3; box.set(new THREE.Vector3(-0.5, 0, -0.5), new THREE.Vector3(0.5, 2.2, 0.5)); }   // Kenney se teprve načítá
+  const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 200);
+  const d = document.createElement('div'); d.textContent = tn(s.jmeno); popisky.appendChild(d);
+  return { s, scene, p, cam, letec, vel, stred: box.getCenter(new THREE.Vector3()) };
+});
+renderer.setScissorTest(true);
+function smycka(t) {
+  const cas = t / 1000, W = innerWidth, H = innerHeight; renderer.setSize(W, H, false);
+  const w = W / sloupcu, h = H / radku;
+  okna.forEach((o, i) => {
+    const x = (i % sloupcu) * w, y = H - (Math.floor(i / sloupcu) + 1) * h;
+    renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h);
+    renderer.setClearColor(i % 2 ? '#8fd0ff' : '#7cc4ff');
+    o.p.g.rotation.y = cas * 0.6 + (o.letec ? Math.PI * 0.75 : Math.PI * 0.85);
+    if (o.letec) o.p.kridla(Math.sin(cas * 3.2) * 0.9, cas);
+    if (o.p.mixer) { if (!o.p.anim && o.p.akce.sprint) { o.p.akce.sprint.play(); o.p.anim = 'sprint'; } o.p.mixer.update(1 / 60); }
+    o.cam.aspect = w / h; o.cam.updateProjectionMatrix();
+    const r = o.vel * (o.letec ? 1.45 : 1.6);
+    o.cam.position.set(o.stred.x + r * 0.35, o.stred.y + r * 0.42, o.stred.z + r);
+    o.cam.lookAt(o.stred);
+    renderer.render(o.scene, o.cam);
+  });
+  requestAnimationFrame(smycka);
+}
+requestAnimationFrame(smycka);
+window.__galerie = { okna };
+</script>
+</body>
+</html>

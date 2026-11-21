@@ -2,8 +2,8 @@
 // Network-first for index.html so a new deploy is picked up quickly.
 // Precache local HTML/JS/icons; cache-on-fetch for CDN/fonts/MediaPipe
 // so a stale model cannot be baked in at install time.
-const SHELL = 'move-it-shell-v1';
-const RUNTIME = 'move-it-runtime-v1';
+const SHELL = 'move-it-shell-v2';
+const RUNTIME = 'move-it-runtime-v2';
 
 const SHELL_URLS = [
   './',
@@ -17,6 +17,9 @@ const SHELL_URLS = [
   './js/let.js',
   './js/postavy.js',
   './js/pwa.js',
+  './js/navod.js',
+  './js/letci.js',
+  './js/bezci.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-512-maskable.png',
@@ -112,7 +115,10 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (url.origin === self.location.origin) {
-    event.respondWith(cacheFirst(request));
+    // velké neměnné soubory (knihovny, model kamery, postavy, ikony) z mezipaměti; kód hry vždy čerstvý,
+    // aby se po nahrání nové verze nepomíchala stará a nová část hry
+    if (/\/(vendor|postavy|icons)\//.test(url.pathname)) event.respondWith(cacheFirst(request));
+    else event.respondWith(networkFirst(request));
     return;
   }
   event.respondWith(cacheOnFetch(request));

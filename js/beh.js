@@ -1,7 +1,8 @@
 // Režim BĚH: tři dráhy, uhýbání, skok, dřep, sbírání. Ovládání kamerou nebo klávesnicí.
 import { THREE, nahoda, vyber, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX } from './zaklad.js';
-import { t, tn } from './i18n.js';
 import { BEZCI } from './postavy.js';
+import { t, tn } from './i18n.js';
+import { hrajAnimaci } from './bezci.js';
 
 export const SVETY = [
   { jmeno: 'ŠUMAVA', nahore: '#3f9cff', dole: '#cdeeff', zem: '#78c850', cesta: '#d9b37c', okraj: '#a87b4f', cara: '#fff3d0', nizky: '#8a5a2b', vysoky: '#ff4d5e', bedna: '#c98a4b', hory: '#5f8f6a', mlha: '#cdeeff' },
@@ -9,15 +10,25 @@ export const SVETY = [
   { jmeno: 'ALPY', nahore: '#6fb6ff', dole: '#eef7ff', zem: '#f5f9ff', cesta: '#a9d1ef', okraj: '#7fb0d6', cara: '#ffffff', nizky: '#7fc8ff', vysoky: '#ff6b3d', bedna: '#9ab7d6', hory: '#9fb8d6', mlha: '#eef7ff' },
   { jmeno: 'SOPKA', nahore: '#4a1530', dole: '#ff8a4a', zem: '#4a3a3a', cesta: '#6e5550', okraj: '#2e2222', cara: '#ffb000', nizky: '#2e2222', vysoky: '#ffd23f', bedna: '#7a5a50', hory: '#3a2a2a', mlha: '#c25a3a' },
   { jmeno: 'MĚSÍC', nahore: '#0b0a24', dole: '#3a2f6e', zem: '#5e5c74', cesta: '#7c7a93', okraj: '#4a4860', cara: '#c9b8ff', nizky: '#9aa0b8', vysoky: '#ff3dd2', bedna: '#6c7aa0', hory: '#3d3b55', mlha: '#3a2f6e' },
+  { jmeno: 'NOC', nahore: '#050818', dole: '#1a2550', zem: '#2a3a3a', cesta: '#55556a', okraj: '#2a2a38', cara: '#ffe680', nizky: '#a07a4a', vysoky: '#ff4d5e', bedna: '#b0884f', hory: '#141a30', mlha: '#0d1430' },
 ];
+// Každý level přidá jednu novinku: nejdřív jen uhýbání, pak skok, dřep, nízká gravitace, jezdící bedny, tma, dvojité řady.
+// typy = jaké řady překážek se losují, hustota < 1 = řady blíž u sebe, navod = pohyb, který se v levelu naučí s panáčkem.
+const T_VSE = ['blok1', 'blok1', 'blok2', 'nizkyVse', 'nizkyVse', 'vysokyVse', 'vysokyVse', 'nizky1', 'vysoky1', 'mince', 'mix'];
+const ZB = { hustota: 1, gravitace: 31, jezdi: 0, dvojita: 0, tma: 0, navod: [], lehke: ['mince', 'blok1'] };
 export const LEVELY = [
-  { jmeno: 'Šumava', svet: 0, cil: 300, rychlost: [8.5, 12] },
-  { jmeno: 'Sahara', svet: 1, cil: 450, rychlost: [9.5, 13.5] },
-  { jmeno: 'Alpy', svet: 2, cil: 600, rychlost: [10, 15] },
-  { jmeno: 'Sopka', svet: 3, cil: 750, rychlost: [11, 16] },
-  { jmeno: 'Měsíc', svet: 4, cil: 900, rychlost: [12, 17] },
+  { ...ZB, jmeno: 'Šumava', svet: 0, cil: 250, rychlost: [7.5, 10], typy: ['mince', 'blok1', 'blok1', 'blok2'], hustota: 1.15, navod: ['krok'] },
+  { ...ZB, jmeno: 'Sahara', svet: 1, cil: 350, rychlost: [8.5, 11.5], typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizkyVse', 'nizky1'], navod: ['skok'] },
+  { ...ZB, jmeno: 'Alpy', svet: 2, cil: 450, rychlost: [8.5, 11.5], hustota: 1.1, typy: ['mince', 'blok1', 'blok2', 'nizkyVse', 'nizky1', 'vysokyVse', 'vysokyVse', 'vysoky1'], navod: ['drep'] },
+  { ...ZB, jmeno: 'Sopka', svet: 3, cil: 550, rychlost: [9.5, 13.5], typy: T_VSE },
+  { ...ZB, jmeno: 'Měsíc', svet: 4, cil: 600, rychlost: [10, 14], typy: T_VSE, gravitace: 16 },
+  { ...ZB, jmeno: 'Les', svet: 0, cil: 650, rychlost: [10.5, 15], typy: [...T_VSE, 'jezdi', 'jezdi', 'jezdi'] },
+  { ...ZB, jmeno: 'Noc', svet: 5, cil: 700, rychlost: [11, 15.5], typy: [...T_VSE, 'jezdi'], tma: 55 },
+  { ...ZB, jmeno: 'Písečná bouře', svet: 1, cil: 750, rychlost: [11.5, 16], typy: T_VSE, dvojita: 0.45, hustota: 0.9 },
+  { ...ZB, jmeno: 'Ledovec', svet: 2, cil: 850, rychlost: [13, 18], typy: [...T_VSE, 'jezdi', 'jezdi'], dvojita: 0.3, hustota: 0.85 },
+  { ...ZB, jmeno: 'Finále', svet: 3, cil: 1000, rychlost: [13, 19], typy: [...T_VSE, 'jezdi', 'jezdi'], dvojita: 0.4, hustota: 0.8, tma: 85 },
 ];
-export const NEKONECNY = { jmeno: 'Nekonečný běh', svet: 0, cil: Infinity, rychlost: [8.5, 18], nekonecny: true };
+export const NEKONECNY = { ...ZB, typy: T_VSE, jmeno: 'Nekonečný běh', svet: 0, cil: Infinity, rychlost: [8.5, 18], nekonecny: true };
 const DRAHY = [-2.3, 0, 2.3];
 
 export function vytvorBeh(ctx) {
@@ -83,7 +94,7 @@ export function vytvorBeh(ctx) {
       const planeta = new THREE.Mesh(new THREE.SphereGeometry(60, 24, 16), toon('#6d8bff', { fog: false })); planeta.position.set(120, 140, -420); kulisy.add(planeta);
       const prstenec = new THREE.Mesh(new THREE.TorusGeometry(95, 5, 4, 40), toon('#c9b8ff', { fog: false })); prstenec.position.copy(planeta.position); prstenec.rotation.x = 1.2; kulisy.add(prstenec);
     }
-    hvezdy.visible = svetIndex === 4 || svetIndex === 3;
+    hvezdy.visible = svetIndex >= 3;
   }
   function prepniSvet(i, hned = false) {
     svetIndex = i % SVETY.length; svet = SVETY[svetIndex];
@@ -126,7 +137,7 @@ export function vytvorBeh(ctx) {
   const objekty = [], dekorace = [];
   let dalsiDekorace = 0;
 
-  function pridej(typ, draha, z) {
+  function pridej(typ, draha, z, navic = null) {
     let m;
     if (typ === 'nizky') { m = new THREE.Mesh(G.kmen, toon(svet.nizky)); m.position.y = 0.42; }
     else if (typ === 'vysoky') {
@@ -147,10 +158,11 @@ export function vytvorBeh(ctx) {
     if (typ !== 'mince' && typ !== 'hvezda') { obrys(m, 1.04); stin(m); }
     m.position.x = typ === 'brana' ? 0 : DRAHY[draha]; m.position.z = z;
     scene.add(m);
-    objekty.push({ mesh: m, typ, draha, z, hotovo: false });
+    objekty.push({ mesh: m, typ, draha, z, hotovo: false, ...navic });
   }
-  function rada(z, lehka = false) {
-    const typ = lehka ? vyber(['mince', 'blok1', 'nizkyVse']) : vyber(['blok1', 'blok1', 'blok2', 'nizkyVse', 'nizkyVse', 'vysokyVse', 'vysokyVse', 'nizky1', 'vysoky1', 'mince', 'mix']);
+  function rada(z, lehka = false, druha = false) {
+    const typ = lehka ? vyber(level.lehke) : vyber(level.typy);
+    if (!lehka && !druha && level.dvojita && Math.random() < level.dvojita) rada(z - 8, false, true);   // hned za ní další řada
     const volna = Math.floor(Math.random() * 3), ostatni = [0, 1, 2].filter(d => d !== volna);
     const radaMinci = (d, n = 5) => { for (let i = 0; i < n; i++) pridej('mince', d, z - i * 2.2); };
     switch (typ) {
@@ -162,6 +174,11 @@ export function vytvorBeh(ctx) {
       case 'nizky1': pridej('nizky', volna, z); pridej('hvezda', volna, z); pridej('bedna', ostatni[0], z - 1); break;
       case 'vysoky1': pridej('vysoky', volna, z); pridej('bedna', ostatni[0], z); radaMinci(ostatni[1], 4); break;
       case 'mix': pridej('nizky', ostatni[0], z); pridej('vysoky', ostatni[1], z); radaMinci(volna); break;
+      case 'jezdi': { // bedna jezdí mezi dvěma drahami, třetí je volná
+        const od = Math.random() < 0.5 ? 0 : 1;
+        pridej('bedna', od, z, { jezdi: { od, do: od + 1, faze: Math.random() * 6 } });
+        radaMinci(od === 0 ? 2 : 0, 4); break;
+      }
     }
   }
 
@@ -224,6 +241,7 @@ export function vytvorBeh(ctx) {
       case 1: return Math.random() < 0.6 ? kaktus() : kamen('#c98f4f');
       case 2: return Math.random() < 0.78 ? strom('#2f7a4a', true) : snehulak();
       case 3: return Math.random() < 0.5 ? lavovyKamen() : kamen('#3a2a2a');
+      case 5: return Math.random() < 0.7 ? strom('#1f4a3a') : kamen('#3a3a4a');
       default: return Math.random() < 0.55 ? krystal() : kamen('#6d6b82');
     }
   }
@@ -268,10 +286,18 @@ export function vytvorBeh(ctx) {
     return true;
   }
 
-  function skok() { if (hrac.y <= 0.001) { hrac.vy = 10.5; SFX.skok(); jiskry.vystrel(new THREE.Vector3(hrac.x, 0.1, 0), '#ffffff', 6, 2, 0.4); } }
+  const pocty = { skok: 0 };
+  function skok() { if (hrac.y <= 0.001) { hrac.vy = 10.5; SFX.skok(); pocty.skok++; jiskry.vystrel(new THREE.Vector3(hrac.x, 0.1, 0), '#ffffff', 6, 2, 0.4); } }
 
   function animuj(dt, stav) {
     const g = postava.g;
+    if (postava.kenney) {   // postava od Kenney.nl: hotové animace místo hýbání nohama v kódu
+      if (stav === 'nahled') { g.position.set(0, 0, 0); g.rotation.set(0, g.rotation.y + dt * 0.9, 0); g.visible = true; }
+      else { g.rotation.set(0, 0, (DRAHY[hrac.draha] - hrac.x) * -0.13); g.position.set(hrac.x, hrac.y, 0); g.visible = hrac.nesmrtelny > 0 ? Math.floor(hrac.nesmrtelny * 12) % 2 === 0 : true; }
+      hrajAnimaci(postava, stav === 'nahled' ? 'idle' : stav !== 'hra' ? 'idle' : hrac.y > 0.05 ? 'jump' : hrac.drep ? 'crouch' : 'sprint', 0.12);
+      if (postava.mixer) postava.mixer.update(dt * (stav === 'hra' ? Math.max(1, rychlost / 9) : 1));
+      return;
+    }
     if (stav === 'nahled') { g.position.set(0, 0, 0); g.rotation.set(0, g.rotation.y + dt * 0.9, 0); g.scale.setScalar(1); g.visible = true; hrac.faze += dt * 5; }
     else {
       g.rotation.y = 0; g.position.set(hrac.x, hrac.y, 0);
@@ -291,7 +317,8 @@ export function vytvorBeh(ctx) {
   }
 
   const api = {
-    scene, camera, P, PRAH, analyzuj, dokonciKalibraci,
+    scene, camera, P, PRAH, analyzuj, dokonciKalibraci, pocty, trenink: false,
+    drahaHrace: () => hrac.draha, drepHrace: () => hrac.drep,
     nastavPostavu(id) {
       if (postava) scene.remove(postava.g);
       postava = (BEZCI.find(b => b.id === id) || BEZCI[0]).vytvor();
@@ -306,12 +333,13 @@ export function vytvorBeh(ctx) {
       api.nastavPostavu(idPostavy);
       postava.g.rotation.set(0, 0, 0); postava.g.scale.setScalar(1);
       prepniSvet(lv.svet, true);
+      scene.fog.near = lv.tma ? lv.tma * 0.25 : 45; scene.fog.far = lv.tma || 150;
       vycistiDekorace();
       // první překážky už po 30 metrech
       rada(-30, true); rada(-52); rada(-76); rada(-100);
       dalsiRada = 14;
     },
-    nahled(idPostavy) { api.nastavPostavu(idPostavy); prepniSvet(0, true); if (!dekorace.length) vycistiDekorace(); },
+    nahled(idPostavy) { api.nastavPostavu(idPostavy); prepniSvet(0, true); scene.fog.near = 45; scene.fog.far = 150; if (!dekorace.length) vycistiDekorace(); },
     zacatekOdpoctu() { if (rezim === 'kamera') P.kalibrace = []; },
     behemOdpoctu(zbyva) { if (rezim === 'kamera' && zbyva > 1.6) P.kalibrace = []; },
     konecOdpoctu() { return rezim !== 'kamera' || dokonciKalibraci(); },
@@ -342,22 +370,22 @@ export function vytvorBeh(ctx) {
       else if (snimek && snimek.novy && !snimek.L) P.videt = false;
 
       if (stav === 'hra') {
-        casHry += dt;
-        rychlost = Math.min(level.rychlost[1], level.rychlost[0] + casHry * 0.09);
+        if (!api.trenink) casHry += dt;
+        rychlost = api.trenink ? 0 : Math.min(level.rychlost[1], level.rychlost[0] + casHry * 0.09);   // v návodu stojí na místě
         const dz = rychlost * dt;
         vzdalenost += dz; cestaTex.offset.y += dz / 10;
         if (rezim === 'kamera') hrac.draha = P.draha;
         hrac.drepKlavesa = Math.max(0, hrac.drepKlavesa - dt);
         hrac.drep = (rezim === 'kamera' && P.drep) || hrac.drepKlavesa > 0;
         hrac.x += (DRAHY[hrac.draha] - hrac.x) * Math.min(1, dt * 18);
-        hrac.vy -= 31 * dt; hrac.y = Math.max(0, hrac.y + hrac.vy * dt);
+        hrac.vy -= (level.gravitace || 31) * dt; hrac.y = Math.max(0, hrac.y + hrac.vy * dt);
         if (hrac.y === 0) hrac.vy = Math.max(hrac.vy, 0);
         hrac.nesmrtelny = Math.max(0, hrac.nesmrtelny - dt);
 
         // nové řady, a před cílem brána
         const doCile = level.cil - vzdalenost;
         dalsiRada -= dz;
-        if (dalsiRada <= 0 && doCile > 120) { rada(-110); dalsiRada = nahoda(15, 22) + rychlost * 0.4; }
+        if (dalsiRada <= 0 && doCile > 120) { rada(-110); dalsiRada = (nahoda(15, 22) + rychlost * 0.4) * level.hustota; }
         if (!branaPostavena && doCile <= 110) { pridej('brana', 1, -doCile); branaPostavena = true; }
 
         const ruka = rezim === 'kamera' && P.ruka;
@@ -365,8 +393,9 @@ export function vytvorBeh(ctx) {
           const o = objekty[i];
           o.z += dz; o.mesh.position.z = o.z;
           if (o.typ === 'mince' || o.typ === 'hvezda') o.mesh.rotation.y += dt * 4;
+          if (o.jezdi) { const k = (Math.sin(casHry * 2.2 + o.jezdi.faze) + 1) / 2; o.mesh.position.x = DRAHY[o.jezdi.od] + (DRAHY[o.jezdi.do] - DRAHY[o.jezdi.od]) * k; }
           if (o.typ === 'brana') { if (o.z > 0 && !konecHlasen) { konecHlasen = true; SFX.vyhra(); jiskry.vystrel(new THREE.Vector3(hrac.x, 2, -1), '#ffd23f', 40, 7, 1.2); ctx.konec({ vyhra: true, mince, srdce: hrac.srdce, vzdalenost }); } }
-          else if (!o.hotovo && Math.abs(o.z) < 0.7 && Math.abs(hrac.x - DRAHY[o.draha]) < 1.0) {
+          else if (!o.hotovo && Math.abs(o.z) < 0.7 && Math.abs(hrac.x - o.mesh.position.x) < 1.0) {
             if (o.typ === 'mince' && hrac.y < 1.6) { o.hotovo = true; mince++; SFX.mince(); jiskry.vystrel(o.mesh.position, '#ffd23f', 6, 3, 0.4); scene.remove(o.mesh); }
             else if (o.typ === 'hvezda' && (hrac.y > 0.7 || ruka)) { o.hotovo = true; mince += 5; SFX.hvezda(); jiskry.vystrel(o.mesh.position, '#fff3a0', 16, 5, 0.7); scene.remove(o.mesh); ctx.banner('+5', '#ffe14d'); }
             else if (o.typ === 'nizky' || o.typ === 'vysoky' || o.typ === 'bedna') {
@@ -405,6 +434,9 @@ export function vytvorBeh(ctx) {
       slunce.position.set(hrac.x + 7, 14, 6); slunce.target.position.set(hrac.x, 0, -4);
     },
     skocNa(m) { vzdalenost = m; },
+    // jen pro zkoušení: co je před hráčem
+    ladeni: () => ({ x: hrac.x, y: hrac.y, draha: hrac.draha, srdce: hrac.srdce, vzdalenost, konec: konecHlasen, pred: objekty.filter(o => !o.hotovo && o.z < 0.7 && o.z > -30).map(o => ({ typ: o.typ, x: o.mesh.position.x, z: o.z, jezdi: !!o.jezdi })) }),
+    klavesaSim(code) { api.klavesa({ code, preventDefault() {} }); },
     ukoncit() { if (!konecHlasen) { konecHlasen = true; SFX.prohra(); ctx.konec({ vyhra: false, mince, srdce: hrac.srdce, vzdalenost }); } },
   };
   prepniSvet(0, true);

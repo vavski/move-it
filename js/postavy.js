@@ -1,5 +1,7 @@
 // Postavičky. Běžci se vidí zezadu, letci taky. Všechno z jednoduchých tvarů v kresleném stylu.
 import { THREE, toon, svit, pruhledny, obrys, stin } from './zaklad.js';
+import { ptak2, drak2, vazka2 } from './letci.js';
+import { DALSI_BEZCI } from './bezci.js';
 
 const S = (r, w = 14, h = 12) => new THREE.SphereGeometry(r, w, h);
 const B = (x, y, z) => new THREE.BoxGeometry(x, y, z);
@@ -91,7 +93,8 @@ export const BEZCI = [
   { id: 'lava', jmeno: 'Lávový dino', cena: 40, vytvor: () => dino({ telo: '#3a1c1c', bricho: '#ff7a1a', ostny: '#ffb000', ostnySviti: true, oci: '#ff3b00' }) },
   { id: 'zlaty', jmeno: 'Zlatý robot', cena: 100, vytvor: () => robot({ telo: '#f2b600', kov: '#fff1b0', svetlo: '#ff3dd2', anten: '#4ff3ff', ploutve: true }) },
   { id: 'drak', jmeno: 'Drak', cena: 180, vytvor: () => dino({ telo: '#7b3fe4', bricho: '#f3d36b', ostny: '#38e0c1', ostnySviti: true, rohy: true, kridla: '#c8a6ff' }) },
-];
+  ...DALSI_BEZCI,
+].sort((a, b) => a.cena - b.cena);
 
 // ================= LETCI =================
 // Každý letec vrací funkci kridla(uhel, cas), která pohne křídly podle rukou hráče.
@@ -175,9 +178,13 @@ function drakLet() {
 }
 
 export const LETCI = [
-  { id: 'orel', jmeno: 'Orel', cena: 0, vytvor: () => ptak({ telo: '#6b4423', kridlo: '#6b4423', konec: '#3e2812', hlava: '#f3efe6', zobak: '#f2b51c', ocas: '#f3efe6' }) },
-  { id: 'vazka', jmeno: 'Vážka', cena: 60, vytvor: vazka },
-  { id: 'fenix', jmeno: 'Fénix', cena: 140, vytvor: () => ptak({ telo: '#ff5a1f', kridlo: '#ff8a1f', konec: '#ffd23f', konecSviti: true, hlava: '#ffb000', zobak: '#fff1b0', ocas: '#ffd23f', dlouhyOcas: true, stopa: '#ffb000' }) },
-  { id: 'draklet', jmeno: 'Létající drak', cena: 250, vytvor: drakLet },
+  { id: 'orel', jmeno: 'Orel', cena: 0, vytvor: () => ptak2({ telo: '#5a3a1e', bricho: '#8a5c34', hlava: '#f6f2ea', zobak: '#f5b41a', kryt: '#6b4628', letka: '#4a2e16', spicka: '#1e1208', ocas: '#f6f2ea', oboci: '#3a2410' }) },
+  { id: 'vazka', jmeno: 'Vážka', cena: 60, vytvor: () => vazka2() },
+  { id: 'papousek', jmeno: 'Papoušek', cena: 90, vytvor: () => ptak2({ telo: '#e8262b', bricho: '#ff5a3a', hlava: '#e8262b', zobak: '#f2efe6', kryt: '#ffd23f', letka: '#2f7bff', spicka: '#1a3fb0', ocas: '#e8262b', oci: '#1a1020' }) },
+  { id: 'fenix', jmeno: 'Fénix', cena: 140, vytvor: () => ptak2({ telo: '#ff4a1a', bricho: '#ffb02e', hlava: '#ff7a1f', zobak: '#fff1b0', kryt: '#ff6a1f', letka: '#ff3a1a', spicka: '#ffe65a', ocas: '#ff5a1f', oci: '#4a0c00', fenix: true, stopa: '#ffb000' }) },
+  { id: 'netopyr', jmeno: 'Netopýr', cena: 180, vytvor: () => drak2({ netopyr: true, telo: '#4a3a5e', bricho: '#8a7aa0', blana: '#6a4a7e', blana2: '#2e2240', kosti: '#3a2c4a', oci: '#ffe14d' }) },
+  { id: 'sova', jmeno: 'Sněžná sova', cena: 220, vytvor: () => ptak2({ telo: '#f4f6fb', bricho: '#ffffff', hlava: '#f4f6fb', zobak: '#3a3a44', kryt: '#e6ebf5', letka: '#d4dbe8', spicka: '#7a8296', ocas: '#eef1f8', oci: '#ffb000', oboci: '#c9d0de' }) },
+  { id: 'draklet', jmeno: 'Létající drak', cena: 300, vytvor: () => drak2({ telo: '#2fbf6f', bricho: '#f2e07a', blana: '#9a5cff', blana2: '#4a1fa8', kosti: '#1f8a4f', rohy: '#ffd23f', ostny: '#ff7a1a', oci: '#ffe14d', stopa: '#ff7a1a' }) },
+  { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 600, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },
 ];
 export const skinPodleId = id => [...BEZCI, ...LETCI].find(s => s.id === id);

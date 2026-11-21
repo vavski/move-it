@@ -44,12 +44,14 @@
   .horni { display:flex; align-items:center; gap:12px; width:min(980px,100%); }
   .zpet { background:var(--panel); font-size:22px; padding:8px 18px; }
   .horni h2 { margin:0; font-size:44px; color:var(--zluta); }
-  .levelySeznam { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:min(560px,100%); margin-top:14px; }
-  .lvl { background:var(--panel); backdrop-filter:blur(6px); padding:10px 8px 8px; border:3px solid transparent; text-align:center; min-height:104px; }
+  .levelySeznam { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; width:min(860px,100%); margin-top:12px; }
+  .lvl { background:var(--panel); backdrop-filter:blur(6px); padding:6px 4px 6px; border:3px solid transparent; text-align:center; min-height:96px; position:relative; }
+  .lvl .ikonaLvl { font-size:30px; line-height:1.1; }
+  .lvl .cislo { position:absolute; top:4px; left:8px; font-size:18px !important; }
   .lvl:hover:not(:disabled) { border-color:var(--zluta); }
   .lvl:disabled { opacity:.5; cursor:not-allowed; }
   .lvl .cislo { font-size:36px; line-height:1; color:var(--zluta); }
-  .lvl .jm { font-size:18px; line-height:1.15; }
+  .lvl .jm { font-size:15px; line-height:1.1; }
   .lvl .hv { font-size:20px; letter-spacing:2px; color:var(--zluta); }
   .lvl.nekonecny .cislo { color:var(--modra); }
   .spodek { margin-top:auto; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:stretch; }
@@ -98,16 +100,43 @@
   #video { display:none; }
   #zvuk { position:fixed; right:14px; bottom:14px; width:52px; height:52px; font-size:24px; background:var(--panel); border-radius:50%; z-index:5; }
 
+  /* výsledek pro děti, co neumí číst: velký obrázek, konfety, tlačítka s ikonami */
+  .vysIkona { font-size:120px; line-height:1; margin-top:-80px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+  .vysIkona.vyhra { animation:poskok .9s ease-in-out infinite; }
+  @keyframes poskok { 0%,100% { transform:translateY(0) rotate(-6deg) scale(1); } 50% { transform:translateY(-16px) rotate(6deg) scale(1.08); } }
+  .velkeHvezdy span.h { display:inline-block; animation:hvezda .5s cubic-bezier(.3,1.8,.5,1) both; }
+  @keyframes hvezda { from { transform:scale(0) rotate(-90deg); } to { transform:scale(1) rotate(0); } }
+  #btnDalsi.tep { animation:tep 1s ease-in-out infinite; font-size:26px; padding:12px 28px; }
+  @keyframes tep { 0%,100% { transform:scale(1); } 50% { transform:scale(1.09); } }
+  #konfety { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:6; }
+  #konfety i { position:absolute; top:-30px; width:12px; height:18px; border-radius:3px; animation:pad linear forwards; }
+  @keyframes pad { to { transform:translate(var(--dx), 110vh) rotate(var(--r)); } }
+  /* návod: panáček předvede pohyb */
+  #navod { position:fixed; top:100px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; z-index:3; pointer-events:none; }
+  .navodKarta { display:flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter:blur(8px); border-radius:28px; padding:10px 22px 10px 10px; border:4px solid var(--zluta); box-shadow:0 10px 30px rgba(0,0,0,.3); }
+  #navodPan { width:150px; height:180px; display:block; }
+  .navodUcinek { font-size:84px; line-height:1; color:var(--zluta); min-width:110px; text-align:center; animation:tep 1s ease-in-out infinite; }
+  .navodKlavesa { margin-top:8px; background:#fff; color:#1a1f3a; font-weight:800; font-size:22px; padding:2px 14px; border-radius:10px; box-shadow:0 4px 0 #9aa3c7; }
+  .navodKlavesa:empty { display:none; }
+  .navodFajfka { position:absolute; top:28px; left:50%; transform:translateX(-50%); font-size:150px; line-height:1; color:#3ddc84; text-shadow:0 6px 0 #1d9a55, 0 10px 30px rgba(0,0,0,.4); animation:hvezda .4s cubic-bezier(.3,1.8,.5,1) both; }
+  .navodTecky { display:flex; gap:8px; margin-top:8px; }
+  .navodTecky i { width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,.35); }
+  .navodTecky i.hotovo { background:#3ddc84; } .navodTecky i.ted { background:var(--zluta); }
+  #navodPreskoc { position:fixed; top:64px; right:70px; width:44px; height:44px; font-size:20px; background:var(--panel); border-radius:50%; z-index:3; }
+  .napovedaObr { display:flex; gap:10px; align-items:flex-end; }
+  .napovedaObr div { text-align:center; font-size:22px; line-height:1; color:var(--zluta); }
+  .napovedaObr canvas { width:46px; height:55px; display:block; }
+  #cekamPan { width:120px; height:144px; display:block; margin:4px auto 0; }
   .jazyky { position:fixed; top:14px; left:16px; z-index:6; display:flex; background:var(--panel); border-radius:999px; padding:4px; gap:2px; }
   .jazyky button { font-size:18px; padding:4px 12px; border-radius:999px; background:transparent; opacity:.75; }
   .jazyky button.aktivni { background:var(--zluta); color:#3a2300; opacity:1; }
   .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
   .instalovat:hover { border-color:#b8fd04; }
-  @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(2,1fr); } .rezim { width:100%; } .horni h2 { font-size:34px; } }
+  @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(3,1fr); } .rezim { width:100%; } .horni h2 { font-size:34px; } }
 </style>
 <script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
 </script>
 <script>
 // Catch the install prompt early so it is not missed while modules load.
@@ -162,6 +191,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
   <div class="panel">
     <h3 data-i18n="wait.title">Stand 2–3 meters from the camera</h3>
     <p data-i18n="wait.body">Your whole body must fit in the little window bottom left.</p>
+    <canvas id="cekamPan" width="240" height="288"></canvas>
     <p style="font-size:28px;font-weight:800;color:var(--zluta)" data-i18n="wait.hands">Raise both hands = START</p>
     <div class="ruceBar"><div id="ruceBar1"></div></div>
     <div class="tlacitka"><button class="tl tl-svetle" id="btnStartRucne" data-i18n="wait.manual">Start without hands</button><button class="tl tl-svetle" id="btnCekamZpet" data-i18n="back.plain">Back</button></div>
@@ -171,15 +201,16 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <!-- VÝSLEDEK -->
 <section class="obrazovka skryt" id="vysledek">
   <div class="panel">
+    <div class="vysIkona" id="vysIkona">🏆</div>
     <h3 id="vysNadpis">YOU DID IT!</h3>
     <div class="velkeHvezdy" id="vysHvezdy">★★★</div>
     <p id="vysDetail"></p>
     <div class="ziskano">+<span id="vysMince">0</span> <span class="minc"></span></div>
     <p id="vysRekord" style="color:var(--modra);font-weight:800"></p>
     <div class="tlacitka">
-      <button class="tl tl-zlute" id="btnDalsi" data-i18n="res.next">Next level ▶</button>
-      <button class="tl tl-svetle" id="btnZnovu" data-i18n="res.again">Again</button>
-      <button class="tl tl-svetle" id="btnNaLevely" data-i18n="res.levels">Levels</button>
+      <button class="tl tl-zlute" id="btnDalsi" data-i18n="res.next">▶ Next</button>
+      <button class="tl tl-svetle" id="btnZnovu" data-i18n="res.again">↻ Again</button>
+      <button class="tl tl-svetle" id="btnNaLevely" data-i18n="res.levels">☰ Levels</button>
     </div>
     <p class="malyText" id="vysRuce" data-i18n="res.hands">or raise both hands = play again</p>
     <div class="ruceBar" id="ruceBarObal2"><div id="ruceBar2"></div></div>
@@ -194,6 +225,9 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <div id="banner" class="stin-text"></div>
 <div id="odpocet" class="skryt stin-text"></div>
 <div id="zasah"></div>
+<div id="navod" class="skryt"><div class="navodKarta"><canvas id="navodPan" width="300" height="360"></canvas><div class="navodUcinek" id="navodUcinek">⬆</div></div><div class="navodKlavesa" id="navodKlavesa"></div><div class="navodTecky" id="navodTecky"></div><div class="navodFajfka skryt" id="navodFajfka">✔</div></div>
+<button id="navodPreskoc" class="skryt" title="Skip" data-i18n-title="skip">⏭</button>
+<div id="konfety"></div>
 
 <div id="kam" class="skryt"><canvas id="kamCanvas" width="320" height="240"></canvas><div id="stavKam">LOADING</div><select id="vyberKamery" title="Camera" data-i18n-title="camera"></select></div>
 <video id="video" playsinline muted></video>

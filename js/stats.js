@@ -21,6 +21,8 @@ let fronta = [], nacteno = false;
 
 if (zapnuto) {
   window.goatcounter = Object.assign(window.goatcounter || {}, {
+    // itch.io hru vkládá do rámečku; GoatCounter v rámečku bez tohohle nepočítá vůbec nic
+    allow_frame: true,
     path: p => sPrefixem(p || (location.pathname + location.search)),
   });
   const s = document.createElement('script');

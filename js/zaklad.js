@@ -27,7 +27,7 @@ addEventListener('resize', () => {
 
 // ================= TOON STYL =================
 // Tři odstíny světla místo plynulého přechodu = „kreslený“ vzhled jako v dětských hrách.
-const gradient = (() => {
+export const gradient = (() => {
   const d = new Uint8Array([90, 90, 90, 255, 170, 170, 170, 255, 255, 255, 255, 255]);
   const t = new THREE.DataTexture(d, 3, 1, THREE.RGBAFormat);
   t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t;
@@ -95,8 +95,8 @@ export function svetla(scene) {
 }
 
 // ================= ČÁSTICE =================
-export function castice(scene, max = 120) {
-  const geo = new THREE.OctahedronGeometry(0.12, 0);
+export function castice(scene, max = 120, velikost = 0.12, gravitace = 6) {
+  const geo = new THREE.OctahedronGeometry(velikost, 0);
   const pool = [];
   for (let i = 0; i < max; i++) {
     const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true }));
@@ -118,7 +118,7 @@ export function castice(scene, max = 120) {
         if (!p.m.visible) continue;
         p.zivot -= dt;
         if (p.zivot <= 0) { p.m.visible = false; continue; }
-        p.v.y -= 6 * dt;
+        p.v.y -= gravitace * dt;
         p.m.position.addScaledVector(p.v, dt); p.m.position.z += posun;
         const k = p.zivot / p.delka;
         p.m.scale.setScalar(0.4 + k); p.m.material.opacity = k; p.m.rotation.x += dt * 8;
@@ -168,31 +168,126 @@ function sum(t, delka, hl, filtr = 6000) {
   g.gain.setValueAtTime(hl, t); g.gain.exponentialRampToValueAtTime(0.0001, t + delka);
   s.connect(f).connect(g).connect(hlavni); s.start(t); s.stop(t + delka);
 }
-// Dvě vlastní smyčky: rychlá na běh, vzdušnější na let.
+// ================= HUDBA =================
+// Dvě vlastní písničky (16 taktů, sloka + refrén), hrané syntezátorem v prohlížeči — žádné cizí nahrávky, žádné licence.
+// Zápis: jeden takt = 8 osmin oddělených mezerou. Nota „E5“, „-“ = drž předchozí, „.“ = ticho. Akord = jméno na takt.
+const NOTY = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+const midiZ = n => { const m = n.match(/^([A-G]#?)(-?\d)$/); return 12 * (+m[2] + 1) + NOTY[m[1]]; };
+const AKORDY = { C: [48, [0, 4, 7]], G: [43, [0, 4, 7]], Am: [45, [0, 3, 7]], F: [41, [0, 4, 7]], Dm: [50, [0, 3, 7]], E: [40, [0, 4, 7]], Em: [40, [0, 3, 7]] };
+function pisen(o) {
+  // převede zápis na seznam not: { krok (16tiny), midi, delka (16tiny) }
+  const melodie = [];
+  o.melodie.forEach((takt, ti) => {
+    takt.trim().split(/\s+/).forEach((tok, i) => {
+      const krok = ti * 16 + i * 2;
+      if (tok === '-') { if (melodie.length) melodie[melodie.length - 1].delka += 2; }
+      else if (tok !== '.') melodie.push({ krok, midi: midiZ(tok), delka: 2 });
+    });
+  });
+  const podleKroku = new Map(melodie.map(n => [n.krok, n]));
+  return { ...o, podleKroku, taktu: o.melodie.length };
+}
 const HUDBY = {
-  beh: { bpm: 132, akordy: [[48, [0, 4, 7]], [43, [0, 4, 7]], [45, [0, 3, 7]], [41, [0, 4, 7]]], melodie: [0, 1, 2, 1, 2, 3, 2, 1], buben: true },
-  let: { bpm: 104, akordy: [[45, [0, 3, 7]], [41, [0, 4, 7]], [48, [0, 4, 7]], [43, [0, 4, 7]]], melodie: [0, 2, 1, 3, 2, 1, 2, 0], buben: false },
+  beh: pisen({
+    bpm: 140, styl: 'beh',
+    akordy: ['C', 'G', 'Am', 'F', 'C', 'G', 'F', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G'],
+    melodie: [
+      'E5 . G5 . C6 . G5 E5', 'D5 . G5 . B5 - A5 G5', 'C5 . E5 . A5 - G5 E5', 'F5 . A5 . G5 - E5 D5',
+      'E5 . G5 . C6 . D6 E6', 'D6 - B5 G5 D5 . G5 .', 'A5 - C6 A5 G5 - F5 E5', 'D5 - - . G5 . B5 .',
+      'A5 . A5 C6 B5 . A5 .', 'F5 . A5 . C6 - A5 .', 'G5 . E5 . G5 C6 E6 .', 'D6 - - . B5 - D6 .',
+      'E6 . D6 C6 B5 . A5 .', 'C6 . A5 F5 A5 . C6 .', 'G5 - E5 . C5 . E5 G5', 'B5 - D6 - G6 - - .',
+    ],
+  }),
+  let: pisen({
+    bpm: 96, styl: 'let',
+    akordy: ['Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'E'],
+    melodie: [
+      'E5 - - - A5 - B5 -', 'C6 - - - A5 - - -', 'G5 - - - E5 - G5 -', 'D5 - - - - - . .',
+      'E5 - A5 - B5 - C6 -', 'D6 - C6 - A5 - - -', 'G5 - E5 - G5 - C6 -', 'B5 - - - - - . .',
+      'A5 - C6 - F6 - E6 -', 'E6 - D6 - C6 - - -', 'D6 - B5 - G5 - B5 -', 'C6 - - - - - . .',
+      'A5 - C6 - F6 - - -', 'G6 - E6 - C6 - - -', 'D6 - - - B5 - D6 -', 'B5 - - - G#5 - - -',
+    ],
+  }),
 };
+let hudbaBus = null, ozvena = null;
+function pripravHudbu() {
+  if (hudbaBus) return;
+  hudbaBus = ac.createGain(); hudbaBus.gain.value = 0.55;
+  const komp = ac.createDynamicsCompressor(); komp.threshold.value = -16; komp.ratio.value = 4;
+  hudbaBus.connect(komp).connect(hlavni);
+  // ozvěna (delay) dodá melodii prostor
+  ozvena = ac.createDelay(1); ozvena.delayTime.value = 0.32;
+  const zpet = ac.createGain(), mix = ac.createGain(), tlum = ac.createBiquadFilter();
+  tlum.type = 'lowpass'; tlum.frequency.value = 2600; zpet.gain.value = 0.32; mix.gain.value = 0.28;
+  ozvena.connect(tlum); tlum.connect(zpet).connect(ozvena); tlum.connect(mix).connect(hudbaBus);
+}
+// nástroj: oscilátory → filtr s obálkou → hlasitost s obálkou
+function nastroj(t, f, delka, { typy = ['square'], ladeni = [0], hl = 0.05, utok = 0.01, filtr = 3000, filtrOd = null, ozv = 0 }) {
+  const g = ac.createGain(), fl = ac.createBiquadFilter();
+  fl.type = 'lowpass'; fl.Q.value = 1.2;
+  fl.frequency.setValueAtTime(filtrOd ?? filtr, t); fl.frequency.exponentialRampToValueAtTime(filtr, t + Math.max(0.02, Math.min(0.25, delka)));
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(hl, t + utok);
+  g.gain.setValueAtTime(hl, t + Math.max(utok, delka * 0.6)); g.gain.exponentialRampToValueAtTime(0.0001, t + delka + 0.08);
+  typy.forEach((typ, i) => { const o = ac.createOscillator(); o.type = typ; o.frequency.value = f; o.detune.value = ladeni[i] || 0; o.connect(fl); o.start(t); o.stop(t + delka + 0.12); });
+  fl.connect(g); g.connect(hudbaBus);
+  if (ozv) { const s = ac.createGain(); s.gain.value = ozv; g.connect(s).connect(ozvena); }
+}
+function kopak(t, hl = 0.5) { const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.14); g.gain.setValueAtTime(hl, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22); o.connect(g).connect(hudbaBus); o.start(t); o.stop(t + 0.25); }
+function sumHudba(t, delka, hl, typ, f) {
+  if (!sumBuf) { sumBuf = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate); const d = sumBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const s = ac.createBufferSource(), g = ac.createGain(), fl = ac.createBiquadFilter();
+  s.buffer = sumBuf; fl.type = typ; fl.frequency.value = f;
+  g.gain.setValueAtTime(hl, t); g.gain.exponentialRampToValueAtTime(0.0001, t + delka);
+  s.connect(fl).connect(g).connect(hudbaBus); s.start(t, Math.random() * 0.3); s.stop(t + delka);
+}
+function hrajKrok(p, krok, t, K) {
+  const takt = Math.floor(krok / 16) % p.taktu, k = krok % 16;
+  const [koren, int] = AKORDY[p.akordy[takt]];
+  const kolo = Math.floor(krok / (16 * p.taktu));          // druhé kolo písničky má navíc arpeggio
+  const n = p.podleKroku.get(takt * 16 + k);
+  if (n) {
+    if (p.styl === 'beh') nastroj(t, hz(n.midi), n.delka * K * 0.92, { typy: ['square', 'square'], ladeni: [-7, 7], hl: 0.045, filtr: 2400, filtrOd: 5000, ozv: 0.35 });
+    else nastroj(t, hz(n.midi), n.delka * K, { typy: ['triangle', 'sine'], ladeni: [0, 1200], hl: 0.09, utok: 0.03, filtr: 3500, ozv: 0.6 });
+  }
+  if (p.styl === 'beh') {
+    // basa: osminy, kořen a oktáva
+    if (k % 2 === 0) nastroj(t, hz(koren - 12 + (k % 4 === 2 ? 12 : 0)), K * 1.7, { typy: ['sawtooth'], hl: 0.07, filtr: 500, filtrOd: 1400 });
+    // bubny: kopák na 1 a 3 (+ „a" před čtyřkou), virbl na 2 a 4, činel na osminách
+    if (k === 0 || k === 8 || k === 14) kopak(t);
+    if (k === 4 || k === 12) { sumHudba(t, 0.16, 0.16, 'bandpass', 1800); nastroj(t, 190, 0.08, { typy: ['triangle'], hl: 0.08, filtr: 1500 }); }
+    if (k % 2 === 0) sumHudba(t, 0.045, k % 4 === 2 ? 0.05 : 0.03, 'highpass', 8000);
+    // arpeggio v druhém kole
+    if (kolo % 2 === 1 && k % 2 === 1) nastroj(t, hz(koren + 24 + int[(k >> 1) % 3]), K * 0.9, { typy: ['square'], hl: 0.018, filtr: 3500 });
+  } else {
+    // let: měkký polštář akordu, basa na dobách, jemný šustík a zvonkohra
+    if (k === 0) for (const i of int) nastroj(t, hz(koren + 12 + i), K * 15, { typy: ['triangle', 'triangle'], ladeni: [-6, 6], hl: 0.022, utok: 0.35, filtr: 1400 });
+    if (k === 0 || k === 8) nastroj(t, hz(koren - 12), K * 7, { typy: ['triangle'], hl: 0.11, utok: 0.02, filtr: 700 });
+    if (k === 0) kopak(t, 0.28);
+    if (k % 4 === 2) sumHudba(t, 0.09, 0.025, 'highpass', 6000);
+    if (k % 2 === 1) nastroj(t, hz(koren + 24 + int[(k >> 1) % 3]), K * 1.2, { typy: ['sine'], hl: kolo % 2 ? 0.03 : 0.018, filtr: 4000, ozv: 0.5 });
+  }
+}
 let hudba = null, krok = 0, dalsi = 0;
 setInterval(() => {
   if (!hudba || !ac) return;
-  const KROK = 60 / hudba.bpm / 4;
-  while (dalsi < ac.currentTime + 0.15) {
-    const takt = Math.floor(krok / 16) % 4, k = krok % 16, t = dalsi;
-    const [koren, int] = hudba.akordy[takt];
-    if (hudba.buben) { if (k % 4 === 0) ton(150, t, 0.18, 'sine', 0.32, 45); if (k % 4 === 2) sum(t, 0.05, 0.08); }
-    else if (k % 8 === 4) sum(t, 0.12, 0.04, 3000);
-    if ([0, 3, 6, 8, 11, 14].includes(k) && (hudba.buben || k % 8 === 0)) ton(hz(koren + (k === 6 || k === 14 ? 12 : 0)), t, KROK * (hudba.buben ? 1.6 : 6), 'triangle', 0.15);
-    if (k % 2 === 0) {
-      const i = hudba.melodie[(k / 2 + takt) % 8];
-      const nota = koren + 24 + (i === 3 ? 12 : int[i]);
-      if (!(takt === 3 && k > 10)) ton(hz(nota), t, KROK * (hudba.buben ? 1.4 : 2.6), hudba.buben ? 'square' : 'triangle', hudba.buben ? 0.042 : 0.07);
-    }
-    krok++; dalsi += KROK;
-  }
+  const K = 60 / hudba.bpm / 4;
+  if (dalsi < ac.currentTime - 0.5) dalsi = ac.currentTime + 0.05;   // po uspání karty nedohánět zpožděné noty
+  while (dalsi < ac.currentTime + 0.15) { hrajKrok(hudba, krok, dalsi, K); krok++; dalsi += K; }
 }, 30);
-export function hrajHudbu(jmeno) { audio(); if (hudba !== HUDBY[jmeno]) { hudba = HUDBY[jmeno]; krok = 0; dalsi = ac.currentTime + 0.05; } }
+export function hrajHudbu(jmeno) { audio(); pripravHudbu(); if (hudba !== HUDBY[jmeno]) { hudba = HUDBY[jmeno]; krok = 0; dalsi = ac.currentTime + 0.05; } }
 export function ztisHudbu() { hudba = null; }
+// jen pro kontrolu: vyrenderuje písničku potichu do paměti a vrátí hlasitost (špička, průměr)
+export async function zkusHudbu(jmeno, sekundy = 20) {
+  const puvodni = [ac, hlavni, hudbaBus, ozvena];
+  const off = new OfflineAudioContext(1, 22050 * sekundy, 22050);
+  ac = off; hlavni = off.createGain(); hlavni.connect(off.destination); hudbaBus = null; pripravHudbu();
+  const p = HUDBY[jmeno], K = 60 / p.bpm / 4;
+  for (let i = 0, t = 0.05; t < sekundy - 0.5; i++, t += K) hrajKrok(p, i, t, K);
+  [ac, hlavni, hudbaBus, ozvena] = puvodni;
+  const d = (await off.startRendering()).getChannelData(0);
+  let spicka = 0, soucet = 0, nan = 0; for (const v of d) { if (Number.isNaN(v)) nan++; spicka = Math.max(spicka, Math.abs(v)); soucet += v * v; }
+  return { spicka: +spicka.toFixed(3), prumer: +Math.sqrt(soucet / d.length).toFixed(3), nan };
+}
 export const SFX = {
   mince() { if (!ac) return; const t = ac.currentTime; ton(988, t, 0.07, 'square', 0.07); ton(1319, t + 0.06, 0.12, 'square', 0.07); },
   hvezda() { if (!ac) return; const t = ac.currentTime; [72, 76, 79, 84].forEach((n, i) => ton(hz(n), t + i * 0.05, 0.12, 'triangle', 0.12)); },
@@ -222,10 +317,10 @@ export const kamera = {
     try { await spustStream(ulozena); } catch (e) { if (!ulozena) throw e; await spustStream(null); }
     $('kam').classList.remove('skryt');
     stavKam.textContent = t('cam.loadingAi');
-    const { PoseLandmarker, FilesetResolver } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
-    const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    const { PoseLandmarker, FilesetResolver } = await import('../vendor/mediapipe/vision_bundle.mjs');
+    const vision = await FilesetResolver.forVisionTasks(new URL('vendor/mediapipe/wasm', document.baseURI).href);
     landmarker = await PoseLandmarker.createFromOptions(vision, {
-      baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task', delegate: 'GPU' },
+      baseOptions: { modelAssetPath: new URL('vendor/model/pose_landmarker_lite.task', document.baseURI).href, delegate: 'GPU' },
       runningMode: 'VIDEO', numPoses: 1
     });
     this.zapnuta = true;

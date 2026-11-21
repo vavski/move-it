@@ -23,7 +23,7 @@ const SLOVNIK = {
     'wait.body': 'Your whole body must fit in the little window bottom left.',
     'wait.hands': 'Raise both hands = START',
     'wait.manual': 'Start without hands',
-    'res.next': 'Next level ▶', 'res.again': 'Again', 'res.levels': 'Levels',
+    'res.next': '▶ Next', 'res.again': '↻ Again', 'res.levels': '☰ Levels', 'key.space': 'SPACE', 'skip': 'Skip',
     'res.hands': 'or raise both hands = play again',
     'res.done': 'YOU DID IT!', 'res.almost': 'SO CLOSE!', 'res.end': 'GAME OVER!',
     'res.newRecord': 'NEW RECORD: {n}', 'res.record': 'Record: {n}', 'lvl.record': 'record {n}',
@@ -64,7 +64,7 @@ const SLOVNIK = {
     'wait.body': 'Celé tělo musí být v okénku vlevo dole.',
     'wait.hands': 'Zvedni obě ruce = START',
     'wait.manual': 'Start bez rukou',
-    'res.next': 'Další level ▶', 'res.again': 'Znovu', 'res.levels': 'Levely',
+    'res.next': '▶ Další', 'res.again': '↻ Znovu', 'res.levels': '☰ Levely', 'key.space': 'MEZERNÍK', 'skip': 'Přeskočit',
     'res.hands': 'nebo zvedni obě ruce = znovu',
     'res.done': 'HOTOVO!', 'res.almost': 'SKORO!', 'res.end': 'KONEC!',
     'res.newRecord': 'NOVÝ REKORD: {n}', 'res.record': 'Rekord: {n}', 'lvl.record': 'rekord {n}',
@@ -91,10 +91,16 @@ const SLOVNIK = {
 const JMENA_EN = {
   'Šumava': 'Forest', 'Sahara': 'Sahara', 'Alpy': 'Alps', 'Sopka': 'Volcano', 'Měsíc': 'Moon',
   'Nekonečný běh': 'Endless Run',
-  'Údolí': 'Valley', 'Jezera': 'Lakes', 'Kaňon': 'Canyon', 'Jeskyně': 'Cave', 'Překážky': 'Obstacles',
+  'Les': 'Woods', 'Noc': 'Night', 'Písečná bouře': 'Sandstorm', 'Ledovec': 'Glacier', 'Finále': 'Finale',
+  'Údolí': 'Valley', 'Jezera': 'Lakes', 'Kaňon': 'Canyon', 'Jeskyně': 'Cave', 'Překážky': 'Obstacles', 'Sloupy': 'Pillars',
+  'Vítr': 'Wind', 'Tančící kruhy': 'Dancing Rings', 'Malé kruhy': 'Tiny Rings', 'Bouře': 'Storm',
   'Volný let': 'Open Sky',
   'Dino': 'Dino', 'Robo': 'Robo', 'Lávový dino': 'Lava Dino', 'Zlatý robot': 'Golden Robot', 'Drak': 'Dragon',
+  'Kafíno Běžíno': 'Coffino Runnino', 'Banáno Sportivo': 'Banano Sportivo', 'Žraloko Tenisko': 'Sharko Sneakero', 'Pizza Miauzza': 'Pizza Miaouzza',
+  'Anička': 'Annie', 'Tomík': 'Tommy', 'Bára': 'Bella', 'Kuba': 'Jake', 'Stavař': 'Builder', 'Voják': 'Soldier',
+  'Pirát': 'Pirate', 'Zombík': 'Zombie', 'Plecháč': 'Tin Bot', 'Rytíř': 'Knight', 'Ufoň': 'Alien',
   'Orel': 'Eagle', 'Vážka': 'Dragonfly', 'Fénix': 'Phoenix', 'Létající drak': 'Flying Dragon',
+  'Papoušek': 'Parrot', 'Netopýr': 'Bat', 'Sněžná sova': 'Snowy Owl', 'Zlatý drak': 'Golden Dragon',
 };
 const JMENA_EN_VELKA = Object.fromEntries(Object.entries(JMENA_EN).map(([k, v]) => [k.toUpperCase(), v.toUpperCase()]));
 
