@@ -1,5 +1,5 @@
 // Řízení celé hry: domů → levely a postavičky → (čekání na ruce) → odpočet → hra → výsledek.
-import { renderer, $, ulozene, uloz, audio, prepniZvuk, hrajHudbu, SFX, kamera, ruce, zpracujRuce } from './zaklad.js';
+import { renderer, snizKvalitu, $, ulozene, uloz, audio, prepniZvuk, hrajHudbu, SFX, kamera, ruce, zpracujRuce } from './zaklad.js';
 import { BEZCI, LETCI, KOSTATA } from './postavy.js';
 import { vytvorBeh, LEVELY as LV_BEH, NEKONECNY } from './beh.js';
 import { vytvorLet, LEVELY as LV_LET, VOLNY, LEVELY_KOSTE, VOLNY_KOSTE } from './let.js';
@@ -352,11 +352,17 @@ function smycka(cas) {
   api.aktualizuj(dt, stavProRezim, snimek);
   if (stav === 'hra' || stav === 'odpocet') obnovHud();
 
-  // na slabším počítači sníží kvalitu, ať hra neseká
-  if (!mereni.hotovo && stav === 'hra' && dtS < 0.5 && !document.hidden) {
+  // když hra seká (pod 40 snímků za sekundu), sníží kvalitu o stupeň; měří se znovu, dokud to nepomůže
+  if (stav === 'hra' && dtS < 0.5 && !document.hidden) {
     mereni.cas += dtS; mereni.n++;
-    if (mereni.cas > 3) { if (mereni.n / mereni.cas < 40) { renderer.setPixelRatio(1); mereni.hotovo = true; } mereni.cas = mereni.n = 0; }
-  }
+    if (mereni.cas > 2.5) {
+      if (mereni.n / mereni.cas < 40 && snizKvalitu()) {
+        // stíny vypnuté → materiály ve všech režimech se musí přestavět (jednorázové škubnutí)
+        for (const r of Object.values(REZIMY)) r.api.scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); });
+      }
+      mereni.cas = mereni.n = 0;
+    }
+  } else mereni.cas = mereni.n = 0;
   renderer.render(api.scene, api.camera);
   requestAnimationFrame(smycka);
 }

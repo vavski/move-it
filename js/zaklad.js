@@ -10,10 +10,31 @@ export const $ = id => document.getElementById(id);
 
 // ================= RENDERER =================
 export const renderer = new THREE.WebGLRenderer({ canvas: $('svet'), antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+// Kvalita obrazu po stupních. Telefon toho dělá najednou hodně (kamera + rozpoznávání postavy + kreslení hry,
+// při zrcadlení na TV ještě posílá obraz do televize) — na videu z 22. 11. hra běžela jen ~10 snímků za sekundu,
+// a protože herní čas má strop na jeden snímek, běžela i zpomaleně. Proto: telefon začíná rovnou na nižší
+// kvalitě a když hra i tak seká, sníží se další stupeň. Dosažený stupeň si zařízení pamatuje pro příště.
+// 0 = plná, 1 = ostrost 1×, 2 = bez stínů, 3 = obraz kreslený menší (0,75×) a roztažený, 4 = 0,6×
+const telefon = matchMedia('(pointer:coarse)').matches;
+const OSTROST = [Math.min(devicePixelRatio, 2), 1, 1, 0.75, 0.6];
+export const kvalita = { stupen: telefon ? 1 : 0, max: OSTROST.length - 1 };
+try { kvalita.stupen = Math.max(kvalita.stupen, Math.min(kvalita.max, +localStorage.getItem('moveit-kvalita') || 0)); } catch {}
+renderer.setPixelRatio(OSTROST[kvalita.stupen]);
 renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = kvalita.stupen < 2;
+renderer.shadowMap.type = telefon ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+// Sníží kvalitu o stupeň. Vrátí true, když se vypnuly stíny (pak je potřeba přestavět materiály scén).
+export function snizKvalitu() {
+  if (kvalita.stupen >= kvalita.max) return false;
+  kvalita.stupen++;
+  try { localStorage.setItem('moveit-kvalita', kvalita.stupen); } catch {}
+  renderer.setPixelRatio(OSTROST[kvalita.stupen]);
+  renderer.setSize(innerWidth, innerHeight);
+  const stiny = kvalita.stupen < 2;
+  if (renderer.shadowMap.enabled === stiny) return false;
+  renderer.shadowMap.enabled = stiny;
+  return true;
+}
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 export function novaKamera(fov = 62) {
   const c = new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 3000);
