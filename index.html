@@ -99,6 +99,25 @@
   #vyberKamery { position:absolute; left:7px; right:7px; bottom:7px; font:inherit; font-size:12px; font-weight:700; color:#fff; background:rgba(0,0,0,.65); border:1px solid rgba(255,255,255,.3); border-radius:8px; padding:2px 6px; }
   #video { display:none; }
   #zvuk { position:fixed; right:14px; bottom:14px; width:52px; height:52px; font-size:24px; background:var(--panel); border-radius:50%; z-index:5; }
+  body.veHre #celaObr { display:none; }
+  #celaObr { position:fixed; right:74px; bottom:14px; width:52px; height:52px; font-size:26px; background:var(--panel); border-radius:50%; z-index:5; line-height:1; }
+  /* nízká obrazovka (telefon na šířku, zrcadlení na televizi): levely v jedné řadě nahoře, panely v rozích dole,
+     uprostřed zůstane vidět postavička */
+  @media (max-height:520px) and (orientation:landscape) {
+    .obrazovka { padding:8px 12px; }
+    .horni { width:100%; } .horni h2 { font-size:26px; } .zpet { font-size:16px; padding:5px 12px; }
+    .levelySeznam { display:flex; width:100%; overflow-x:auto; gap:6px; margin-top:14px; padding-bottom:4px; scrollbar-width:thin; }
+    #penezenka { top:8px; right:10px; transform:scale(.85); transform-origin:top right; }
+    .lvl { flex:0 0 96px; min-height:0; padding:3px 4px 4px; border-width:2px; }
+    .lvl .ikonaLvl { font-size:19px; } .lvl .jm { font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .lvl .hv { font-size:13px; } .lvl .cislo { font-size:13px !important; top:2px; left:6px; }
+    .spodek { width:100%; justify-content:space-between; flex-wrap:nowrap; gap:8px; padding-right:120px; }
+    .karta { padding:6px 10px; border-radius:16px; }
+    .sipka { width:38px; height:38px; font-size:18px; } .skinJmeno { font-size:19px; min-width:120px; } .skinStav { margin-top:3px; } .skinStav .tl { font-size:15px; padding:6px 12px; }
+    .ovladaniPrepinac button { font-size:14px; padding:6px 10px; } .malyText { font-size:11px; }
+    #zvuk, #celaObr { width:44px; height:44px; font-size:20px; bottom:10px; } #zvuk { right:10px; } #celaObr { right:60px; }
+    .logo { font-size:56px; margin-top:0; } .rezimy { margin-bottom:1vh; } .rezim { padding:8px 12px; } .rezim .ikona { font-size:34px; } .rezim .nazev { font-size:26px; } .rezim .popis { font-size:13px; }
+    .soukromi { font-size:12px; margin-bottom:0; }
+  }
 
   /* výsledek pro děti, co neumí číst: velký obrázek, konfety, tlačítka s ikonami */
   .vysIkona { font-size:120px; line-height:1; margin-top:-80px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
@@ -271,6 +290,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <div id="kam" class="skryt"><canvas id="kamCanvas" width="320" height="240"></canvas><div id="stavKam">LOADING</div><select id="vyberKamery" title="Camera" data-i18n-title="camera"></select></div>
 <video id="video" playsinline muted></video>
 <button id="zvuk" title="Sound (M)" data-i18n-title="sound">♪</button>
+<button id="celaObr" class="skryt" title="Full screen" data-i18n-title="fullscreen">⛶</button>
 
 <script>
 // Kdo hrál první verzi Move It, má v prohlížeči starý service worker, který kód hry dává z mezipaměti

@@ -473,7 +473,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       Object.assign(vstup, { vzlet: 0, naklon: 0, plachti: true, strmhlav: false, kridla: 0.1, smer: 0 });
       kamPos.copy(hrac.pos).add(new THREE.Vector3(0, 9, 17));
     },
-    nahled(idPostavy) { if (!svetSkupina) postavSvet(LEVELY[0]); api.nastavPostavu(idPostavy); hrac.pos.set(0, 90, 700); hrac.yaw = 0; },
+    nahled(idPostavy) { if (!svetSkupina) postavSvet(LEVELY[0]); api.nastavPostavu(idPostavy); hrac.pos.set(0, 90, 700); hrac.yaw = 0; kamPos.copy(hrac.pos).add(new THREE.Vector3(0, 9, 17)); },
     zacatekOdpoctu() {}, behemOdpoctu() {}, konecOdpoctu: () => true,
     klavesa(e) {
       klavesy[e.code] = true;

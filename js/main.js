@@ -38,6 +38,7 @@ function ukaz(id) {
   $('konecHry').classList.toggle('skryt', !veHre);
   $('napoveda').classList.toggle('skryt', !veHre);
   $('penezenka').classList.toggle('skryt', veHre);
+  document.body.classList.toggle('veHre', veHre);   // ve hře se schová tlačítko celé obrazovky (překrývalo nápovědu)
 }
 function obnovPenezenku() { $('pocetMinci').textContent = ulozene.mince; }
 let bannerT = null;
@@ -268,6 +269,23 @@ $('btnNaLevely').onclick = () => naLevely();
 $('konecHry').onclick = () => ukonci();
 $('zvuk').onclick = () => { audio(); $('zvuk').textContent = prepniZvuk() ? '♪' : '✕'; };
 $('zvuk').textContent = ulozene.zvuk ? '♪' : '✕';
+// celá obrazovka: bez horní lišty prohlížeče. Na telefonu se zapne sama při prvním dotyku,
+// na počítači tlačítkem ⛶. iPhone to v prohlížeči neumí — tam pomůže „Přidat na plochu“ (aplikace je bez lišty).
+const umiCelou = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+const veStandalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+function celaObrazovka(zapnout = !document.fullscreenElement) {
+  const el = document.documentElement;
+  if (zapnout) {
+    const p = (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: 'hide' });
+    Promise.resolve(p).then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {});
+  } else (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+}
+if (umiCelou && !veStandalone) {
+  $('celaObr').classList.remove('skryt');
+  $('celaObr').onclick = () => { SFX.klik(); celaObrazovka(); };
+  const dotyk = matchMedia('(pointer:coarse)').matches;
+  if (dotyk) addEventListener('pointerdown', function prvni(e) { if (e.target.id === 'celaObr') return; removeEventListener('pointerdown', prvni); celaObrazovka(true); });
+}
 function ukonci() {
   konecNavodu(false);
   // nekonečný režim: křížek = konec s výsledkem a mincemi
