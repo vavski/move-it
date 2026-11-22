@@ -183,6 +183,8 @@ async function spustLevel(i) {
   $('kam').classList.toggle('skryt', ovladani !== 'kamera');
   const r = R(), lv = i < 0 ? r.extra : r.levely[i];
   r.api.pripravit(lv, ulozene.vybrany[rezimHry], ovladani);
+  // připraví grafiku všech věcí ve scéně hned teď — jinak se dopočítávala v prvních vteřinách hry a ta sekala
+  try { renderer.compile(r.api.scene, r.api.camera); } catch {}
   konecNavodu(false);
   if (ovladani === 'kamera') napovedaObrazky(); else $('napoveda').textContent = t(r.napovedaKlavesy);
   if (ovladani === 'kamera') { stav = 'cekam'; ukaz('cekam'); }
@@ -308,7 +310,9 @@ const mereni = { cas: 0, n: 0, hotovo: false };
 function smycka(cas) {
   const dtS = (cas - posledni) / 1000; posledni = cas;
   // TV režim: hra běží o 15 % pomaleji, ať zpoždění obrazu u zrcadlení na televizi tolik nevadí
-  const dt = Math.min(0.05, dtS) * (ulozene.tv && (stav === 'hra' || stav === 'odpocet') ? 0.85 : 1);
+  // strop na délku snímku: při velkém sekání by hra skákala o kusy; v běhu je vyšší (1/15 s), jinak by při
+  // 15 snímcích za sekundu běžela zpomaleně — kolize v běhu to ještě spolehlivě chytí i v nejvyšší rychlosti
+  const dt = Math.min(rezimHry === 'beh' ? 0.067 : 0.05, dtS) * (ulozene.tv && (stav === 'hra' || stav === 'odpocet') ? 0.85 : 1);
   const api = R().api;
   // kamera
   let snimek = null;
@@ -353,9 +357,10 @@ function smycka(cas) {
   if (stav === 'hra' || stav === 'odpocet') obnovHud();
 
   // když hra seká (pod 40 snímků za sekundu), sníží kvalitu o stupeň; měří se znovu, dokud to nepomůže
-  if (stav === 'hra' && dtS < 0.5 && !document.hidden) {
+  // měří se už během odpočtu, ať je kvalita srovnaná dřív, než se rozběhne
+  if ((stav === 'hra' || stav === 'odpocet') && dtS < 0.5 && !document.hidden) {
     mereni.cas += dtS; mereni.n++;
-    if (mereni.cas > 2.5) {
+    if (mereni.cas > 1.5) {
       if (mereni.n / mereni.cas < 40 && snizKvalitu()) {
         // stíny vypnuté → materiály ve všech režimech se musí přestavět (jednorázové škubnutí)
         for (const r of Object.values(REZIMY)) r.api.scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); });
