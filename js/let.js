@@ -25,11 +25,11 @@ export const LEVELY = [
   { ...Z, jmeno: 'Kaňon', kanon: true, kruhu: 11, potreba: 8, posun: 81, nahore: '#ff9e5a', dole: '#ffe1b8', amp: 14, vyska: 32, velikost: 1.05, pomoc: 0.85 },
   { ...Z, jmeno: 'Jeskyně', jeskyne: true, kruhu: 11, potreba: 8, posun: 120, nahore: '#7a6cff', dole: '#e0dcff', amp: 0, vyska: 45, vlny: 0, pomoc: 0.8 },
   { ...Z, jmeno: 'Sloupy', sloupy: true, kruhu: 12, potreba: 9, posun: 201, more: 8, nahore: '#2f86ff', dole: '#cfeaff', amp: 35, vyska: 50, pomoc: 0.7, navod: ['kure'] },
-  { ...Z, jmeno: 'Vítr', kruhu: 12, potreba: 9, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 9, pomoc: 0.6 },
-  { ...Z, jmeno: 'Tančící kruhy', kruhu: 12, potreba: 9, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55 },
-  { ...Z, jmeno: 'Malé kruhy', kruhu: 14, potreba: 10, posun: 410, more: 10, nahore: '#2b7bff', dole: '#d3ecff', amp: 38, vyska: 48, velikost: 0.8, pomoc: 0.45, rychlost: 33 },
-  { ...Z, jmeno: 'Bouře', kanon: true, kruhu: 13, potreba: 10, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45 },
-  { ...Z, jmeno: 'Finále', sloupy: true, jeskyne: true, kruhu: 15, potreba: 12, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, vitr: 6, pohyb: 7, velikost: 0.85, pomoc: 0.35, rychlost: 34 },
+  { ...Z, vlny: 20, strmost: 1.3, jmeno: 'Vítr', kruhu: 12, potreba: 9, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 9, pomoc: 0.6 },
+  { ...Z, vlny: 22, strmost: 1.4, jmeno: 'Tančící kruhy', kruhu: 12, potreba: 9, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55 },
+  { ...Z, vlny: 22, strmost: 1.5, jmeno: 'Malé kruhy', kruhu: 14, potreba: 10, posun: 410, more: 10, nahore: '#2b7bff', dole: '#d3ecff', amp: 38, vyska: 48, velikost: 0.8, pomoc: 0.45, rychlost: 33 },
+  { ...Z, vlny: 20, strmost: 1.5, jmeno: 'Bouře', kanon: true, kruhu: 13, potreba: 10, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45 },
+  { ...Z, vlny: 24, strmost: 1.4, jmeno: 'Finále', sloupy: true, jeskyne: true, kruhu: 15, potreba: 12, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, vitr: 6, pohyb: 7, velikost: 0.85, pomoc: 0.35, rychlost: 34 },
 ];
 export const VOLNY = { ...Z, jmeno: 'Volný let', typ: 'volny', kruhu: Infinity, potreba: 0, posun: 0, more: 0, nahore: '#3f9cff', dole: '#d6f0ff', amp: 0, vyska: 70 };
 
@@ -41,10 +41,10 @@ export const LEVELY_KOSTE = [
   { ...ZK, jmeno: 'Jezerní závod', kruhu: 11, souperu: 2, posun: 37, more: 22, nahore: '#4a8dff', dole: '#e2f3ff', amp: 40, vyska: 42, vlny: 24, velikost: 1.15, pomoc: 0.9 },
   { ...ZK, jmeno: 'Kaňon', kanon: true, kruhu: 12, posun: 81, nahore: '#ff9e5a', dole: '#ffe1b8', amp: 14, vyska: 32, velikost: 1.1, pomoc: 0.85 },
   { ...ZK, jmeno: 'Kamenné sloupy', sloupy: true, kruhu: 12, posun: 201, more: 8, nahore: '#2f86ff', dole: '#cfeaff', amp: 35, vyska: 50, pomoc: 0.75 },
-  { ...ZK, jmeno: 'Větrná pláň', kruhu: 13, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 7, pomoc: 0.65 },
-  { ...ZK, jmeno: 'Tančící kruhy', kruhu: 13, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 7, pomoc: 0.6 },
-  { ...ZK, jmeno: 'Bouřkový kaňon', kanon: true, kruhu: 13, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 6, velikost: 0.95, pomoc: 0.5 },
-  { ...ZK, jmeno: 'Velké finále', sloupy: true, kruhu: 15, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, pohyb: 5, velikost: 0.95, pomoc: 0.45, rychlost: 32 },
+  { ...ZK, vlny: 18, strmost: 1.4, jmeno: 'Větrná pláň', kruhu: 13, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 7, pomoc: 0.65 },
+  { ...ZK, vlny: 20, strmost: 1.5, jmeno: 'Tančící kruhy', kruhu: 13, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 7, pomoc: 0.6 },
+  { ...ZK, vlny: 20, strmost: 1.5, jmeno: 'Bouřkový kaňon', kanon: true, kruhu: 13, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 6, velikost: 0.95, pomoc: 0.5 },
+  { ...ZK, vlny: 22, strmost: 1.5, jmeno: 'Velké finále', sloupy: true, kruhu: 15, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, pohyb: 5, velikost: 0.95, pomoc: 0.45, rychlost: 32 },
 ];
 export const VOLNY_KOSTE = { ...VOLNY, jmeno: 'Volné létání', souperu: 0 };
 
@@ -112,7 +112,7 @@ export function vytvorLet(ctx, varianta = 'let') {
     else {
       const f = 0.55 + (o % 7) * 0.05;
       drahaX = z => lv.amp * Math.sin(z * 0.009 * f + o) + lv.amp * 0.5 * Math.sin(z * 0.021 + o * 2);
-      drahaY = z => Math.max(lv.vyska + lv.vlny * Math.sin(z * 0.012 + o), vyskaTerenu(drahaX(z), z) + 22);
+      drahaY = z => Math.max(lv.vyska + lv.vlny * Math.sin(z * 0.012 * (lv.strmost || 1) + o), vyskaTerenu(drahaX(z), z) + 22);   // strmost: pozdější levely prudší
     }
     // terén s plochými trojúhelníky a barvou podle výšky
     const g = new THREE.PlaneGeometry(3000, 3000, 190, 190); g.rotateX(-Math.PI / 2);
@@ -539,7 +539,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       if (stav === 'hra' && api.trenink) {
         // návod: pták visí na místě, ale na pohyby reaguje (nahoru, dolů, náklon, turbo), ať dítě vidí, co dělá
         const vz = Math.min(vstup.vzlet, 30); vstup.vzlet = 0;
-        if (KOSTE) hrac.vy += (vstup.smer * 13 - hrac.vy) * Math.min(1, dt * 3);
+        if (KOSTE) hrac.vy += (vstup.smer * 17 - hrac.vy) * Math.min(1, dt * 3);
         else {
           hrac.vy += vz - TIZE * dt;
           if (vstup.strmhlav) hrac.vy += (DOLU - hrac.vy) * Math.min(1, dt * 3); else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, PLACHTI);
@@ -557,7 +557,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       }
       if (stav === 'hra' && konecT < 0 && !api.trenink) {
         const vz = Math.min(vstup.vzlet, 30); vstup.vzlet = 0;
-        if (KOSTE) hrac.vy += (vstup.smer * 13 - hrac.vy) * Math.min(1, dt * 3);   // koště drží výšku samo
+        if (KOSTE) hrac.vy += (vstup.smer * 17 - hrac.vy) * Math.min(1, dt * 3);   // koště drží výšku samo
         else {
           hrac.vy += vz; hrac.rychlost += vz * 0.12;
           hrac.vy -= TIZE * dt;
