@@ -31,7 +31,7 @@
   .logo small { display:block; font-size:.32em; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25); letter-spacing:.08em; margin-top:8px; }
   .soukromi { margin-bottom:2vh; font-size:15px; font-weight:600; opacity:.9; text-align:center; background:var(--panel); padding:4px 14px; border-radius:999px; }
   .rezimy { display:flex; gap:18px; margin-top:auto; margin-bottom:3vh; flex-wrap:wrap; justify-content:center; }
-  .rezim { width:min(300px,42vw); padding:18px 16px 14px; background:var(--panel); backdrop-filter:blur(8px); border:3px solid rgba(255,255,255,.18); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+  .rezim { width:min(270px,29vw); padding:18px 16px 14px; background:var(--panel); backdrop-filter:blur(8px); border:3px solid rgba(255,255,255,.18); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25); }
   .rezim:hover { border-color:var(--zluta); }
   .rezim .ikona { font-size:64px; line-height:1; }
   .rezim .nazev { font-size:40px; color:var(--zluta); line-height:1.1; }
@@ -137,7 +137,7 @@
   .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
   .instalovat:hover { border-color:#b8fd04; }
-  @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(3,1fr); } .rezim { width:100%; } .horni h2 { font-size:34px; } }
+  @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(3,1fr); } .rezim { width:100%; padding:8px 14px; display:grid; grid-template-columns:auto 1fr; column-gap:14px; align-items:center; text-align:left; } .rezim .ikona { font-size:42px; grid-row:span 2; } .rezim .nazev { font-size:30px; } .rezim .popis { font-size:14px; } .horni h2 { font-size:34px; } }
 </style>
 <script type="importmap">
 { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
@@ -166,6 +166,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
   <div class="rezimy">
     <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>
     <button class="rezim" id="btnLet"><div class="ikona">🦅</div><div class="nazev" data-i18n="mode.let">FLY</div><div class="popis" data-i18n="mode.let.desc">flap your arms and fly through rings</div></button>
+    <button class="rezim" id="btnKoste"><div class="ikona">🧹</div><div class="nazev" data-i18n="mode.koste">BROOM</div><div class="popis" data-i18n="mode.koste.desc">race on a broom and cast spells</div></button>
   </div>
   <div class="pwaAkce">
     <button id="btnInstalovat" class="instalovat skryt" data-i18n="install">Install app</button>

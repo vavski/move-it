@@ -19,13 +19,13 @@
 <script type="module">
 // Ukázka postaviček: ?skupina=letci | bezci, ?ids=orel,fenix (jen vybrané). Každá postavička ve vlastním okénku, točí se a mává.
 import { THREE, renderer, svetla, toon } from './js/zaklad.js';
-import { BEZCI, LETCI } from './js/postavy.js';
+import { BEZCI, LETCI, KOSTATA } from './js/postavy.js';
 import { tn } from './js/i18n.js';
 const q = new URLSearchParams(location.search);
 const ZOOM = +(q.get('zoom') || 1), NAHLED = q.has('nahled'), UHEL = (q.has('uhel') ? +q.get('uhel') : 155) * Math.PI / 180;
-let seznam = q.get('skupina') === 'bezci' ? BEZCI : q.get('skupina') === 'vse' ? [...BEZCI, ...LETCI] : LETCI;
+let seznam = q.get('skupina') === 'koste' ? KOSTATA : q.get('skupina') === 'bezci' ? BEZCI : q.get('skupina') === 'vse' ? [...BEZCI, ...LETCI] : LETCI;
 if (q.get('soubory')) { const { model } = await import('./js/bezci.js'); seznam = q.get('soubory').split(',').map(f => ({ id: f, jmeno: f, vytvor: () => model('modely/' + f + '.glb', { vyska: 2.3, barvy: { Skin: '#f3c7a1' } }) })); }   // jen pro výběr nových modelů
-if (q.get('ids')) { const ids = q.get('ids').split(','); seznam = [...BEZCI, ...LETCI].filter(s => ids.includes(s.id)); }
+if (q.get('ids')) { const ids = q.get('ids').split(','); seznam = [...BEZCI, ...LETCI, ...KOSTATA].filter(s => ids.includes(s.id)); }
 const sloupcu = Math.ceil(Math.sqrt(seznam.length * 1.6)), radku = Math.ceil(seznam.length / sloupcu);
 const popisky = document.getElementById('popisky');
 popisky.style.gridTemplateColumns = `repeat(${sloupcu},1fr)`; popisky.style.gridTemplateRows = `repeat(${radku},1fr)`;

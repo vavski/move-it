@@ -1,6 +1,6 @@
 // Postavičky. Běžci se vidí zezadu, letci taky. Všechno z jednoduchých tvarů v kresleném stylu.
 import { THREE, toon, svit, pruhledny, obrys, stin } from './zaklad.js';
-import { ptak2, drak2, vazka2, letecModel } from './letci.js';
+import { ptak2, drak2, vazka2, letecModel, jezdec } from './letci.js';
 import { model } from './bezci.js';
 const VYSKA = 2.6;   // výška všech lidí a robotů
 const CLOVEK = { vyska: VYSKA, mapa: { crouch: 'Roll' }, barvy: { Skin: '#f3c7a1' } };
@@ -222,4 +222,18 @@ export const LETCI = [
   { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 1500, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },
   { id: 'velkydrak', jmeno: 'Ohnivý drak', cena: 2000, vytvor: () => { const p = letecModel('Dragon', { vyska: 5.6, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }); p.stopa = '#ff7a1a'; return p; } },
 ];
-export const skinPodleId = id => [...BEZCI, ...LETCI].find(s => s.id === id);
+// ================= KOŠTĚ =================
+// Jezdci na koštěti: lidé z běhu posazení na koště z kódu. Liší se postavou, barvou koštěte a stopou.
+const KUZE = { Skin: '#f3c7a1' };
+export const KOSTATA = [
+  { id: 'ko-carodejnice', jmeno: 'Čarodějnice', cena: 0, vytvor: () => jezdec('Witch', { barvy: KUZE, stopa: '#b06bff' }) },
+  { id: 'ko-karate', jmeno: 'Karatista', cena: 0, vytvor: () => jezdec('Kimono_Male', { barvy: KUZE, po: vlasy('#231c18'), metla: '#ffd23f', pasek: '#2f6bff' }) },
+  { id: 'ko-karatistka', jmeno: 'Karatistka', cena: 150, vytvor: () => jezdec('Kimono_Female', { barvy: KUZE, metla: '#ffd23f', pasek: '#ff4d8d', stopa: '#ff8ad0' }) },
+  { id: 'ko-carodej', jmeno: 'Čaroděj', cena: 250, vytvor: () => jezdec('Wizard', { barvy: KUZE, nasada: '#5a3a8a', pasek: '#ffd23f', stopa: '#4ff3ff' }) },
+  { id: 'ko-ninja', jmeno: 'Ninja', cena: 400, vytvor: () => jezdec('Ninja_Male', { barvy: { ...KUZE, Main: '#e0362f', Details: '#ffd23f', Grey: '#3a3a44' }, nasada: '#2a2a33', metla: '#e0362f', pasek: '#ffd23f', stopa: '#ff4d5e' }) },
+  { id: 'ko-pirat', jmeno: 'Pirát', cena: 550, vytvor: () => jezdec('Pirate_Male', { barvy: KUZE, pasek: '#2f6bff', stopa: '#7fd8ff' }) },
+  { id: 'ko-viking', jmeno: 'Viking', cena: 700, vytvor: () => jezdec('Viking_Male', { barvy: KUZE, nasada: '#5a3a22', pasek: '#c0c6d0', stopa: '#ffffff' }) },
+  { id: 'ko-rytir', jmeno: 'Zlatý rytíř', cena: 900, vytvor: () => jezdec('Knight_Golden_Male', { barvy: { ...KUZE, Armor: '#f7b51e', Armor_Dark: '#b8740c', Detail: '#d8323a', Red: '#d8323a' }, nasada: '#c48a00', metla: '#fff1b0', pasek: '#d8323a', stopa: '#ffd23f' }) },
+  { id: 'ko-ohnive', jmeno: 'Ohnivé koště', cena: 1500, vytvor: () => jezdec('Witch', { barvy: { ...KUZE }, nasada: '#3a1c1c', metla: '#ff7a1a', pasek: '#ffd23f', stopa: '#ff7a1a', ohen: true }) },
+];
+export const skinPodleId = id => [...BEZCI, ...LETCI, ...KOSTATA].find(s => s.id === id);

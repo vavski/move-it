@@ -15,13 +15,17 @@ const POZY = {
   kure: t => { const s = vlna(t, 9); return { ruce: [[0.35 + s * 0.9, 2.7], [0.35 + s * 0.9, 2.7]] }; },
   krok: t => { const s = Math.sin(t * 1.6); return { x: s * 38, ruce: [[0.3, 0], [0.3, 0]], nohy: [[0.15 + Math.max(0, -s) * 0.3, 0], [0.15 + Math.max(0, s) * 0.3, 0]] }; },
   skok: t => { const s = Math.max(0, Math.sin(t * 3.2)); return { y: -s * 34, ruce: [[0.4 + s * 2.3, 0], [0.4 + s * 2.3, 0]], nohy: [[0.1, s * 0.5], [0.1, s * 0.5]] }; },
+  // koště: ruce před sebou na násadě, náklon těla / ruce k bradě / obě ruce nad hlavu
+  naklon: t => { const w = Math.sin(t * 2) * 0.5; return { ruce: [[0.55, 1.5], [0.55, 1.5]], naklon: -w * 0.4 }; },
+  nahoru: t => { const s = vlna(t, 3); return { ruce: [[0.55 + s * 0.7, 1.5 + s * 0.4], [0.55 + s * 0.7, 1.5 + s * 0.4]] }; },
+  kouzlo: t => { const s = vlna(t, 4); return { ruce: [[0.6 + s * 2.4, 1.4 - s * 1.4], [0.6 + s * 2.4, 1.4 - s * 1.4]] }; },
   drep: t => { const s = vlna(t, 3); return { y: s * 34, ruce: [[0.9 + s * 0.5, 0.4], [0.9 + s * 0.5, 0.4]], nohy: [[0.5 + s * 0.9, s * 2.0], [0.5 + s * 0.9, s * 2.0]] }; },
 };
 
 // Co pohyb udělá ve hře (velká značka vedle panáčka).
-export const UCINEK = { mav: '⬆', zatacka: '↶ ↷', plachti: '〰', strmhlav: '⬇', kure: '⚡', krok: '⬅ ➡', skok: '⤒', drep: '⤓', start: '▶' };
+export const UCINEK = { naklon: '↶ ↷', nahoru: '⬆', kouzlo: '✨', mav: '⬆', zatacka: '↶ ↷', plachti: '〰', strmhlav: '⬇', kure: '⚡', krok: '⬅ ➡', skok: '⤒', drep: '⤓', start: '▶' };
 // Klávesa pro hraní bez kamery.
-export const KLAVESA = { mav: 'MEZERNÍK', zatacka: '← →', plachti: '↑', strmhlav: '↓', kure: 'SHIFT', krok: '← →', skok: '↑', drep: '↓', start: '' };
+export const KLAVESA = { naklon: '← →', nahoru: '↑', kouzlo: 'MEZERNÍK', mav: 'MEZERNÍK', zatacka: '← →', plachti: '↑', strmhlav: '↓', kure: 'SHIFT', krok: '← →', skok: '↑', drep: '↓', start: '' };
 
 export function kresliPanacka(k, w, h, poza, t, barva = '#ffffff') {
   const p = (POZY[poza] || POZY.start)(t);
@@ -73,6 +77,10 @@ export const KROKY = {
     { poza: 'zatacka', hotovo: (a, dt, s) => drz(s, Math.abs(a.vstup.naklon) > 0.45, dt, 0.35) },
     { poza: 'strmhlav', hotovo: (a, dt, s) => drz(s, a.vstup.strmhlav, dt, 0.35) },
     { poza: 'kure', hotovo: (a, dt, s) => a.pocty.turbo > s.start.turbo },
+  ],
+  koste: [
+    { poza: 'naklon', hotovo: (a, dt, s) => drz(s, Math.abs(a.vstup.naklon) > 0.45, dt, 0.35) },
+    { poza: 'kouzlo', hotovo: (a, dt, s) => a.pocty.kouzlo > s.start.kouzlo },
   ],
   beh: [
     { poza: 'krok', hotovo: a => a.drahaHrace() !== 1 },

@@ -1,8 +1,8 @@
 // Řízení celé hry: domů → levely a postavičky → (čekání na ruce) → odpočet → hra → výsledek.
 import { renderer, $, ulozene, uloz, audio, prepniZvuk, hrajHudbu, SFX, kamera, ruce, zpracujRuce } from './zaklad.js';
-import { BEZCI, LETCI } from './postavy.js';
+import { BEZCI, LETCI, KOSTATA } from './postavy.js';
 import { vytvorBeh, LEVELY as LV_BEH, NEKONECNY } from './beh.js';
-import { vytvorLet, LEVELY as LV_LET, VOLNY } from './let.js';
+import { vytvorLet, LEVELY as LV_LET, VOLNY, LEVELY_KOSTE, VOLNY_KOSTE } from './let.js';
 import { kresliPanacka, KROKY, UCINEK, KLAVESA } from './navod.js';
 import { stats } from './stats.js';
 import { t, tn, jazyk, nastavJazyk, poZmene } from './i18n.js';
@@ -15,11 +15,14 @@ const ctx = {
 };
 const beh = vytvorBeh(ctx);
 const lt = vytvorLet(ctx);
+const ko = vytvorLet(ctx, 'koste');     // závod na koštěti: stejný motor jako let
 const REZIMY = {
   beh: { api: beh, levely: LV_BEH, extra: NEKONECNY, skiny: BEZCI, nazev: 'mode.beh', hudba: 'beh',
     napovedaKamera: 'hint.beh.cam', napovedaKlavesy: 'hint.beh.keys' },
   let: { api: lt, levely: LV_LET, extra: VOLNY, skiny: LETCI, nazev: 'mode.let', hudba: 'let',
     napovedaKamera: 'hint.let.cam', napovedaKlavesy: 'hint.let.keys' },
+  koste: { api: ko, levely: LEVELY_KOSTE, extra: VOLNY_KOSTE, skiny: KOSTATA, nazev: 'mode.koste', hudba: 'let',
+    napovedaKamera: 'hint.koste.cam', napovedaKlavesy: 'hint.koste.keys' },
 };
 
 let stav = 'domu';            // domu | levely | cekam | odpocet | hra | vysledek
@@ -80,6 +83,7 @@ function naLevely(rz = rezimHry) {
 const IKONY = {
   beh: ['🌲', '🐪', '🏔️', '🌋', '🌙', '🌳', '🌃', '🌪️', '🧊', '🏆'],
   let: ['🏞️', '🌊', '🏜️', '🕳️', '🗿', '💨', '💃', '🎯', '⛈️', '🏆'],
+  koste: ['🌼', '🌊', '🏜️', '🗿', '💨', '💃', '⛈️', '🏆'],
 };
 // ---- obchod se skiny ----
 function ukazSkin() {
@@ -132,7 +136,7 @@ function krokNavodu(i) {
 }
 function konecNavodu(oznam = true) {
   if (!navod) return;
-  navod = null; REZIMY.beh.api.trenink = false; REZIMY.let.api.trenink = false;
+  navod = null; for (const r of Object.values(REZIMY)) r.api.trenink = false;
   $('navod').classList.add('skryt'); $('navodPreskoc').classList.add('skryt');
   if (oznam && stav === 'hra') { banner('▶ START!', '#ffd23f'); SFX.svet(); }
 }
@@ -155,8 +159,8 @@ $('navodPreskoc').onclick = () => { SFX.klik(); konecNavodu(); };
 // malé obrázky pohybů vpravo dole místo textu (pro děti, co neumí číst)
 function napovedaObrazky() {
   const n = $('napoveda'); n.innerHTML = '<div class="napovedaObr"></div>';
-  const poz = rezimHry === 'let' ? ['mav', 'zatacka', 'strmhlav', 'kure'] : ['krok', 'skok', 'drep'];
-  const casy = { mav: 0.2, zatacka: 0.8, strmhlav: 0, kure: 0.1, krok: 1, skok: 0.5, drep: 0.5 };
+  const poz = rezimHry === 'let' ? ['mav', 'zatacka', 'strmhlav', 'kure'] : rezimHry === 'koste' ? ['naklon', 'nahoru', 'kouzlo'] : ['krok', 'skok', 'drep'];
+  const casy = { naklon: 0.8, nahoru: 0.5, kouzlo: 0.4, mav: 0.2, zatacka: 0.8, strmhlav: 0, kure: 0.1, krok: 1, skok: 0.5, drep: 0.5 };
   for (const p of poz) {
     const d = document.createElement('div'), c = document.createElement('canvas'); c.width = 100; c.height = 120;
     kresliPanacka(c.getContext('2d'), 100, 120, p, casy[p]);
@@ -213,7 +217,9 @@ function konecHry(v) {
   const ik = $('vysIkona'); ik.textContent = vyhral ? (hvezdy === 3 || levelIndex < 0 ? '🏆' : '🥇') : '💪'; ik.classList.toggle('vyhra', vyhral);
   if (vyhral) konfety();
   hrajHudbu(vyhral ? 'vyhra' : 'lobby');
-  $('vysDetail').textContent = rezimHry === 'beh'
+  $('vysDetail').textContent = rezimHry === 'koste' && levelIndex >= 0
+    ? t('res.broom', { p: v.misto, n: v.hracu, k: v.kruhy, b: v.balonky })
+    : rezimHry === 'beh'
     ? (levelIndex < 0 ? t('res.runEndless', { m: Math.floor(v.vzdalenost), c: v.mince }) : v.vyhra ? t('res.runWin', { lvl: tn(lv.jmeno) }) : t('res.runLose', { m: Math.floor(v.vzdalenost), cil: lv.cil }))
     : (levelIndex < 0 ? t('res.flyEndless', { k: v.kruhy }) : t('res.fly', { k: v.kruhy, n: lv.kruhu }) + (v.vyhra ? '' : t('res.flyNeed', { n: lv.potreba })));
   $('vysMince').textContent = v.mince;
@@ -252,6 +258,7 @@ function obnovHud() {
 // ================= TLAČÍTKA =================
 $('btnBeh').onclick = () => { audio(); SFX.klik(); naLevely('beh'); };
 $('btnLet').onclick = () => { audio(); SFX.klik(); naLevely('let'); };
+$('btnKoste').onclick = () => { audio(); SFX.klik(); naLevely('koste'); };
 $('btnZpet').onclick = () => { SFX.klik(); naDomu(); };
 $('btnStartRucne').onclick = () => zacniOdpocet();
 $('btnCekamZpet').onclick = () => naLevely();
@@ -331,7 +338,7 @@ function smycka(cas) {
   renderer.render(api.scene, api.camera);
   requestAnimationFrame(smycka);
 }
-window.__hra = { beh, let: lt, ulozene, stav: () => stav, spustLevel, naLevely, konecHry };
+window.__hra = { beh, let: lt, koste: ko, ulozene, stav: () => stav, spustLevel, naLevely, konecHry };
 // přepínač jazyka (EN | CZ)
 document.querySelectorAll('[data-jazyk]').forEach(b => b.onclick = () => { SFX.klik(); nastavJazyk(b.dataset.jazyk); $('nastaveni').classList.add('skryt'); });
 $('btnNastaveni').onclick = e => { e.stopPropagation(); audio(); SFX.klik(); $('nastaveni').classList.toggle('skryt'); };

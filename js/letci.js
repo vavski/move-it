@@ -332,3 +332,50 @@ export function letecModel(soubor, opt = {}) {
   };
   return p;
 }
+
+// ---- jezdec na koštěti (režim Koště) ----
+// Postava z běhu (Quaternius) v sedu: vezme se první snímek animace Idle (rovný postoj) a kosti nohou
+// a rukou se pootočí (úhly spočítané tak, aby kolena byla vpředu ve výšce boků a pěsti u sebe na násadě).
+// Koště je z kódu. Rozhraní jako letec: { g, stopa, kridla(u, cas) } — „křídla“ tu jen jemně houpou koštětem.
+const SED = { UpperLeg: [-1.2, 0, 0], LowerLeg: [1.05, 0, 0], UpperArmL: [0.6, 0.2, -1], UpperArmR: [0.6, -0.2, 1] };
+export function jezdec(soubor, opt = {}) {
+  const g = new THREE.Group();
+  const kost = new THREE.Group(); kost.rotation.x = 0.22; g.add(kost);
+  const nasada = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.09, 3.8, 8), toon(opt.nasada || '#8a5a2b'));
+  nasada.rotation.x = Math.PI / 2; nasada.position.z = -0.2; kost.add(nasada);
+  const spicka = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), toon(opt.pasek || '#e8434e')); spicka.position.z = -2.1; kost.add(spicka);
+  const metla = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.5, 12), toon(opt.metla || '#f2c66a'));
+  metla.rotation.x = -Math.PI / 2; metla.position.z = 2.15; kost.add(metla);
+  const pasek = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.18, 10), toon(opt.pasek || '#e8434e'));
+  pasek.rotation.x = Math.PI / 2; pasek.position.z = 1.5; kost.add(pasek);
+  obrys(kost, 1.06); stin(kost);
+  // vyska = výška postavy ve stoje (stejná u všech jezdců); jen Idle, aby galerie ani hra nepouštěly běh
+  const p = model('modely/' + soubor + '.glb', { vyska: opt.vyska || 2.3, barvy: opt.barvy || {}, po: opt.po || null, mapa: { sprint: null, jump: null } });
+  g.add(p.g);
+  g.rotation.order = 'YXZ'; g.scale.setScalar(opt.mer || 1.7);   // jezdec je menší než letci, ať je ve hře dobře vidět
+  let sedi = false;
+  const q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3();
+  function posad() {
+    if (!p.mixer || !p.akce.idle) return;
+    p.akce.idle.play(); p.mixer.update(0);
+    const m = p.g.children[0]?.children[0]; if (!m) return;
+    const otoc = (jm, [x, y, z]) => { const b = m.getObjectByName(jm); if (b) b.quaternion.multiply(q.setFromEuler(e.set(x, y, z))); };
+    for (const sd of ['L', 'R']) { otoc('UpperLeg' + sd, SED.UpperLeg); otoc('LowerLeg' + sd, SED.LowerLeg); }
+    otoc('UpperArmL', SED.UpperArmL); otoc('UpperArmR', SED.UpperArmR);
+    p.akce.idle.stop();                 // póza zůstane, mixer už kosti nepřepisuje
+    // boky posadit na násadu (kus za středem násady)
+    g.updateMatrixWorld(true);
+    const boky = m.getObjectByName('Hips'); if (!boky) return;
+    g.worldToLocal(boky.getWorldPosition(v));
+    p.g.position.set(-v.x, 0.06 - v.y, 0.15 - v.z);
+    sedi = true;
+  }
+  return {
+    g, stopa: opt.stopa || null, ohen: !!opt.ohen, jezdec: p,
+    kridla(u, cas = 0) {
+      if (!sedi) posad();
+      kost.rotation.z = Math.sin(cas * 2.1) * 0.04;
+      metla.scale.set(1 + Math.sin(cas * 9) * 0.04, 1, 1);
+    },
+  };
+}
