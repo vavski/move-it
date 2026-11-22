@@ -112,6 +112,7 @@ const JMENA_EN = {
   'Údolí': 'Valley', 'Jezera': 'Lakes', 'Kaňon': 'Canyon', 'Jeskyně': 'Cave', 'Překážky': 'Obstacles', 'Sloupy': 'Pillars',
   'Vítr': 'Wind', 'Tančící kruhy': 'Dancing Rings', 'Malé kruhy': 'Tiny Rings', 'Bouře': 'Storm',
   'Volný let': 'Open Sky',
+  'Fialový drak': 'Purple Dragon',
   'Kouzelná louka': 'Magic Meadow', 'Jezerní závod': 'Lake Race', 'Kamenné sloupy': 'Stone Pillars', 'Větrná pláň': 'Windy Plain', 'Bouřkový kaňon': 'Stormy Canyon', 'Velké finále': 'Grand Finale', 'Volné létání': 'Free Flying', 'Ohnivé koště': 'Fire Broom',
   'Dino': 'Dino', 'Robo': 'Robo', 'Lávový dino': 'Lava Dino', 'Zlatý robot': 'Golden Robot', 'Drak': 'Dragon',
   'Kafíno Běžíno': 'Coffino Runnino', 'Banáno Sportivo': 'Banano Sportivo', 'Žraloko Tenisko': 'Sharko Sneakero', 'Pizza Miauzza': 'Pizza Miaouzza',

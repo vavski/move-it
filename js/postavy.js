@@ -219,6 +219,8 @@ export const LETCI = [
   { id: 'ptero', jmeno: 'Pterodaktyl', cena: 700, vytvor: () => drak2({ ptero: true, telo: '#3a9ad9', bricho: '#cdeeff', blana: '#8fd8ff', blana2: '#2a6fb0', kosti: '#1f5f9a', oci: '#ffe14d', zobak: '#ffc93a', hrebinek: '#ff7a2a' }) },
   { id: 'draklet', jmeno: 'Létající drak', cena: 1000, vytvor: () => drak2({ telo: '#2fbf6f', bricho: '#f2e07a', blana: '#9a5cff', blana2: '#4a1fa8', kosti: '#1f8a4f', rohy: '#ffd23f', ostny: '#ff7a1a', oci: '#ffe14d', stopa: '#ff7a1a' }) },
   { id: 'dracek', jmeno: 'Dráček', cena: 1200, vytvor: () => letecModel('M_Dragon_Evolved', { vyska: 5.4 }) },
+  // Fialový drak (22. 11., podle videa od Vasilije): štíhlý, dlouhý krk, hřebínek z ostnů, blanitá křídla, ocas s hrotem
+  { id: 'fialovydrak', jmeno: 'Fialový drak', cena: 1300, vytvor: () => drak2({ dlouhyKrk: true, hreben: '#e6d6ff', telo: '#7d52d6', bricho: '#cdb9f5', blana: '#e3a8dc', blana2: '#6a3cb8', kosti: '#5b36a6', rohy: '#efe4ff', ostny: '#4e2c96', oci: '#ffe14d', stopa: '#c58cff' }) },
   { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 1500, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },
   { id: 'velkydrak', jmeno: 'Ohnivý drak', cena: 2000, vytvor: () => { const p = letecModel('Dragon', { vyska: 5.6, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }); p.stopa = '#ff7a1a'; return p; } },
 ];

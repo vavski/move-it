@@ -186,8 +186,13 @@ export function drak2(o) {
   prechod(tg, 'y', o.bricho, o.telo, 0.7);
   g.add(new THREE.Mesh(tg, matBarvy()));
   // krk a hlava
-  const hlava = new THREE.Group(); hlava.position.set(0, pt ? 0.4 : net ? 0.15 : 0.35, pt ? -1.35 : net ? -0.95 : -1.55); g.add(hlava);
-  if (!net || pt) { const krk = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.36, 0.7, 10), toon(o.telo)); krk.rotation.x = Math.PI / 2 - 0.5; krk.position.set(0, -0.12, 0.3); hlava.add(krk); }
+  const dk = o.dlouhyKrk ? 1 : 0;   // štíhlý drak s dlouhým krkem (Fialový drak)
+  const hlava = new THREE.Group(); hlava.position.set(0, pt ? 0.4 : net ? 0.15 : 0.35 + dk * 0.75, pt ? -1.35 : net ? -0.95 : -1.55 - dk * 0.6); g.add(hlava);
+  if (!net || pt) { if (dk) {   // dlouhý krk: válec natažený od hrudi k hlavě
+      const a = new THREE.Vector3(0, 0.2, -1.05), b = hlava.position.clone().add(new THREE.Vector3(0, -0.12, 0.22)), d = b.clone().sub(a);
+      const krk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.34, d.length(), 10), toon(o.telo));
+      krk.position.copy(a).addScaledVector(d, 0.5); krk.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(krk);
+    } else { const krk = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.36, 0.7, 10), toon(o.telo)); krk.rotation.x = Math.PI / 2 - 0.5; krk.position.set(0, -0.12, 0.3); hlava.add(krk); } }
   const lebka = new THREE.Mesh(new THREE.SphereGeometry(net ? 0.42 : 0.4, 16, 12), toon(o.telo)); lebka.scale.set(1, 0.85, pt ? 1.25 : net ? 0.95 : 1.1); hlava.add(lebka);
   if (!pt) { const cumak = new THREE.Mesh(new THREE.SphereGeometry(net ? 0.2 : 0.3, 12, 10), toon(net ? o.bricho : o.telo)); cumak.scale.set(1, 0.7, 1.3); cumak.position.set(0, -0.08, net ? -0.32 : -0.48); hlava.add(cumak); }
   for (const sx of [-1, 1]) {
@@ -212,6 +217,9 @@ export function drak2(o) {
     const tvar = new THREE.Shape(); tvar.moveTo(0, 0); tvar.quadraticCurveTo(0.5, 0.35, 1.45, 0.42); tvar.quadraticCurveTo(0.7, 0.05, 0.25, -0.22); tvar.closePath();
     const hg = new THREE.ExtrudeGeometry(tvar, { depth: 0.08, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 1 }); hg.translate(0, 0, -0.04); hg.rotateY(-Math.PI / 2);
     const hreb = new THREE.Mesh(hg, toon(o.hrebinek || '#e8434e')); hreb.position.set(0, 0.18, 0.15); hlava.add(hreb);
+  }
+  if (o.hreben) for (let i = 0; i < 5; i++) {   // hřebínek z ostnů na temeni a za hlavou
+    const h = new THREE.Mesh(new THREE.ConeGeometry(0.07 - i * 0.006, 0.42 - i * 0.04, 5), toon(o.hreben)); h.position.set(0, 0.3 - i * 0.05, 0.05 + i * 0.14); h.rotation.x = 0.85; hlava.add(h);
   }
   // ostny po zádech
   if (!net) for (let i = 0; i < 6; i++) { const os = new THREE.Mesh(new THREE.ConeGeometry(0.13 - i * 0.012, 0.36, 5), toon(o.ostny)); os.position.set(0, 0.55 - i * 0.03, -0.7 + i * 0.42); os.rotation.x = -0.5; g.add(os); }
