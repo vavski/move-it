@@ -1,5 +1,5 @@
 // Režim BĚH: tři dráhy, uhýbání, skok, dřep, sbírání. Ovládání kamerou nebo klávesnicí.
-import { THREE, nahoda, vyber, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX } from './zaklad.js';
+import { THREE, nahoda, vyber, toon, svit, obrys, stin, vytvorNebe, svetla, castice, novaKamera, SFX, gradient } from './zaklad.js';
 import { BEZCI } from './postavy.js';
 import { t, tn } from './i18n.js';
 import { hrajAnimaci } from './bezci.js';
@@ -135,6 +135,38 @@ export function vytvorBeh(ctx) {
     branaSloup: new THREE.BoxGeometry(0.5, 5, 0.5),
     branaTyc: new THREE.BoxGeometry(8.4, 1.0, 0.5),
   };
+  // Mince se strukturou (22. 11.): vystouplý okraj, propadlá plocha a vyražené „M“ (Move It) se stínem,
+  // ať je mince vidět jako opravdová i na světlé cestě. Okraj je soustružený profil, líc a rub mají obrázek.
+  const minceDily = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+    const g = x.createRadialGradient(46, 40, 8, 64, 64, 64);
+    g.addColorStop(0, '#fff3b0'); g.addColorStop(0.55, '#ffc928'); g.addColorStop(1, '#e8901a');
+    x.fillStyle = g; x.beginPath(); x.arc(64, 64, 64, 0, Math.PI * 2); x.fill();
+    // vnitřní vyražený kroužek: tmavá linka a pod ní světlá (vypadá jako prohloubení)
+    x.lineWidth = 5; x.strokeStyle = '#c96d10'; x.beginPath(); x.arc(64, 64, 49, 0, Math.PI * 2); x.stroke();
+    x.lineWidth = 3; x.strokeStyle = 'rgba(255,248,200,.9)'; x.beginPath(); x.arc(64, 66, 46, 0, Math.PI * 2); x.stroke();
+    // „M“: stín dole vpravo, pak světlý obrys nahoře vlevo, pak samotné písmeno
+    x.font = '900 64px "Arial Black", "Baloo 2", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#b8600c'; x.fillText('M', 68, 72);
+    x.fillStyle = '#fff8d0'; x.fillText('M', 62, 65);
+    x.fillStyle = '#f5a623'; x.fillText('M', 64, 68);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const lic = new THREE.MeshToonMaterial({ map: t, emissive: '#ffffff', emissiveMap: t, emissiveIntensity: 0.32, gradientMap: gradient });
+    // okraj: profil (poloměr, výška) — tlustší val na kraji, plocha uvnitř trochu propadlá
+    const pr = [[0, 0.045], [0.27, 0.045], [0.3, 0.07], [0.35, 0.075], [0.38, 0.05], [0.385, 0], [0.38, -0.05], [0.35, -0.075], [0.3, -0.07], [0.27, -0.045], [0, -0.045]]
+      .map(([r, y]) => new THREE.Vector2(r, y));
+    const okrajGeo = new THREE.LatheGeometry(pr, 28).rotateX(Math.PI / 2);
+    const okraj = new THREE.MeshToonMaterial({ color: '#f0a020', emissive: '#ff9a00', emissiveIntensity: 0.22, gradientMap: gradient });
+    const licGeo = new THREE.CircleGeometry(0.3, 28);
+    return { lic, okraj, okrajGeo, licGeo };
+  })();
+  function novaMince() {
+    const m = new THREE.Group();
+    m.add(new THREE.Mesh(minceDily.okrajGeo, minceDily.okraj));
+    const a = new THREE.Mesh(minceDily.licGeo, minceDily.lic); a.position.z = 0.047; m.add(a);
+    const b = new THREE.Mesh(minceDily.licGeo, minceDily.lic); b.position.z = -0.047; b.rotation.y = Math.PI; m.add(b);
+    return m;
+  }
   const hvezdaGeo = (() => {
     const s = new THREE.Shape();
     for (let i = 0; i < 10; i++) { const r = i % 2 ? 0.22 : 0.52, a = i / 10 * Math.PI * 2 + Math.PI / 2; i ? s.lineTo(Math.cos(a) * r, Math.sin(a) * r) : s.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
@@ -230,7 +262,7 @@ export function vytvorBeh(ctx) {
     else if (typ === 'bedna') {
       m = bednaSveta();
       if (!m) { m = new THREE.Mesh(G.bedna, bednaMat[svet.bedna] ??= new THREE.MeshToonMaterial({ map: bednaTex, color: svet.bedna })); m.position.y = 0.97; }
-    } else if (typ === 'mince') { m = new THREE.Mesh(G.mince, svit('#ffc928', 0.25)); m.position.y = 0.85; m.scale.setScalar(1.2); m.add(zare(1.6)); }
+    } else if (typ === 'mince') { m = novaMince(); m.position.y = 0.85; m.scale.setScalar(1.35); m.add(zare(1.4)); }
     else if (typ === 'hvezda') { m = new THREE.Mesh(hvezdaGeo, svit('#ff5ad8', 0.4)); m.position.y = 2.75; m.scale.setScalar(1.25); m.add(zare(2.6, 'hvezda')); }
     else if (typ === 'brana') {
       m = new THREE.Group();
@@ -504,7 +536,7 @@ export function vytvorBeh(ctx) {
         for (let i = objekty.length - 1; i >= 0; i--) {
           const o = objekty[i];
           o.z += dz; o.mesh.position.z = o.z;
-          if (o.typ === 'mince' || o.typ === 'hvezda') o.mesh.rotation.y += dt * 4;
+          if (o.typ === 'mince' || o.typ === 'hvezda') o.mesh.rotation.y += dt * 2.5;   // pomaleji, ať je obrázek na minci vidět
           if (o.jezdi) { const k = (Math.sin(casHry * 2.2 + o.jezdi.faze) + 1) / 2; o.mesh.position.x = DRAHY[o.jezdi.od] + (DRAHY[o.jezdi.do] - DRAHY[o.jezdi.od]) * k; }
           if (o.typ === 'brana') { if (o.z > 0 && !konecHlasen) { konecHlasen = true; SFX.vyhra(); jiskry.vystrel(new THREE.Vector3(hrac.x, 2, -1), '#ffd23f', 40, 7, 1.2); ctx.konec({ vyhra: true, mince, srdce: hrac.srdce, vzdalenost }); } }
           else if (!o.hotovo && Math.abs(o.z) < 0.7 && Math.abs(hrac.x - o.mesh.position.x) < 1.0) {
