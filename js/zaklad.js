@@ -283,10 +283,10 @@ setInterval(() => {
 // (výše je původní hudba generovaná v kódu, zůstává jen pro zkusHudbu; ve hře hrají skladby ze složky hudba/)
 
 // ================= HUDBA ZE SOUBORŮ =================
-// Skladby z Gemini. Lobby = skladba letu potichu; při startu letu se jen zesílí a hraje dál.
+// Skladby z Gemini (běh, let, výhra) a klidná podložka do lobby z kódu.
 // Výhra začne hrát už v cíli a hraje dokola, dokud je vidět výsledek.
-const SKLADBY = { beh: 'beh.mp3', let: 'let.mp3', vyhra: 'vyhra.mp3' };
-const HLASITOST = { beh: 0.3, let: 0.3, vyhra: 0.35, lobby: 0.12 };   // hudba vůči zvukům ve hře (0.3 ≈ hlasitost původní hudby z kódu)
+const SKLADBY = { beh: 'beh.mp3', let: 'let.mp3', vyhra: 'vyhra.mp3', lobby: 'lobby.mp3' };   // lobby = klidné akordy bez melodie (22. 11.)
+const HLASITOST = { beh: 0.3, let: 0.3, vyhra: 0.35, lobby: 0.3 };   // hudba vůči zvukům ve hře (0.3 ≈ hlasitost původní hudby z kódu)
 const prehravace = {};
 let chtena = null, hraje = null;   // { stopa, hl }
 function prehravac(stopa) {
@@ -320,7 +320,7 @@ function pouzijHudbu() {
   hraje = { ...chtena };
 }
 export function hrajHudbu(jmeno) {
-  chtena = jmeno === 'lobby' ? { stopa: 'let', hl: HLASITOST.lobby } : { stopa: jmeno, hl: HLASITOST[jmeno] };
+  chtena = { stopa: jmeno, hl: HLASITOST[jmeno] };
   pouzijHudbu();
 }
 export function ztisHudbu() { chtena = null; pouzijHudbu(); }

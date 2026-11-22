@@ -291,7 +291,8 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       }
     }
     if (hulka) vstup.smer = 0;          // při kouzlu koště drží výšku
-    vstup.naklon = omez(n, -1, 1);
+    const cilN = Math.abs(n) < 0.1 ? 0 : omez((n - Math.sign(n) * 0.1) / 0.9, -1, 1);
+    vstup.naklon += (cilN - vstup.naklon) * 0.3;
     poza.stav = hulka ? 'pose.spell' : vstup.smer > 0.3 ? 'pose.up' : vstup.smer < -0.3 ? 'pose.down' : 'pose.broom';
   }
   function analyzuj(L, dt) {
@@ -321,7 +322,9 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       let n = ((L[iR].y - L[iL].y) / sw) * (iL === 15 ? 0.9 : 1.6);
       // zatáčet jde i nakloněním těla (ramena), takže ruce nemusí být pořád ve vzduchu
       n += ((L[12].y - L[11].y) / sw) * 2.6;
-      vstup.naklon = omez(n, -1, 1);
+      // malé chvění těla nic nedělá a náklon se mění plynule (dřív cukal hned doprava/doleva)
+      const cilN = Math.abs(n) < 0.12 ? 0 : omez((n - Math.sign(n) * 0.12) / 0.88, -1, 1);
+      vstup.naklon += (cilN - vstup.naklon) * 0.25;
       const sirka = Math.abs(L[iL].x - L[iR].x) / sw;
       vstup.plachti = sirka > (iL === 15 ? 2.2 : 1.5) && Math.abs(poza.zdvih) < 0.7;
       // ruce dole u těla = odpočinek: pták klesá (ne střemhlav jako dřív), dítě si může ruce spustit
@@ -568,8 +571,8 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
         hrac.turbo = Math.max(0, hrac.turbo - dt);
         hrac.rychlost += ((level.rychlost || 30) - hrac.rychlost) * dt * (hrac.turbo > 0 ? 0.05 : 0.45);
         hrac.rychlost = Math.min(62, hrac.rychlost);
-        hrac.naklon += (vstup.naklon - hrac.naklon) * Math.min(1, dt * 4);
-        hrac.yaw -= hrac.naklon * 1.15 * dt;
+        hrac.naklon += (vstup.naklon - hrac.naklon) * Math.min(1, dt * 2.5);
+        hrac.yaw -= hrac.naklon * 1.0 * dt;
         // jemná pomoc k dalšímu kruhu (děti)
         const cilK = level.typ === 'volny' ? null : kruhy[dalsiKruh];
         if (cilK) {

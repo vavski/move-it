@@ -226,16 +226,17 @@ export const LETCI = [
 ];
 // ================= KOŠTĚ =================
 // Jezdci na koštěti: lidé z běhu posazení na koště z kódu. Liší se postavou, barvou koštěte a stopou.
+// Režim Koště je BETA (22. 11.), proto jsou všichni jezdci zdarma.
 const KUZE = { Skin: '#f3c7a1' };
 export const KOSTATA = [
   { id: 'ko-carodejnice', jmeno: 'Čarodějnice', cena: 0, vytvor: () => jezdec('Witch', { barvy: KUZE, stopa: '#b06bff' }) },
   { id: 'ko-karate', jmeno: 'Karatista', cena: 0, vytvor: () => jezdec('Kimono_Male', { barvy: KUZE, po: vlasy('#231c18'), metla: '#ffd23f', pasek: '#2f6bff' }) },
-  { id: 'ko-karatistka', jmeno: 'Karatistka', cena: 150, vytvor: () => jezdec('Kimono_Female', { barvy: KUZE, metla: '#ffd23f', pasek: '#ff4d8d', stopa: '#ff8ad0' }) },
-  { id: 'ko-carodej', jmeno: 'Čaroděj', cena: 250, vytvor: () => jezdec('Wizard', { barvy: KUZE, nasada: '#5a3a8a', pasek: '#ffd23f', stopa: '#4ff3ff' }) },
-  { id: 'ko-ninja', jmeno: 'Ninja', cena: 400, vytvor: () => jezdec('Ninja_Male', { barvy: { ...KUZE, Main: '#e0362f', Details: '#ffd23f', Grey: '#3a3a44' }, nasada: '#2a2a33', metla: '#e0362f', pasek: '#ffd23f', stopa: '#ff4d5e' }) },
-  { id: 'ko-pirat', jmeno: 'Pirát', cena: 550, vytvor: () => jezdec('Pirate_Male', { barvy: KUZE, pasek: '#2f6bff', stopa: '#7fd8ff' }) },
-  { id: 'ko-viking', jmeno: 'Viking', cena: 700, vytvor: () => jezdec('Viking_Male', { barvy: KUZE, nasada: '#5a3a22', pasek: '#c0c6d0', stopa: '#ffffff' }) },
-  { id: 'ko-rytir', jmeno: 'Zlatý rytíř', cena: 900, vytvor: () => jezdec('Knight_Golden_Male', { barvy: { ...KUZE, Armor: '#f7b51e', Armor_Dark: '#b8740c', Detail: '#d8323a', Red: '#d8323a' }, nasada: '#c48a00', metla: '#fff1b0', pasek: '#d8323a', stopa: '#ffd23f' }) },
-  { id: 'ko-ohnive', jmeno: 'Ohnivé koště', cena: 1500, vytvor: () => jezdec('Witch', { barvy: { ...KUZE }, nasada: '#3a1c1c', metla: '#ff7a1a', pasek: '#ffd23f', stopa: '#ff7a1a', ohen: true }) },
+  { id: 'ko-karatistka', jmeno: 'Karatistka', cena: 0, vytvor: () => jezdec('Kimono_Female', { barvy: KUZE, metla: '#ffd23f', pasek: '#ff4d8d', stopa: '#ff8ad0' }) },
+  { id: 'ko-carodej', jmeno: 'Čaroděj', cena: 0, vytvor: () => jezdec('Wizard', { barvy: KUZE, nasada: '#5a3a8a', pasek: '#ffd23f', stopa: '#4ff3ff' }) },
+  { id: 'ko-ninja', jmeno: 'Ninja', cena: 0, vytvor: () => jezdec('Ninja_Male', { barvy: { ...KUZE, Main: '#e0362f', Details: '#ffd23f', Grey: '#3a3a44' }, nasada: '#2a2a33', metla: '#e0362f', pasek: '#ffd23f', stopa: '#ff4d5e' }) },
+  { id: 'ko-pirat', jmeno: 'Pirát', cena: 0, vytvor: () => jezdec('Pirate_Male', { barvy: KUZE, pasek: '#2f6bff', stopa: '#7fd8ff' }) },
+  { id: 'ko-viking', jmeno: 'Viking', cena: 0, vytvor: () => jezdec('Viking_Male', { barvy: KUZE, nasada: '#5a3a22', pasek: '#c0c6d0', stopa: '#ffffff' }) },
+  { id: 'ko-rytir', jmeno: 'Zlatý rytíř', cena: 0, vytvor: () => jezdec('Knight_Golden_Male', { barvy: { ...KUZE, Armor: '#f7b51e', Armor_Dark: '#b8740c', Detail: '#d8323a', Red: '#d8323a' }, nasada: '#c48a00', metla: '#fff1b0', pasek: '#d8323a', stopa: '#ffd23f' }) },
+  { id: 'ko-ohnive', jmeno: 'Ohnivé koště', cena: 0, vytvor: () => jezdec('Witch', { barvy: { ...KUZE }, nasada: '#3a1c1c', metla: '#ff7a1a', pasek: '#ffd23f', stopa: '#ff7a1a', ohen: true }) },
 ];
 export const skinPodleId = id => [...BEZCI, ...LETCI, ...KOSTATA].find(s => s.id === id);

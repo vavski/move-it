@@ -38,6 +38,8 @@ function ukaz(id) {
   $('konecHry').classList.toggle('skryt', !veHre);
   $('napoveda').classList.toggle('skryt', !veHre);
   $('penezenka').classList.toggle('skryt', veHre);
+  if (id === 'domu' || id === 'levely') $('kam').classList.add('skryt');
+  else if (ovladani === 'kamera' && kamera.zapnuta) $('kam').classList.remove('skryt');
   document.body.classList.toggle('veHre', veHre);   // ve hře se schová tlačítko celé obrazovky (překrývalo nápovědu)
 }
 function obnovPenezenku() { $('pocetMinci').textContent = ulozene.mince; }

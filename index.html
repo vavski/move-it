@@ -34,6 +34,8 @@
   .rezim { width:min(270px,29vw); padding:18px 16px 14px; background:var(--panel); backdrop-filter:blur(8px); border:3px solid rgba(255,255,255,.18); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25); }
   .rezim:hover { border-color:var(--zluta); }
   .rezim .ikona { font-size:64px; line-height:1; }
+  .rezim { position:relative; }
+  .beta { position:absolute; top:8px; right:10px; background:#ff4d8d; color:#fff; font-size:13px; font-weight:800; letter-spacing:.08em; padding:2px 8px; border-radius:999px; }
   .rezim .nazev { font-size:40px; color:var(--zluta); line-height:1.1; }
   .rezim .popis { font-size:17px; opacity:.9; font-weight:600; }
 
@@ -217,7 +219,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
   <div class="rezimy">
     <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>
     <button class="rezim" id="btnLet"><div class="ikona">🦅</div><div class="nazev" data-i18n="mode.let">FLY</div><div class="popis" data-i18n="mode.let.desc">flap your arms and fly through rings</div></button>
-    <button class="rezim" id="btnKoste"><div class="ikona">🧹</div><div class="nazev" data-i18n="mode.koste">BROOM</div><div class="popis" data-i18n="mode.koste.desc">race on a broom and cast spells</div></button>
+    <button class="rezim" id="btnKoste"><span class="beta">BETA</span><div class="ikona">🧹</div><div class="nazev" data-i18n="mode.koste">BROOM</div><div class="popis" data-i18n="mode.koste.desc">race on a broom and cast spells</div></button>
   </div>
   <div class="pwaAkce">
     <button id="btnInstalovat" class="instalovat skryt" data-i18n="install">Install app</button>

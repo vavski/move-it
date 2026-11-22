@@ -178,7 +178,8 @@ export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = 
       const clip = gltf.animations.find(a => a.name === jejich || a.name.endsWith('|' + jejich) || a.name.toLowerCase().endsWith(jejich.toLowerCase()));
       if (!clip) continue;
       const ak = p.mixer.clipAction(clip);
-      if (nase === 'jump' || nase === 'crouch') { ak.setLoop(THREE.LoopOnce); ak.clampWhenFinished = true; }
+      // kotoul (Roll) se opakuje, dokud je dítě v dřepu; ostatní dřepy a skok jen jednou
+      if (nase === 'jump' || (nase === 'crouch' && !/roll/i.test(clip.name))) { ak.setLoop(THREE.LoopOnce); ak.clampWhenFinished = true; }
       if (nase === 'jump') ak.timeScale = clip.duration / skok;   // skok ve hře trvá asi 0,75 s
       p.akce[nase] = ak;
     }

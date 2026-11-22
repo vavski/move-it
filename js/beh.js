@@ -150,15 +150,19 @@ export function vytvorBeh(ctx) {
   })();
   const bednaMat = {};
   // záře kolem mincí a hvězd, aby byly vidět i z dálky a na světlé cestě
-  const zareTex = (() => {
+  // (22. 11.) slabší než dřív — přepalovala; mince zlatá záře, hvězda růžovofialová, ať se nepletou
+  const zareTex = (stred, okraj) => {
     const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
     const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0, 'rgba(255,240,150,1)'); g.addColorStop(0.35, 'rgba(255,200,40,.55)'); g.addColorStop(1, 'rgba(255,170,0,0)');
+    g.addColorStop(0, stred); g.addColorStop(0.35, okraj); g.addColorStop(1, 'rgba(0,0,0,0)');
     x.fillStyle = g; x.fillRect(0, 0, 64, 64);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-  })();
-  const zareMat = new THREE.SpriteMaterial({ map: zareTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false });
-  const zare = velikost => { const z = new THREE.Sprite(zareMat); z.scale.setScalar(velikost); z.userData.bezObrysu = true; return z; };
+  };
+  const zareMat = {
+    mince: new THREE.SpriteMaterial({ map: zareTex('rgba(255,230,140,.55)', 'rgba(255,190,40,.25)'), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }),
+    hvezda: new THREE.SpriteMaterial({ map: zareTex('rgba(255,170,240,.7)', 'rgba(200,80,255,.3)'), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }),
+  };
+  const zare = (velikost, druh = 'mince') => { const z = new THREE.Sprite(zareMat[druh]); z.scale.setScalar(velikost); z.userData.bezObrysu = true; return z; };
 
   // ---- stav ----
   const hrac = { draha: 1, x: 0, y: 0, vy: 0, drep: false, drepKlavesa: 0, nesmrtelny: 0, srdce: 3, faze: 0 };
@@ -226,8 +230,8 @@ export function vytvorBeh(ctx) {
     else if (typ === 'bedna') {
       m = bednaSveta();
       if (!m) { m = new THREE.Mesh(G.bedna, bednaMat[svet.bedna] ??= new THREE.MeshToonMaterial({ map: bednaTex, color: svet.bedna })); m.position.y = 0.97; }
-    } else if (typ === 'mince') { m = new THREE.Mesh(G.mince, svit('#ffc928', 0.45)); m.position.y = 0.85; m.scale.setScalar(1.2); m.add(zare(2.0)); }
-    else if (typ === 'hvezda') { m = new THREE.Mesh(hvezdaGeo, svit('#ffe14d', 0.7)); m.position.y = 2.75; m.scale.setScalar(1.15); m.add(zare(3.2)); }
+    } else if (typ === 'mince') { m = new THREE.Mesh(G.mince, svit('#ffc928', 0.25)); m.position.y = 0.85; m.scale.setScalar(1.2); m.add(zare(1.6)); }
+    else if (typ === 'hvezda') { m = new THREE.Mesh(hvezdaGeo, svit('#ff5ad8', 0.4)); m.position.y = 2.75; m.scale.setScalar(1.25); m.add(zare(2.6, 'hvezda')); }
     else if (typ === 'brana') {
       m = new THREE.Group();
       for (const sx of [-1, 1]) { const s = new THREE.Mesh(G.branaSloup, toon('#ffffff')); s.position.set(sx * 4.2, 2.5, 0); m.add(s); }
@@ -505,7 +509,7 @@ export function vytvorBeh(ctx) {
           if (o.typ === 'brana') { if (o.z > 0 && !konecHlasen) { konecHlasen = true; SFX.vyhra(); jiskry.vystrel(new THREE.Vector3(hrac.x, 2, -1), '#ffd23f', 40, 7, 1.2); ctx.konec({ vyhra: true, mince, srdce: hrac.srdce, vzdalenost }); } }
           else if (!o.hotovo && Math.abs(o.z) < 0.7 && Math.abs(hrac.x - o.mesh.position.x) < 1.0) {
             if (o.typ === 'mince' && hrac.y < 1.6) { o.hotovo = true; mince++; SFX.mince(); jiskry.vystrel(o.mesh.position, '#ffd23f', 6, 3, 0.4); scene.remove(o.mesh); }
-            else if (o.typ === 'hvezda' && (hrac.y > 0.7 || ruka)) { o.hotovo = true; mince += 3; SFX.hvezda(); jiskry.vystrel(o.mesh.position, '#fff3a0', 16, 5, 0.7); scene.remove(o.mesh); ctx.banner('+3', '#ffe14d'); }
+            else if (o.typ === 'hvezda' && (hrac.y > 0.7 || ruka)) { o.hotovo = true; mince += 3; SFX.hvezda(); jiskry.vystrel(o.mesh.position, '#ff9be8', 16, 5, 0.7); scene.remove(o.mesh); ctx.banner('+3', '#ff7ae0'); }
             else if (o.typ === 'nizky' || o.typ === 'vysoky' || o.typ === 'bedna') {
               const narazil = o.typ === 'nizky' ? hrac.y < 0.82 : o.typ === 'vysoky' ? !hrac.drep || hrac.y > 0.3 : true;
               if (narazil && hrac.nesmrtelny === 0) {
