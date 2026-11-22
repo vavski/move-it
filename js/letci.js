@@ -352,7 +352,7 @@ export function jezdec(soubor, opt = {}) {
   // vyska = výška postavy ve stoje (stejná u všech jezdců); jen Idle, aby galerie ani hra nepouštěly běh
   const p = model('modely/' + soubor + '.glb', { vyska: opt.vyska || 2.3, barvy: opt.barvy || {}, po: opt.po || null, mapa: { sprint: null, jump: null } });
   g.add(p.g);
-  g.rotation.order = 'YXZ'; g.scale.setScalar(opt.mer || 1.7);   // jezdec je menší než letci, ať je ve hře dobře vidět
+  g.rotation.order = 'YXZ'; g.scale.setScalar(opt.mer || 2.5);   // jezdec je menší než letci, ať je ve hře dobře vidět (22. 11. zvětšeno z 1.7)
   let sedi = false;
   const q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3();
   function posad() {

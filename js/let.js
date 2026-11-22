@@ -689,7 +689,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       const zKam = hrac.pos.z + 20;
       const blizkoTunelu = tunely.some(t => zKam < t.zA + 25 && hrac.pos.z > t.zB - 5);
       vTunelu += ((blizkoTunelu ? 1 : 0) - vTunelu) * Math.min(1, dt * 3);
-      const zpet = 17 - 8 * vTunelu, nahoru = 9 - 6 * vTunelu;
+      const zpet = (KOSTE ? 9.5 : 17) - 8 * vTunelu, nahoru = (KOSTE ? 5.5 : 9) - 6 * vTunelu;   // na koštěti kamera blíž, jezdec je víc vidět
       let cilKam = hrac.pos.clone().addScaledVector(f, -zpet).add(new THREE.Vector3(0, nahoru, 0));
       if (konecT >= 0 && vyhraTed) {
         // oslava: kamera přeletí dopředu a dívá se na postavičku zepředu z boku
