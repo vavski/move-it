@@ -3,7 +3,7 @@ Modely v této složce: licence CC0 1.0 (volné dílo, i komerčně, bez uvádě
   "Ultimate Animated Character Pack" (Nov 2019). Staženo ze zrcadla na GitHubu (TheFlameFoundation/MagicWorlds), protože
   Google Drive autora hlásil překročený limit; velikosti souborů shodné s druhým nezávislým zrcadlem.
 - Stan, Mike: "Animated Mech Pack" (March 2021), zrcadlo francisb1996/brave-chicken-assets (licence v balíku: CC0).
-- ShibaInu, Fox: "Ultimate Animated Animals" (July 2021), tamtéž.
+- ShibaInu, Fox, Husky, Alpaca, Cow, Horse, Deer: "Ultimate Animated Animals" (July 2021), tamtéž (soubory přes Git LFS).
 - Chicken: Quaternius "Cube World Kit" (zrcadlo chongdashu/threejs-forest-census).
 - PlatformHero: "Ultimate Platformer Pack" (Dec 2021), itch.io quaternius.
 - Dragon, Bat: "LowPoly Animated Monsters", itch.io quaternius (Dragon = běžec Drak i letec Ohnivý drak, Bat = letec Netopýr).

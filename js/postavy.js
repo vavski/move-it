@@ -112,7 +112,12 @@ export const BEZCI = [
     ['hrdina', 'Modrásek', 120, 'PlatformHero', { vyska: 2.5, mapa: { crouch: 'Duck' } }],
     ['shiba', 'Pejsek', 180, 'ShibaInu', { ...ZVIRE, barvy: { Main: '#f39a3c', Main_Light: '#ffffff', Black: '#3a2a22' } }],
     ['slepice', 'Slepice', 220, 'Chicken', { vyska: 1.9, mapa: { jump: null }, jas: 2.1 }],
-    ['robo', 'Robo', 250, 'RobotExpressive', { vyska: VYSKA, mapa: { sprint: 'Running' }, barvy: { Main: '#3d8bff', Grey: '#f4f7fb', Black: '#2a3140' } }],
+    // zvířata (22. 11. večer): bráchovi se nejvíc líbil pejsek, tak přibylo pět dalších ze stejné sady; Robo vyřazen
+    ['husky', 'Husky', 200, 'Husky', { ...ZVIRE, barvy: { Material: '#5f7590', 'Material.001': '#b4c2d2', 'Material.003': '#ffffff' } }],   // materiály v modelu nemají jména
+    ['alpaka', 'Alpaka', 260, 'Alpaca', { ...ZVIRE, vyska: 2.6, barvy: { Main: '#fff3e2', Main_Light: '#ffffff', Main_Dark: '#f2c894', Muzzle: '#ffd9b8', Hooves: '#6a4a3a' } }],
+    ['krava', 'Kravička', 300, 'Cow', { ...ZVIRE, vyska: 2.0, barvy: { Main: '#ffffff', Main_Light: '#3a302c', Muzzle: '#ffb3c6', Horns: '#fff3d6', Hooves: '#3a302c' } }],
+    ['kun', 'Koník', 420, 'Horse', { ...ZVIRE, vyska: 2.4, barvy: { Main: '#b8743a', Main_Dark: '#8a5228', Main_Light: '#f5e2c8', Hair: '#3a2418' } }],
+    ['jelen', 'Jelínek', 550, 'Deer', { ...ZVIRE, vyska: 2.4, barvy: { Main: '#d98a48', Main_Light: '#fff1dc', Main_Dark: '#a8602c' } }],
     ['liska', 'Liška', 320, 'Fox', { ...ZVIRE, barvy: { Main: '#ff7a1f', Main_Light: '#ffffff', Black: '#2a2222', Eyes: '#1a1414', Grey: '#3a3434' } }],
     ['ninja', 'Ninja', 380, 'Ninja_Male', { ...CLOVEK, barvy: { ...CLOVEK.barvy, Main: '#e0362f', Details: '#ffd23f', Grey: '#3a3a44' } }],
     ['pirat', 'Pirát', 450, 'Pirate_Male', CLOVEK],

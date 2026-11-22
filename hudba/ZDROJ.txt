@@ -1,4 +1,4 @@
 Hudba vygenerovaná v Google Gemini (Vasilii, 21. 11. 2026):
 beh.mp3 = Level Up Rush, let.mp3 = Above the Crystalline Ridge, vyhra.mp3 = Winning Streak.
 Překódováno na 128 kb/s, oříznuto ticho na konci.
-lobby.mp3 = klidné akordy C–Am–F–G vygenerované kódem (22. 11. 2026), bez melodie, smyčka 32 s.
+lobby2.mp3 = živá smyčka 112 BPM (akordy C–G–Am–F, basa, arpeggio, bubny) vygenerovaná kódem (22. 11. 2026 večer), bez melodie, 34 s.

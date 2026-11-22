@@ -151,7 +151,7 @@ export const DALSI_SLOVNIK = {
 export const DALSI_JMENA = {
   de: {
     'Holoubek': 'Täubchen', 'Včelka': 'Bienchen', 'Duch': 'Geist', 'Pterodaktyl': 'Flugsaurier', 'Dráček': 'Drachenbaby', 'Ohnivý drak': 'Feuerdrache',
-    'Karatista': 'Karate-Junge', 'Karatistka': 'Karate-Mädchen', 'Modrásek': 'Blauer Held', 'Pejsek': 'Hündchen', 'Slepice': 'Huhn', 'Liška': 'Fuchs', 'Zombík': 'Zombie', 'Pirát': 'Pirat', 'Čaroděj': 'Zauberer', 'Čarodějnice': 'Hexe', 'Zlatý rytíř': 'Goldritter',
+    'Karatista': 'Karate-Junge', 'Karatistka': 'Karate-Mädchen', 'Modrásek': 'Blauer Held', 'Pejsek': 'Hündchen', 'Husky': 'Husky', 'Alpaka': 'Alpaka', 'Kravička': 'Kuh', 'Koník': 'Pony', 'Jelínek': 'Rehkitz', 'Slepice': 'Huhn', 'Liška': 'Fuchs', 'Zombík': 'Zombie', 'Pirát': 'Pirat', 'Čaroděj': 'Zauberer', 'Čarodějnice': 'Hexe', 'Zlatý rytíř': 'Goldritter',
     'Šumava': 'Wald', 'Sahara': 'Sahara', 'Alpy': 'Alpen', 'Sopka': 'Vulkan', 'Měsíc': 'Mond', 'Noc': 'Nacht',
     'Nekonečný běh': 'Endloslauf', 'Les': 'Dickicht', 'Písečná bouře': 'Sandsturm', 'Ledovec': 'Gletscher', 'Finále': 'Finale',
     'Údolí': 'Tal', 'Jezera': 'Seen', 'Kaňon': 'Schlucht', 'Jeskyně': 'Höhle', 'Sloupy': 'Säulen', 'Vítr': 'Wind',
@@ -163,7 +163,7 @@ export const DALSI_JMENA = {
   },
   es: {
     'Holoubek': 'Palomita', 'Včelka': 'Abejita', 'Duch': 'Fantasma', 'Pterodaktyl': 'Pterodáctilo', 'Dráček': 'Dragoncito', 'Ohnivý drak': 'Dragón de fuego',
-    'Karatista': 'Chico kárate', 'Karatistka': 'Chica kárate', 'Modrásek': 'Héroe azul', 'Pejsek': 'Perrito', 'Slepice': 'Gallina', 'Liška': 'Zorro', 'Zombík': 'Zombi', 'Pirát': 'Pirata', 'Viking': 'Vikingo', 'Čaroděj': 'Mago', 'Čarodějnice': 'Bruja', 'Zlatý rytíř': 'Caballero dorado',
+    'Karatista': 'Chico kárate', 'Karatistka': 'Chica kárate', 'Modrásek': 'Héroe azul', 'Pejsek': 'Perrito', 'Husky': 'Husky', 'Alpaka': 'Alpaca', 'Kravička': 'Vaquita', 'Koník': 'Poni', 'Jelínek': 'Cervatillo', 'Slepice': 'Gallina', 'Liška': 'Zorro', 'Zombík': 'Zombi', 'Pirát': 'Pirata', 'Viking': 'Vikingo', 'Čaroděj': 'Mago', 'Čarodějnice': 'Bruja', 'Zlatý rytíř': 'Caballero dorado',
     'Šumava': 'Bosque', 'Sahara': 'Sáhara', 'Alpy': 'Alpes', 'Sopka': 'Volcán', 'Měsíc': 'Luna', 'Noc': 'Noche',
     'Nekonečný běh': 'Carrera infinita', 'Les': 'Arboleda', 'Písečná bouře': 'Tormenta de arena', 'Ledovec': 'Glaciar', 'Finále': 'Final',
     'Údolí': 'Valle', 'Jezera': 'Lagos', 'Kaňon': 'Cañón', 'Jeskyně': 'Cueva', 'Sloupy': 'Columnas', 'Vítr': 'Viento',
@@ -175,7 +175,7 @@ export const DALSI_JMENA = {
   },
   fr: {
     'Holoubek': 'Pigeon', 'Včelka': 'Abeille', 'Duch': 'Fantôme', 'Pterodaktyl': 'Ptérodactyle', 'Dráček': 'Petit dragon', 'Ohnivý drak': 'Dragon de feu',
-    'Karatista': 'Karatéka', 'Karatistka': 'Karatéka fille', 'Modrásek': 'Héros bleu', 'Pejsek': 'Toutou', 'Slepice': 'Poule', 'Liška': 'Renard', 'Zombík': 'Zombie', 'Pirát': 'Pirate', 'Čaroděj': 'Sorcier', 'Čarodějnice': 'Sorcière', 'Zlatý rytíř': 'Chevalier doré',
+    'Karatista': 'Karatéka', 'Karatistka': 'Karatéka fille', 'Modrásek': 'Héros bleu', 'Pejsek': 'Toutou', 'Husky': 'Husky', 'Alpaka': 'Alpaga', 'Kravička': 'Vachette', 'Koník': 'Poney', 'Jelínek': 'Faon', 'Slepice': 'Poule', 'Liška': 'Renard', 'Zombík': 'Zombie', 'Pirát': 'Pirate', 'Čaroděj': 'Sorcier', 'Čarodějnice': 'Sorcière', 'Zlatý rytíř': 'Chevalier doré',
     'Šumava': 'Forêt', 'Sahara': 'Sahara', 'Alpy': 'Alpes', 'Sopka': 'Volcan', 'Měsíc': 'Lune', 'Noc': 'Nuit',
     'Nekonečný běh': 'Course infinie', 'Les': 'Bois', 'Písečná bouře': 'Tempête de sable', 'Ledovec': 'Glacier', 'Finále': 'Finale',
     'Údolí': 'Vallée', 'Jezera': 'Lacs', 'Kaňon': 'Canyon', 'Jeskyně': 'Grotte', 'Sloupy': 'Colonnes', 'Vítr': 'Vent',

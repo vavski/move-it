@@ -156,7 +156,7 @@ export const ulozene = (() => {
   let d = vychozi();
   try { const s = JSON.parse(localStorage.getItem(KLIC)); if (s) d = { ...d, ...s, vybrany: { ...d.vybrany, ...s.vybrany }, odemceno: { ...d.odemceno, ...s.odemceno }, hvezdy: { ...d.hvezdy, ...s.hvezdy }, rekord: { ...d.rekord, ...s.rekord } }; } catch {}
   // vyřazené postavy (22. 11.): kdo je koupil, dostane mince zpátky a vybere se mu výchozí postava
-  const VYRAZENE = { zombik: 600, alien: 1400, mech: 1500, mech2: 1800 };
+  const VYRAZENE = { zombik: 600, alien: 1400, mech: 1500, mech2: 1800, robo: 250 };   // koupené vyřazené postavy = mince zpátky
   for (const [id, cena] of Object.entries(VYRAZENE)) if (d.skiny.includes(id)) { d.skiny = d.skiny.filter(x => x !== id); d.mince += cena; }
   if (VYRAZENE[d.vybrany.beh]) d.vybrany.beh = 'karate';
   return d;
@@ -306,8 +306,8 @@ setInterval(() => {
 // ================= HUDBA ZE SOUBORŮ =================
 // Skladby z Gemini (běh, let, výhra) a klidná podložka do lobby z kódu.
 // Výhra začne hrát už v cíli a hraje dokola, dokud je vidět výsledek.
-const SKLADBY = { beh: 'beh.mp3', let: 'let.mp3', vyhra: 'vyhra.mp3', lobby: 'lobby.mp3' };   // lobby = klidné akordy bez melodie (22. 11.)
-const HLASITOST = { beh: 0.3, let: 0.3, vyhra: 0.35, lobby: 0.3 };   // hudba vůči zvukům ve hře (0.3 ≈ hlasitost původní hudby z kódu)
+const SKLADBY = { beh: 'beh.mp3', let: 'let.mp3', vyhra: 'vyhra.mp3', lobby: 'lobby2.mp3' };   // lobby = živá smyčka s bubny, bez melodie (22. 11. večer; dřívější klidná byla moc potichu a nudná)
+const HLASITOST = { beh: 0.3, let: 0.3, vyhra: 0.35, lobby: 0.34 };   // hudba vůči zvukům ve hře (0.3 ≈ hlasitost původní hudby z kódu)
 const prehravace = {};
 let chtena = null, hraje = null;   // { stopa, hl }
 function prehravac(stopa) {

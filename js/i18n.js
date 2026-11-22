@@ -118,7 +118,7 @@ const JMENA_EN = {
   'Kafíno Běžíno': 'Coffino Runnino', 'Banáno Sportivo': 'Banano Sportivo', 'Žraloko Tenisko': 'Sharko Sneakero', 'Pizza Miauzza': 'Pizza Miaouzza',
   'Anička': 'Annie', 'Tomík': 'Tommy', 'Bára': 'Bella', 'Kuba': 'Jake', 'Stavař': 'Builder', 'Voják': 'Soldier',
   'Pirát': 'Pirate', 'Zombík': 'Zombie', 'Plecháč': 'Tin Bot', 'Rytíř': 'Knight', 'Ufoň': 'Alien',
-  'Karatista': 'Karate Boy', 'Karatistka': 'Karate Girl', 'Modrásek': 'Blue Hero', 'Pejsek': 'Doggo', 'Slepice': 'Chicken',
+  'Karatista': 'Karate Boy', 'Karatistka': 'Karate Girl', 'Modrásek': 'Blue Hero', 'Pejsek': 'Doggo', 'Husky': 'Husky', 'Alpaka': 'Alpaca', 'Kravička': 'Moo Cow', 'Koník': 'Pony', 'Jelínek': 'Little Deer', 'Slepice': 'Chicken',
   'Liška': 'Fox', 'Ninja': 'Ninja', 'Zombík': 'Zombie', 'Viking': 'Viking', 'Čaroděj': 'Wizard', 'Čarodějnice': 'Witch',
   'Zlatý rytíř': 'Golden Knight', 'Mech Stan': 'Mech Stan', 'Mech Mike': 'Mech Mike',
   'Holoubek': 'Pigeon', 'Včelka': 'Bee', 'Duch': 'Ghost', 'Pterodaktyl': 'Pterodactyl', 'Dráček': 'Little Dragon', 'Ohnivý drak': 'Fire Dragon',
