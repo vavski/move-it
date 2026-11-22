@@ -418,10 +418,21 @@ async function spustStream(deviceId) {
   });
   if (stream) stream.getTracks().forEach(t => t.stop());
   stream = novy; video.srcObject = stream; await video.play();
-  posledniCas = -1; jas = 255;
+  posledniCas = -1; jas = 255; srovnejPomer();
   try { localStorage.setItem('uhni-kamera', stream.getVideoTracks()[0].getSettings().deviceId); } catch {}
   await naplnVyber();
 }
+// Náhled kamery má stejný poměr stran jako obraz z kamery. Dřív byl natvrdo 4 : 3, takže obraz
+// z telefonu (na výšku nebo 16 : 9) byl roztažený a vypadal křivě. Telefon při otočení pošle 'resize'.
+function srovnejPomer() {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return;
+  const h = Math.round(320 * vh / vw);
+  if (kamCanvas.height !== h) kamCanvas.height = h;
+  $('kam').style.setProperty('--pomerKam', (vw / vh).toFixed(3));
+}
+video.addEventListener('resize', srovnejPomer);
+video.addEventListener('loadedmetadata', srovnejPomer);
 async function naplnVyber() {
   const kamery = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
   const aktualni = stream && stream.getVideoTracks()[0].getSettings().deviceId;

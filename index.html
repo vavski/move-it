@@ -95,7 +95,9 @@
   #odpocet { position:fixed; top:46%; left:50%; transform:translate(-50%,-50%); font-size:clamp(100px,20vw,210px); font-weight:800; pointer-events:none; }
   #zasah { position:fixed; inset:0; background:radial-gradient(circle, transparent 40%, rgba(255,40,60,.55)); opacity:0; pointer-events:none; transition:opacity .25s; }
 
-  #kam { position:fixed; left:14px; bottom:14px; width:230px; border-radius:16px; overflow:hidden; box-shadow:0 6px 24px rgba(0,0,0,.35); background:#000; z-index:4; }
+  /* náhled kamery: velikost podle obrazovky (na telefonu a při zrcadlení na TV dřív zabíral půlku výšky),
+     výška nikdy přes ~30 % obrazovky; --pomerKam nastaví kód podle skutečného obrazu z kamery */
+  #kam { position:fixed; left:14px; bottom:14px; width:min(230px, 24vw, calc(30vh * var(--pomerKam, 1.333))); border-radius:16px; overflow:hidden; box-shadow:0 6px 24px rgba(0,0,0,.35); background:#000; z-index:4; }
   #kam canvas { display:block; width:100%; height:auto; }
   #stavKam { position:absolute; top:7px; left:7px; right:7px; background:rgba(0,0,0,.62); font-weight:800; font-size:13px; padding:3px 9px; border-radius:999px; text-align:center; }
   #vyberKamery { position:absolute; left:7px; right:7px; bottom:7px; font:inherit; font-size:12px; font-weight:700; color:#fff; background:rgba(0,0,0,.65); border:1px solid rgba(255,255,255,.3); border-radius:8px; padding:2px 6px; }
@@ -119,6 +121,8 @@
     #zvuk, #celaObr { width:44px; height:44px; font-size:20px; bottom:10px; } #zvuk { right:10px; } #celaObr { right:60px; }
     .logo { font-size:56px; margin-top:0; } .rezimy { margin-bottom:1vh; } .rezim { padding:8px 12px; } .rezim .ikona { font-size:34px; } .rezim .nazev { font-size:26px; } .rezim .popis { font-size:13px; }
     .soukromi { font-size:12px; margin-bottom:0; }
+    #kam { left:8px; bottom:8px; border-radius:12px; }
+    #stavKam { font-size:10px; padding:1px 6px; top:4px; left:4px; right:4px; } #vyberKamery { font-size:9px; padding:0 4px; left:4px; right:4px; bottom:4px; }
   }
 
   /* výsledek pro děti, co neumí číst: velký obrázek, konfety, tlačítka s ikonami */
@@ -174,7 +178,7 @@
   body.tv #napoveda { font-size:22px; max-width:70vw; }
   body.tv .napovedaObr canvas { width:72px; height:86px; }
   body.tv .napovedaObr div { font-size:32px; }
-  body.tv #kam { width:340px; }
+  body.tv #kam { width:min(340px, 26vw, calc(34vh * var(--pomerKam, 1.333))); }
   body.tv #banner { font-size:clamp(60px,12vw,140px); }
   .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
