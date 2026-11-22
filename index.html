@@ -134,6 +134,27 @@
   #nastaveni h3 { margin:0 0 4px; font-size:16px; opacity:.8; }
   #nastaveni button { font-size:18px; padding:8px 14px; border-radius:12px; background:transparent; text-align:left; }
   #nastaveni button.aktivni { background:var(--zluta); color:#3a2300; }
+  #nastaveni .oddel { height:1px; background:rgba(255,255,255,.2); margin:6px 0; }
+  #tvOkno { position:fixed; inset:0; z-index:9; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(8,12,40,.55); }
+  #tvOkno .panel { width:min(760px,100%); max-height:100%; overflow:auto; }
+  .tvKroky { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0; }
+  .tvKrok { background:rgba(255,255,255,.08); border-radius:18px; padding:12px 10px; }
+  .tvKrok .obr { font-size:46px; line-height:1.15; white-space:nowrap; }
+  .tvKrok .cis { display:inline-block; width:30px; height:30px; border-radius:50%; background:var(--zluta); color:#3a2300; font-weight:800; line-height:30px; margin-bottom:6px; text-align:center; }
+  .tvKrok p { font-size:17px !important; margin:6px 0 0 !important; }
+  .tvPozor { font-size:16px !important; opacity:.9; background:rgba(255,210,63,.15); border-radius:14px; padding:8px 12px; }
+  .tvPrepinac { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+  @media (max-width:700px) { .tvKroky { grid-template-columns:1fr; } .tvKrok { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; text-align:left; } .tvKrok .obr { font-size:36px; } }
+  /* TV režim: hraje se z 2–3 metrů, všechno ve hře je větší */
+  body.tv #hudVlevo { font-size:52px; }
+  body.tv #hudStred { font-size:84px; }
+  body.tv #hudStred small { font-size:24px; }
+  body.tv #postup { top:118px; height:18px; width:min(560px,70vw); }
+  body.tv #napoveda { font-size:22px; max-width:70vw; }
+  body.tv .napovedaObr canvas { width:72px; height:86px; }
+  body.tv .napovedaObr div { font-size:32px; }
+  body.tv #kam { width:340px; }
+  body.tv #banner { font-size:clamp(60px,12vw,140px); }
   .pwaAkce { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0 8px; }
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
   .instalovat:hover { border-color:#b8fd04; }
@@ -161,7 +182,18 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <section class="obrazovka" id="domu">
   <div class="jazyky" role="group" aria-label="Language"><button data-jazyk="en" class="aktivni" lang="en">EN</button><button data-jazyk="cs" lang="cs">CZ</button><button id="btnNastaveni" title="Settings" data-i18n-title="settings" aria-haspopup="true">⚙</button></div>
   <div id="nastaveni" class="skryt" role="dialog" aria-label="Settings"><h3 data-i18n="settings.lang">Language</h3>
-    <button data-jazyk="en" lang="en">English</button><button data-jazyk="cs" lang="cs">Čeština</button><button data-jazyk="de" lang="de">Deutsch</button><button data-jazyk="es" lang="es">Español</button><button data-jazyk="fr" lang="fr">Français</button></div>
+    <button data-jazyk="en" lang="en">English</button><button data-jazyk="cs" lang="cs">Čeština</button><button data-jazyk="de" lang="de">Deutsch</button><button data-jazyk="es" lang="es">Español</button><button data-jazyk="fr" lang="fr">Français</button>
+    <div class="oddel"></div><button id="btnTv">📺 <span data-i18n="tv.menu">Play on TV</span></button></div>
+  <div id="tvOkno" class="skryt" role="dialog" aria-labelledby="tvNadpis"><div class="panel">
+    <h3 id="tvNadpis" data-i18n="tv.title">PLAY ON TV</h3>
+    <div class="tvKroky">
+      <div class="tvKrok"><div><div class="cis">1</div><div class="obr">💻📱➜📺</div></div><p data-i18n="tv.step1">Connect a laptop or phone to the TV. A cable (HDMI) works best.</p></div>
+      <div class="tvKrok"><div><div class="cis">2</div><div class="obr">📷</div></div><p data-i18n="tv.step2">Put it under the TV with the camera facing the player.</p></div>
+      <div class="tvKrok"><div><div class="cis">3</div><div class="obr">🧍↔📺</div></div><p data-i18n="tv.step3">Stand 2–3 metres from the TV so the camera sees your whole body.</p></div>
+    </div>
+    <p class="tvPozor" data-i18n="tv.wireless">Wireless screen mirroring works too, but the picture comes a bit late. Turn on TV mode: everything is bigger and the game is a bit slower.</p>
+    <div class="tvPrepinac"><button class="tl" id="btnTvRezim"></button><button class="tl tl-zelene" id="btnTvHotovo" data-i18n="tv.done">Done</button></div>
+  </div></div>
   <div class="logo">MOVE<br>IT<small data-i18n="logo.sub">PLAY WITH YOUR WHOLE BODY</small></div>
   <div class="rezimy">
     <button class="rezim" id="btnBeh"><div class="ikona">🦖</div><div class="nazev" data-i18n="mode.beh">RUN</div><div class="popis" data-i18n="mode.beh.desc">dodge, jump, duck</div></button>

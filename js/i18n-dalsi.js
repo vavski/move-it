@@ -45,6 +45,7 @@ export const DALSI_SLOVNIK = {
     'hint.koste.keys': '← → Kurve · ↑ steigen · ↓ sinken · Leertaste = Zauber',
     'pose.broom': 'AUF DEM BESEN', 'pose.up': 'HOCH', 'pose.down': 'RUNTER', 'pose.spell': 'ZAUBER!',
     'hud.points': 'PUNKTE', 'hud.goal': 'ZIEL {n} m', 'hud.rings': 'RINGE', 'hud.need': 'DU BRAUCHST {n}',
+    'tv.menu': 'Auf dem Fernseher spielen', 'tv.title': 'AUF DEM FERNSEHER', 'tv.step1': 'Verbinde einen Laptop oder ein Handy mit dem Fernseher. Am besten mit Kabel (HDMI).', 'tv.step2': 'Stell es unter den Fernseher, die Kamera zum Spieler.', 'tv.step3': 'Stell dich 2–3 Meter vor den Fernseher, damit die Kamera dich ganz sieht.', 'tv.wireless': 'Kabelloses Spiegeln geht auch, aber das Bild kommt etwas später. Schalte den TV-Modus ein: alles ist größer und das Spiel etwas langsamer.', 'tv.on': '📺 TV-Modus: AN', 'tv.off': '📺 TV-Modus: AUS', 'tv.done': 'Fertig',
     'settings': 'Einstellungen', 'settings.lang': 'Sprache',
   },
   es: {
@@ -91,6 +92,7 @@ export const DALSI_SLOVNIK = {
     'hint.koste.keys': '← → girar · ↑ subir · ↓ bajar · espacio = hechizo',
     'pose.broom': 'EN LA ESCOBA', 'pose.up': 'ARRIBA', 'pose.down': 'ABAJO', 'pose.spell': '¡HECHIZO!',
     'hud.points': 'PUNTOS', 'hud.goal': 'META {n} m', 'hud.rings': 'AROS', 'hud.need': 'NECESITAS {n}',
+    'tv.menu': 'Jugar en la tele', 'tv.title': 'JUGAR EN LA TELE', 'tv.step1': 'Conecta un portátil o un móvil a la tele. Lo mejor es un cable (HDMI).', 'tv.step2': 'Ponlo debajo de la tele, con la cámara hacia el jugador.', 'tv.step3': 'Ponte a 2–3 metros de la tele para que la cámara te vea entero.', 'tv.wireless': 'Duplicar la pantalla sin cable también funciona, pero la imagen llega un poco tarde. Activa el modo TV: todo es más grande y el juego un poco más lento.', 'tv.on': '📺 Modo TV: SÍ', 'tv.off': '📺 Modo TV: NO', 'tv.done': 'Listo',
     'settings': 'Ajustes', 'settings.lang': 'Idioma',
   },
   fr: {
@@ -137,6 +139,7 @@ export const DALSI_SLOVNIK = {
     'hint.koste.keys': '← → tourner · ↑ monter · ↓ descendre · espace = sortilège',
     'pose.broom': 'SUR LE BALAI', 'pose.up': 'EN HAUT', 'pose.down': 'EN BAS', 'pose.spell': 'SORTILÈGE !',
     'hud.points': 'POINTS', 'hud.goal': 'ARRIVÉE {n} m', 'hud.rings': 'ANNEAUX', 'hud.need': 'IL EN FAUT {n}',
+    'tv.menu': 'Jouer sur la télé', 'tv.title': 'JOUER SUR LA TÉLÉ', 'tv.step1': 'Branche un ordinateur portable ou un téléphone à la télé. Le mieux, c’est un câble (HDMI).', 'tv.step2': 'Pose-le sous la télé, la caméra tournée vers le joueur.', 'tv.step3': 'Mets-toi à 2–3 mètres de la télé pour que la caméra te voie en entier.', 'tv.wireless': 'La recopie d’écran sans fil marche aussi, mais l’image arrive un peu en retard. Active le mode TV : tout est plus grand et le jeu un peu plus lent.', 'tv.on': '📺 Mode TV : OUI', 'tv.off': '📺 Mode TV : NON', 'tv.done': 'OK',
     'settings': 'Réglages', 'settings.lang': 'Langue',
   },
 };

@@ -286,7 +286,9 @@ addEventListener('keydown', e => {
 let posledni = performance.now();
 const mereni = { cas: 0, n: 0, hotovo: false };
 function smycka(cas) {
-  const dtS = (cas - posledni) / 1000, dt = Math.min(0.05, dtS); posledni = cas;
+  const dtS = (cas - posledni) / 1000; posledni = cas;
+  // TV režim: hra běží o 15 % pomaleji, ať zpoždění obrazu u zrcadlení na televizi tolik nevadí
+  const dt = Math.min(0.05, dtS) * (ulozene.tv && (stav === 'hra' || stav === 'odpocet') ? 0.85 : 1);
   const api = R().api;
   // kamera
   let snimek = null;
@@ -341,8 +343,19 @@ function smycka(cas) {
 window.__hra = { beh, let: lt, koste: ko, ulozene, stav: () => stav, spustLevel, naLevely, konecHry };
 // přepínač jazyka (EN | CZ)
 document.querySelectorAll('[data-jazyk]').forEach(b => b.onclick = () => { SFX.klik(); nastavJazyk(b.dataset.jazyk); $('nastaveni').classList.add('skryt'); });
+// hraní na televizi: návod a TV režim (větší texty, pomalejší hra)
+function obnovTv() {
+  document.body.classList.toggle('tv', !!ulozene.tv);
+  $('btnTvRezim').textContent = t(ulozene.tv ? 'tv.on' : 'tv.off');
+  $('btnTvRezim').className = 'tl ' + (ulozene.tv ? 'tl-zlute' : 'tl-svetle');
+}
+$('btnTv').onclick = e => { e.stopPropagation(); SFX.klik(); $('nastaveni').classList.add('skryt'); obnovTv(); $('tvOkno').classList.remove('skryt'); };
+$('btnTvRezim').onclick = () => { SFX.klik(); ulozene.tv = !ulozene.tv; uloz(); obnovTv(); };
+$('btnTvHotovo').onclick = () => { SFX.klik(); $('tvOkno').classList.add('skryt'); };
+$('tvOkno').onclick = e => { if (e.target.id === 'tvOkno') $('tvOkno').classList.add('skryt'); };
+obnovTv();
 $('btnNastaveni').onclick = e => { e.stopPropagation(); audio(); SFX.klik(); $('nastaveni').classList.toggle('skryt'); };
 addEventListener('pointerdown', e => { if (!e.target.closest('#nastaveni, #btnNastaveni')) $('nastaveni').classList.add('skryt'); });
-poZmene(() => { if (stav === 'levely') naLevely(); });
+poZmene(() => { obnovTv(); if (stav === 'levely') naLevely(); });
 naDomu();
 requestAnimationFrame(smycka);

@@ -332,7 +332,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
     for (let i = 0; i < (lv.souperu || 0); i++) {
       const k = vyber[(i * 3 + 1) % vyber.length], p = k.vytvor();
       svetSkupina.add(p.g);
-      souperi.push({ p, z: zStart - 3 - i * 4, bok: boky[i % 4], faze: i * 2.1, t: 0, sila: [0.97, 1.0, 0.94][i % 3], zasah: 0, cil: false, poradi: 0 });
+      souperi.push({ p, z: zStart - 1.5 * i, bok: boky[i % 4], faze: i * 2.1, t: 0, sila: [0.97, 1.0, 0.94][i % 3], zasah: 0, cil: false, poradi: 0 });
     }
   }
   function postavBalonky(lv, z0, roztec) {
