@@ -16,9 +16,9 @@ const POZY = {
   krok: t => { const s = Math.sin(t * 1.6); return { x: s * 38, ruce: [[0.3, 0], [0.3, 0]], nohy: [[0.15 + Math.max(0, -s) * 0.3, 0], [0.15 + Math.max(0, s) * 0.3, 0]] }; },
   skok: t => { const s = Math.max(0, Math.sin(t * 3.2)); return { y: -s * 34, ruce: [[0.4 + s * 2.3, 0], [0.4 + s * 2.3, 0]], nohy: [[0.1, s * 0.5], [0.1, s * 0.5]] }; },
   // koště: ruce před sebou na násadě, náklon těla / ruce k bradě / obě ruce nad hlavu
-  naklon: t => { const w = Math.sin(t * 2) * 0.5; return { ruce: [[0.55, 1.5], [0.55, 1.5]], naklon: -w * 0.4 }; },
-  nahoru: t => { const s = vlna(t, 3); return { ruce: [[0.55 + s * 0.7, 1.5 + s * 0.4], [0.55 + s * 0.7, 1.5 + s * 0.4]] }; },
-  kouzlo: t => { const s = vlna(t, 4); return { ruce: [[0.6 + s * 2.4, 1.4 - s * 1.4], [0.6 + s * 2.4, 1.4 - s * 1.4]] }; },
+  naklon: t => { const w = Math.sin(t * 2); return { x: w * 10, naklon: -w * 0.18, ruce: [[0.45 - w * 0.35, 1.9 + w * 0.3], [0.45 + w * 0.35, 1.9 - w * 0.3]] }; },
+  nahoru: t => { const s = Math.sin(t * 2.5) * 0.3; return { ruce: [[0.45 + s, 1.9], [0.45 + s, 1.9]] }; },
+  kouzlo: t => { const s = vlna(t, 4); return { ruce: [[0.45, 1.9], [0.6 + s * 2.3, 1.6 - s * 1.6]] }; },
   drep: t => { const s = vlna(t, 3); return { y: s * 34, ruce: [[0.9 + s * 0.5, 0.4], [0.9 + s * 0.5, 0.4]], nohy: [[0.5 + s * 0.9, s * 2.0], [0.5 + s * 0.9, s * 2.0]] }; },
 };
 

@@ -255,28 +255,44 @@ export function vytvorLet(ctx, varianta = 'let') {
   // méně náročné na ruce: stačí menší mávnutí a jedno mávnutí unese ptáka déle
 const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
   const TIZE = 10, PLACHTI = -3.5, DOLU = -11;   // klesání bez mávání, při plachtění a s rukama dole
-  // KOŠTĚ: ruce před sebou jako na násadě. Ruce výš (k bradě) = stoupáš, ruce dolů ke stehnům = klesáš,
-  // náklon těla do strany = zatáčka, obě ruce rychle nad hlavu = kouzlo. Žádné mávání, ruce se neunaví.
-  const kz = { nad: false, predZdvih: 0 };
+  // KOŠTĚ: hráč drží neviditelnou násadu oběma rukama před sebou a řídí tím, jak s ní hýbe.
+  // Hra si během odpočtu zapamatuje, kde má ruce (každé dítě je drží jinak), a počítá jen malé posuny od toho místa:
+  // násada doleva/doprava (nebo náklon těla) = zatáčka, násada kousek nahoru/dolů = stoupá/klesá.
+  // Jedna ruka pustí násadu a zvedne se nad hlavu jako hůlka = kouzlo. Nic se nedrží nad hlavou, ruce se neunaví.
+  const kz = { kal: false, y0: -1, x0: 0, hulka: false };
   function analyzujKoste(L, dt) {
     const ok = i => L[i] && (L[i].visibility ?? 1) > 0.3;
     poza.videt = ok(11) && ok(12);
     if (!poza.videt) { vstup.smer = 0; return; }
     const sw = Math.max(0.05, Math.abs(L[11].x - L[12].x));
-    const ruka = (s, w) => ok(w) ? (L[s].y - L[w].y) / sw : null;
-    const l = ruka(11, 15), rr = ruka(12, 16);
-    const zdvih = l === null ? (rr ?? -1) : rr === null ? l : (l + rr) / 2;
-    poza.zdvih = poza.zdvih * 0.5 + zdvih * 0.5;
-    let n = ((L[12].y - L[11].y) / sw) * 2.6;
-    if (ok(15) && ok(16)) n += ((L[16].y - L[15].y) / sw) * 0.7;
+    const ramenaX = 1 - (L[11].x + L[12].x) / 2, ramenaY = (L[11].y + L[12].y) / 2;
+    const hlava = ok(0) ? L[0].y : ramenaY - sw * 0.9;
+    // kouzlo: jedno zápěstí nad hlavou (hůlka), druhé dole u násady
+    const nad = w => ok(w) && L[w].y < hlava - sw * 0.15;
+    const hulka = nad(15) !== nad(16) || (nad(15) && nad(16));
+    if (hulka && !kz.hulka) kouzlo();
+    kz.hulka = hulka;
+    // ruce na násadě: ta, která není nahoře (když jsou obě dole, průměr obou)
+    const ruce = [15, 16].filter(w => ok(w) && !nad(w));
+    let n = ((L[12].y - L[11].y) / sw) * 2.2;          // náklon těla
+    if (ruce.length) {
+      const rx = ruce.reduce((a, w) => a + (1 - L[w].x), 0) / ruce.length;
+      const ry = ruce.reduce((a, w) => a + L[w].y, 0) / ruce.length;
+      const x = (rx - ramenaX) / sw, y = (ramenaY - ry) / sw;      // x > 0 = násada doprava, y > 0 = výš
+      if (stavTed === 'odpocet' || !kz.kal) {
+        // zapamatuj si, kde dítě ruce drží (během odpočtu plynule, jinak z prvního snímku)
+        kz.y0 = kz.kal ? kz.y0 * 0.85 + y * 0.15 : y; kz.x0 = kz.kal ? kz.x0 * 0.85 + x * 0.15 : x; kz.kal = true;
+      }
+      if (!hulka) {
+        n += (x - kz.x0) * 2.4;
+        poza.zdvih = poza.zdvih * 0.5 + (y - kz.y0) * 0.5;
+        const d = poza.zdvih, mrtva = 0.12;
+        vstup.smer = Math.abs(d) < mrtva ? 0 : omez((d - Math.sign(d) * mrtva) / 0.35, -1, 1);
+      }
+    }
+    if (hulka) vstup.smer = 0;          // při kouzlu koště drží výšku
     vstup.naklon = omez(n, -1, 1);
-    // kouzlo: obě zápěstí nad hlavou (nad nosem o kus víc než šířka ramen)
-    const hlava = ok(0) ? L[0].y : (L[11].y + L[12].y) / 2 - sw * 0.9;
-    const nad = ok(15) && ok(16) && L[15].y < hlava - sw * 0.35 && L[16].y < hlava - sw * 0.35;
-    if (nad && !kz.nad) kouzlo();
-    kz.nad = nad;
-    vstup.smer = nad ? 0 : poza.zdvih > -0.35 ? 1 : poza.zdvih < -1.6 ? -1 : 0;
-    poza.stav = nad ? 'pose.spell' : vstup.smer > 0 ? 'pose.up' : vstup.smer < 0 ? 'pose.down' : 'pose.broom';
+    poza.stav = hulka ? 'pose.spell' : vstup.smer > 0.3 ? 'pose.up' : vstup.smer < -0.3 ? 'pose.down' : 'pose.broom';
   }
   function analyzuj(L, dt) {
     if (KOSTE) return analyzujKoste(L, dt);
@@ -332,7 +348,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
     for (let i = 0; i < (lv.souperu || 0); i++) {
       const k = vyber[(i * 3 + 1) % vyber.length], p = k.vytvor();
       svetSkupina.add(p.g);
-      souperi.push({ p, z: zStart - 1.5 * i, bok: boky[i % 4], faze: i * 2.1, t: 0, sila: [0.97, 1.0, 0.94][i % 3], zasah: 0, cil: false, poradi: 0 });
+      souperi.push({ p, z: zStart - 5 - i * 3, bok: boky[i % 4], faze: i * 2.1, t: 0, sila: [0.97, 1.0, 0.94][i % 3], zasah: 0, cil: false, poradi: 0 });
     }
   }
   function postavBalonky(lv, z0, roztec) {
@@ -474,7 +490,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       kamPos.copy(hrac.pos).add(new THREE.Vector3(0, 9, 17));
     },
     nahled(idPostavy) { if (!svetSkupina) postavSvet(LEVELY[0]); api.nastavPostavu(idPostavy); hrac.pos.set(0, 90, 700); hrac.yaw = 0; kamPos.copy(hrac.pos).add(new THREE.Vector3(0, 9, 17)); },
-    zacatekOdpoctu() {}, behemOdpoctu() {}, konecOdpoctu: () => true,
+    zacatekOdpoctu() { kz.kal = false; kz.hulka = false; }, behemOdpoctu() {}, konecOdpoctu: () => true,
     klavesa(e) {
       klavesy[e.code] = true;
       if (KOSTE) { if (e.code === 'Space' && !e.repeat) { kouzlo(); e.preventDefault(); } return; }
