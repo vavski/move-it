@@ -5,6 +5,18 @@ import { model } from './bezci.js';
 const VYSKA = 2.6;   // výška všech lidí a robotů
 const CLOVEK = { vyska: VYSKA, mapa: { crouch: 'Roll' }, barvy: { Skin: '#f3c7a1' } };
 const ZVIRE = { vyska: 2.1, mapa: { sprint: 'Gallop', jump: 'Gallop_Jump' } };
+// Karatista je holohlavý a zezadu splýval s hnědou cestou → černé vlasy přidělané na kost hlavy.
+function vlasy(barva) {
+  return (m, THREE) => {
+    const hlava = m.getObjectByName('Head'); if (!hlava) return;
+    const geo = new THREE.SphereGeometry(0.56, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.58);
+    const v = new THREE.Mesh(geo, toon(barva)); v.scale.set(1, 0.95, 1.05);
+    v.position.set(-0.1, 2.47, -0.05); v.rotation.x = -0.55; v.castShadow = true;
+    m.add(v); m.updateMatrixWorld(true); hlava.attach(v);
+  };
+}
+// Postava z kódu zvětšená na výšku ostatních (původní dino byl menší než lidé).
+function vetsi(p, k) { const obal = new THREE.Group(); p.g.scale.setScalar(k); obal.add(p.g); p.g = obal; p.vyska *= k; return p; }
 
 const S = (r, w = 14, h = 12) => new THREE.SphereGeometry(r, w, h);
 const B = (x, y, z) => new THREE.BoxGeometry(x, y, z);
@@ -91,32 +103,29 @@ function robot(o) {
 }
 
 export const BEZCI = [
-  // Běžci (21. 11., verze 3): hotové modely s animacemi od Quaternius (CC0), viz postavy/modely/LICENCE.txt.
-  // Všichni lidé a roboti mají stejnou výšku, zvířata jsou nižší (jsou dlouhá). Lidé mají světlou pleť.
+  // Běžci (22. 11., verze 4): hotové modely s animacemi od Quaternius (CC0), viz postavy/modely/LICENCE.txt.
+  // Vyřazeni Zombík a Alien (strašidelní), Mech Stan a Mike (moc detailní, nehodí se). Dino je zpátky původní z kódu.
+  // Barvy jsou schválně syté a světlé: v toon stínování zezadu jinak vypadaly vybledle a tmavě.
   ...[
-    ['karate', 'Karatista', 0, 'Kimono_Male', CLOVEK],
+    ['karate', 'Karatista', 0, 'Kimono_Male', { ...CLOVEK, po: vlasy('#231c18') }],
     ['karatistka', 'Karatistka', 0, 'Kimono_Female', CLOVEK],
     ['hrdina', 'Modrásek', 120, 'PlatformHero', { vyska: 2.5, mapa: { crouch: 'Duck' } }],
-    ['shiba', 'Pejsek', 180, 'ShibaInu', ZVIRE],
-    ['slepice', 'Slepice', 220, 'Chicken', { vyska: 1.9, mapa: { jump: null } }],
-    ['robo', 'Robo', 250, 'RobotExpressive', { vyska: VYSKA, mapa: { sprint: 'Running' }, barvy: { Main: '#2f6bff', Grey: '#d5dbe6', Black: '#222831' } }],
-    ['liska', 'Liška', 320, 'Fox', ZVIRE],
-    ['ninja', 'Ninja', 380, 'Ninja_Male', CLOVEK],
+    ['shiba', 'Pejsek', 180, 'ShibaInu', { ...ZVIRE, barvy: { Main: '#f39a3c', Main_Light: '#ffffff', Black: '#3a2a22' } }],
+    ['slepice', 'Slepice', 220, 'Chicken', { vyska: 1.9, mapa: { jump: null }, jas: 2.1 }],
+    ['robo', 'Robo', 250, 'RobotExpressive', { vyska: VYSKA, mapa: { sprint: 'Running' }, barvy: { Main: '#3d8bff', Grey: '#f4f7fb', Black: '#2a3140' } }],
+    ['liska', 'Liška', 320, 'Fox', { ...ZVIRE, barvy: { Main: '#ff7a1f', Main_Light: '#ffffff', Black: '#2a2222', Eyes: '#1a1414', Grey: '#3a3434' } }],
+    ['ninja', 'Ninja', 380, 'Ninja_Male', { ...CLOVEK, barvy: { ...CLOVEK.barvy, Main: '#e0362f', Details: '#ffd23f', Grey: '#3a3a44' } }],
     ['pirat', 'Pirát', 450, 'Pirate_Male', CLOVEK],
-    ['zombik', 'Zombík', 600, 'Zombie_Male', { ...CLOVEK, barvy: { Skin: '#8fc46a' } }],
     ['viking', 'Viking', 700, 'Viking_Male', CLOVEK],
-    // Dino = roztomilý dráček-dino s velkýma očima (T-rex byl na děti moc strašidelný)
-    ['dino', 'Dino', 900, 'M_Dino', { vyska: VYSKA, mapa: { crouch: 'Duck' } }],
     ['carodej', 'Čaroděj', 1000, 'Wizard', CLOVEK],
     ['carodejnice', 'Čarodějnice', 1100, 'Witch', CLOVEK],
-    ['rytir', 'Zlatý rytíř', 1200, 'Knight_Golden_Male', CLOVEK],
-    ['alien', 'Alien', 1400, 'M_Alien', { vyska: VYSKA, mapa: { crouch: 'Duck' } }],
+    ['rytir', 'Zlatý rytíř', 1200, 'Knight_Golden_Male', { ...CLOVEK, barvy: { ...CLOVEK.barvy, Armor: '#f7b51e', Armor_Dark: '#b8740c', Detail: '#d8323a', Red: '#d8323a' } }],
     ['para', 'Parasaurus', 1300, 'Parasaurolophus', { vyska: 2.5, barvy: { Green: '#f08a2c', LightGreen: '#ffd38a', LightYellow: '#fff0c8', Red: '#c2331e' } }],
-    ['mech', 'Mech Stan', 1500, 'Stan', { vyska: 2.8, toonStyl: false }],
-    ['mech2', 'Mech Mike', 1800, 'Mike', { vyska: 2.8, toonStyl: false }],
-    // Drak = nejlepší postava: létá nízko nad cestou a mává křídly
-    ['drak', 'Drak', 2500, 'Dragon', { vyska: 2.3, vznasi: 0.7, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#ffffff' } }],
+    // Drak = nejlepší postava: létá nízko nad cestou a mává křídly. Oči tmavé (bílé bez zorniček působily strašidelně).
+    ['drak', 'Drak', 2500, 'Dragon', { vyska: 2.3, vznasi: 0.7, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }],
   ].map(([id, jmeno, cena, soubor, opt]) => ({ id, jmeno, cena, vytvor: () => model('modely/' + soubor + '.glb', opt) })),
+  // původní dino z první verze (z kódu), zvětšený na výšku ostatních
+  { id: 'dino', jmeno: 'Dino', cena: 500, vytvor: () => vetsi(dino({ telo: '#5cc85c', bricho: '#c4f29a', ostny: '#ff9b2f' }), 1.2) },
 ].sort((a, b) => a.cena - b.cena);
 
 // ================= LETCI =================
@@ -201,17 +210,16 @@ function drakLet() {
 }
 
 export const LETCI = [
-  // Letci (21. 11., verze 2): roztomilé létající příšerky s hotovou animací (Quaternius, CC0) + nejlepší z kódu (Vážka, draci).
-  // Papoušek, Fénix a Sova vyřazeni (divné zobáky). id 'orel' zůstává kvůli uloženým postupům, je to teď Holoubek.
-  { id: 'orel', jmeno: 'Holoubek', cena: 0, vytvor: () => letecModel('M_Pigeon') },
+  // Letci (22. 11., verze 3): Orel zpátky, Holoubek vyřazen. Postavy s hotovou animací zvětšené aspoň na velikost Vážky.
+  { id: 'orel', jmeno: 'Orel', cena: 0, vytvor: () => ptak2({ telo: '#5a3a1e', bricho: '#8a5c34', hlava: '#f6f2ea', zobak: '#f5b41a', kryt: '#6b4628', letka: '#4a2e16', spicka: '#1e1208', ocas: '#f6f2ea', oboci: '#3a2410' }) },
   { id: 'vazka', jmeno: 'Vážka', cena: 150, vytvor: () => vazka2() },
-  { id: 'vcela', jmeno: 'Včelka', cena: 250, vytvor: () => letecModel('M_Armabee', { vyska: 2.0 }) },
-  { id: 'duch', jmeno: 'Duch', cena: 400, vytvor: () => letecModel('M_Ghost', { vyska: 2.4 }) },
-  { id: 'netopyr', jmeno: 'Netopýr', cena: 550, vytvor: () => letecModel('Bat', { vyska: 2.0, mapa: { idle: 'Bat_Flying', sprint: 'Bat_Flying', jump: null }, barvy: { Main: '#5a4a7a', Belly: '#c9a6e8', Eyes: '#ffe14d', Black: '#1a1430' } }) },
-  { id: 'ptero', jmeno: 'Pterodaktyl', cena: 700, vytvor: () => drak2({ ptero: true, telo: '#d9823b', bricho: '#f5d39a', blana: '#f0a860', blana2: '#a8521e', kosti: '#8a4418', oci: '#ffe14d', zobak: '#f2c66a', hrebinek: '#e8434e' }) },
+  { id: 'vcela', jmeno: 'Včelka', cena: 250, vytvor: () => letecModel('M_Armabee', { vyska: 4.6 }) },
+  { id: 'duch', jmeno: 'Duch', cena: 400, vytvor: () => letecModel('M_Ghost', { vyska: 5.4, jas: 2.4 }) },
+  { id: 'netopyr', jmeno: 'Netopýr', cena: 550, vytvor: () => letecModel('Bat', { vyska: 5.5, mapa: { idle: 'Bat_Flying', sprint: 'Bat_Flying', jump: null }, barvy: { Main: '#6a58a0', Belly: '#d8b8f4', Eyes: '#1a1430', Black: '#2a2040' } }) },
+  { id: 'ptero', jmeno: 'Pterodaktyl', cena: 700, vytvor: () => drak2({ ptero: true, telo: '#3a9ad9', bricho: '#cdeeff', blana: '#8fd8ff', blana2: '#2a6fb0', kosti: '#1f5f9a', oci: '#ffe14d', zobak: '#ffc93a', hrebinek: '#ff7a2a' }) },
   { id: 'draklet', jmeno: 'Létající drak', cena: 1000, vytvor: () => drak2({ telo: '#2fbf6f', bricho: '#f2e07a', blana: '#9a5cff', blana2: '#4a1fa8', kosti: '#1f8a4f', rohy: '#ffd23f', ostny: '#ff7a1a', oci: '#ffe14d', stopa: '#ff7a1a' }) },
-  { id: 'dracek', jmeno: 'Dráček', cena: 1200, vytvor: () => letecModel('M_Dragon_Evolved', { vyska: 2.6 }) },
+  { id: 'dracek', jmeno: 'Dráček', cena: 1200, vytvor: () => letecModel('M_Dragon_Evolved', { vyska: 5.4 }) },
   { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 1500, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },
-  { id: 'velkydrak', jmeno: 'Ohnivý drak', cena: 2000, vytvor: () => { const p = letecModel('Dragon', { vyska: 2.6, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#ffffff' } }); p.stopa = '#ff7a1a'; return p; } },
+  { id: 'velkydrak', jmeno: 'Ohnivý drak', cena: 2000, vytvor: () => { const p = letecModel('Dragon', { vyska: 5.6, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }); p.stopa = '#ff7a1a'; return p; } },
 ];
 export const skinPodleId = id => [...BEZCI, ...LETCI].find(s => s.id === id);

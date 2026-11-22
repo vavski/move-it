@@ -22,6 +22,7 @@ import { THREE, renderer, svetla, toon } from './js/zaklad.js';
 import { BEZCI, LETCI } from './js/postavy.js';
 import { tn } from './js/i18n.js';
 const q = new URLSearchParams(location.search);
+const ZOOM = +(q.get('zoom') || 1), NAHLED = q.has('nahled'), UHEL = (q.has('uhel') ? +q.get('uhel') : 155) * Math.PI / 180;
 let seznam = q.get('skupina') === 'bezci' ? BEZCI : q.get('skupina') === 'vse' ? [...BEZCI, ...LETCI] : LETCI;
 if (q.get('soubory')) { const { model } = await import('./js/bezci.js'); seznam = q.get('soubory').split(',').map(f => ({ id: f, jmeno: f, vytvor: () => model('modely/' + f + '.glb', { vyska: 2.3, barvy: { Skin: '#f3c7a1' } }) })); }   // jen pro výběr nových modelů
 if (q.get('ids')) { const ids = q.get('ids').split(','); seznam = [...BEZCI, ...LETCI].filter(s => ids.includes(s.id)); }
@@ -45,13 +46,19 @@ function smycka(t) {
     const x = (i % sloupcu) * w, y = H - (Math.floor(i / sloupcu) + 1) * h;
     renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h);
     renderer.setClearColor(i % 2 ? '#8fd0ff' : '#7cc4ff');
-    o.p.g.rotation.y = cas * 0.6 + (o.letec ? Math.PI * 0.75 : Math.PI * 0.85);
+    // ?nahled=1 = pevná kamera pro všechny stejně (je vidět skutečná velikost), ?uhel=180 = zezadu jako ve hře
+    o.p.g.rotation.y = NAHLED ? UHEL : cas * 0.6 + (o.letec ? Math.PI * 0.75 : Math.PI * 0.85);
     if (o.letec) o.p.kridla(Math.sin(cas * 3.2) * 0.9, cas);
     if (o.p.mixer) { if (!o.p.anim && o.p.akce.sprint) { o.p.akce.sprint.play(); o.p.anim = 'sprint'; } o.p.mixer.update(1 / 60); }
     o.cam.aspect = w / h; o.cam.updateProjectionMatrix();
-    const r = o.vel * (o.letec ? 1.45 : 1.6);
-    o.cam.position.set(o.stred.x + r * 0.35, o.stred.y + r * 0.42, o.stred.z + r);
-    o.cam.lookAt(o.stred);
+    if (NAHLED) {
+      if (o.letec) { o.cam.position.set(3.5 / ZOOM, 6 / ZOOM, 19 / ZOOM); o.cam.lookAt(0, 0.4, 0); }
+      else { o.cam.position.set(1.6 / ZOOM, 1.35 + 1.25 / ZOOM, 7.2 / ZOOM); o.cam.lookAt(0, 1.35, 0); }
+    } else {
+      const r = o.vel * (o.letec ? 1.45 : 1.6);
+      o.cam.position.set(o.stred.x + r * 0.35, o.stred.y + r * 0.42, o.stred.z + r);
+      o.cam.lookAt(o.stred);
+    }
     renderer.render(o.scene, o.cam);
   });
   requestAnimationFrame(smycka);

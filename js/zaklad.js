@@ -134,6 +134,10 @@ const vychozi = () => ({ mince: 0, skiny: ['karate', 'karatistka', 'orel'], vybr
 export const ulozene = (() => {
   let d = vychozi();
   try { const s = JSON.parse(localStorage.getItem(KLIC)); if (s) d = { ...d, ...s, vybrany: { ...d.vybrany, ...s.vybrany }, odemceno: { ...d.odemceno, ...s.odemceno }, hvezdy: { ...d.hvezdy, ...s.hvezdy }, rekord: { ...d.rekord, ...s.rekord } }; } catch {}
+  // vyřazené postavy (22. 11.): kdo je koupil, dostane mince zpátky a vybere se mu výchozí postava
+  const VYRAZENE = { zombik: 600, alien: 1400, mech: 1500, mech2: 1800 };
+  for (const [id, cena] of Object.entries(VYRAZENE)) if (d.skiny.includes(id)) { d.skiny = d.skiny.filter(x => x !== id); d.mince += cena; }
+  if (VYRAZENE[d.vybrany.beh]) d.vybrany.beh = 'karate';
   return d;
 })();
 export function uloz() { try { localStorage.setItem(KLIC, JSON.stringify(ulozene)); } catch {} }

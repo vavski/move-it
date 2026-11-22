@@ -135,7 +135,15 @@ function kenney(id) {
 // mapa = jak se jmenuje animace v souboru; dřep většina nemá – hra pak postavu jen přimáčkne k zemi.
 // barvy = přebarvení materiálů podle jména (varianty jako Lávový dino nebo Zlatý robot).
 const modely = {};
-export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = {}, toonStyl = true, skok = 0.75, vznasi = 0 } = {}) {
+// Měkčí stínování než u postav z kódu: hotové modely mají hodně malých plošek a při ostrých třech odstínech
+// při otáčení blikaly („lesk po pixelech“) a ze zadu byly moc tmavé.
+const GRAD_MODEL = (() => {
+  const d = new Uint8Array([165, 165, 165, 255, 215, 215, 215, 255, 255, 255, 255, 255]);
+  const t = new THREE.DataTexture(d, 3, 1, THREE.RGBAFormat);
+  t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t;
+})();
+// po = funkce, která modelu něco přidá (vlasy, zorničky) ještě před změřením výšky; dostane model a THREE.
+export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = {}, toonStyl = true, skok = 0.75, vznasi = 0, po = null, jas = 1 } = {}) {
   const g = new THREE.Group();
   const p = { g, nohy: [], ruce: [], kenney: true, mixer: null, akce: {}, anim: null, vyska };
   (modely[soubor] ??= loader.loadAsync(CESTA_POSTAV + soubor)).then(gltf => {
@@ -145,9 +153,12 @@ export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = 
       const prevod = mt => {
         const barva = barvy[mt.name] ?? '#' + mt.color.getHexString();
         if (!toonStyl && !barvy[mt.name]) return mt;
-        const n = toonStyl ? new THREE.MeshToonMaterial({ color: barva, gradientMap: gradient }) : mt.clone();
+        const n = toonStyl ? new THREE.MeshToonMaterial({ color: barva, gradientMap: GRAD_MODEL }) : mt.clone();
         if (!toonStyl) n.color.set(barva);
+        if (jas !== 1) n.color.multiplyScalar(jas);   // zesvětlení modelů s barvami v obrázku (slepice)
         n.name = mt.name; if (mt.map) n.map = mt.map;
+        // oči a obličej leží těsně na hlavě; bez posunu z dálky problikávaly
+        if (/face|eye/i.test(mt.name)) { n.polygonOffset = true; n.polygonOffsetFactor = -2; n.polygonOffsetUnits = -2; }
         return n;
       };
       o.material = Array.isArray(o.material) ? o.material.map(prevod) : prevod(o.material);
@@ -155,6 +166,7 @@ export function model(soubor, { vyska = 2.3, otoc = Math.PI, mapa = {}, barvy = 
     });
     // výška a postavení na zem podle skutečné velikosti modelu
     m.updateMatrixWorld(true);
+    if (po) { po(m, THREE); m.updateMatrixWorld(true); }
     const box = new THREE.Box3().setFromObject(m), v = box.max.y - box.min.y || 1;
     const obal = new THREE.Group(); obal.add(m);
     m.scale.multiplyScalar(vyska / v); m.position.y = -box.min.y * (vyska / v);
