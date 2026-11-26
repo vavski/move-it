@@ -26,10 +26,12 @@ export const LEVELY = [
   { ...Z, jmeno: 'Jeskyně', jeskyne: true, kruhu: 11, potreba: 8, posun: 120, nahore: '#7a6cff', dole: '#e0dcff', amp: 0, vyska: 45, vlny: 0, pomoc: 0.8 },
   { ...Z, jmeno: 'Sloupy', sloupy: true, kruhu: 12, potreba: 9, posun: 201, more: 8, nahore: '#2f86ff', dole: '#cfeaff', amp: 35, vyska: 50, pomoc: 0.7, navod: ['kure'] },
   { ...Z, vlny: 20, strmost: 1.3, jmeno: 'Vítr', kruhu: 12, potreba: 9, posun: 640, nahore: '#5fa8ff', dole: '#e8f6ff', amp: 30, vyska: 50, vitr: 9, pomoc: 0.6 },
-  { ...Z, vlny: 22, strmost: 1.4, jmeno: 'Tančící kruhy', kruhu: 12, potreba: 9, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55 },
+  { ...Z, vlny: 22, strmost: 1.4, jmeno: 'Tančící kruhy', kruhu: 12, potreba: 9, posun: 333, nahore: '#ff7fb0', dole: '#ffe6f2', amp: 35, vyska: 50, pohyb: 9, pomoc: 0.55, dravec: [4, 10] },
   { ...Z, vlny: 22, strmost: 1.5, jmeno: 'Malé kruhy', kruhu: 14, potreba: 10, posun: 410, more: 10, nahore: '#2b7bff', dole: '#d3ecff', amp: 38, vyska: 48, velikost: 0.8, pomoc: 0.45, rychlost: 33 },
-  { ...Z, vlny: 20, strmost: 1.5, jmeno: 'Bouře', kanon: true, kruhu: 13, potreba: 10, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45 },
+  { ...Z, vlny: 20, strmost: 1.5, jmeno: 'Bouře', kanon: true, kruhu: 13, potreba: 10, posun: 470, nahore: '#34405e', dole: '#a4b0c8', amp: 16, vyska: 34, vitr: 7, pohyb: 6, velikost: 0.9, pomoc: 0.45, dravec: [3, 10] },
   { ...Z, vlny: 24, strmost: 1.4, jmeno: 'Finále', sloupy: true, jeskyne: true, kruhu: 15, potreba: 12, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, vitr: 6, pohyb: 7, velikost: 0.85, pomoc: 0.35, rychlost: 34 },
+  // bonus (26. 11.): svítící mřížka v noci, honička s dravcem — nenáročné na výkon (žádné stromy ani terén)
+  { ...Z, vlny: 22, strmost: 1.5, jmeno: 'Neon', neon: true, kruhu: 14, potreba: 10, posun: 900, nahore: '#12002e', dole: '#3d0b5c', amp: 30, vyska: 40, pohyb: 4, velikost: 0.9, pomoc: 0.45, rychlost: 33, dravec: [3, 11] },
 ];
 export const VOLNY = { ...Z, jmeno: 'Volný let', typ: 'volny', kruhu: Infinity, potreba: 0, posun: 0, more: 0, nahore: '#3f9cff', dole: '#d6f0ff', amp: 0, vyska: 70 };
 
@@ -47,6 +49,17 @@ export const LEVELY_KOSTE = [
   { ...ZK, vlny: 22, strmost: 1.5, jmeno: 'Velké finále', sloupy: true, kruhu: 15, posun: 700, nahore: '#ffb347', dole: '#fff0d6', amp: 18, vyska: 50, pohyb: 5, velikost: 0.95, pomoc: 0.45, rychlost: 32 },
 ];
 export const VOLNY_KOSTE = { ...VOLNY, jmeno: 'Volné létání', souperu: 0 };
+
+// Udělá z postavičky průhledného „ducha“: vlastní kopie materiálů (sdílené se nesmí měnit), bez obrysu a stínu.
+function zduchovat(g) {
+  g.traverse(o => {
+    if (!o.isMesh || o.userData.duch) return;
+    o.userData.duch = true; o.castShadow = false;
+    if (o.userData.bezObrysu) { o.visible = false; return; }
+    o.material = [].concat(o.material).map(m => { const c = m.clone(); c.transparent = true; c.opacity = 0.38; c.depthWrite = false; if (c.color) c.color.lerp(new THREE.Color('#bfe9ff'), 0.45); return c; });
+    if (o.material.length === 1) o.material = o.material[0];
+  });
+}
 
 export function vytvorLet(ctx, varianta = 'let') {
   const KOSTE = varianta === 'koste';          // závod na koštěti: jiné ovládání, soupeři, balónky, kouzlo
@@ -67,6 +80,9 @@ export function vytvorLet(ctx, varianta = 'let') {
   const kruhy = [], sloupy = [], tunely = [];
   let dalsiKruh = 0, sebrano = 0, konecT = -1, rezim = 'klavesy', postava = null, cas = 0;
   let cekaVysledek = null, zCil = -Infinity, cilBrana = null, vyhraTed = false, dalsiRachejtle = 0, vTunelu = 0;
+  // čas levelu a záznam dráhy pro „ducha“ (průhledný pták, který letí tvůj nejlepší let)
+  let casLevelu = 0, zaznam = [], zaznamT = 0, duch = null, duchStopa = null, duchKontrola = 0, nejlepsi = 0;
+  const KROK_ZAZNAMU = 0.1;
   const T_POLOMER = 18, T_DRZI = 12.5;            // trubice: poloměr stěny a kde tě začne jemně držet
   // směr trati v místě z (úhel, kterým se letí „správně“ dopředu)
   const smerTrati = z => Math.atan2(-(drahaX(z - 5) - drahaX(z + 5)), 10);
@@ -99,7 +115,10 @@ export function vytvorLet(ctx, varianta = 'let') {
     svetSkupina = new THREE.Group(); scene.add(svetSkupina);
     kruhy.length = 0; sloupy.length = 0; tunely.length = 0; zCil = -Infinity; cilBrana = null;
     nebe.nastav(lv.nahore, lv.dole); scene.fog.color.set(lv.dole);
+    scene.fog.near = lv.neon ? 180 : 350; scene.fog.far = lv.neon ? 1100 : 1500;
+    voda.visible = !lv.neon; vlnky.visible = !lv.neon;
     const o = lv.posun;
+    if (lv.neon) return postavNeon(lv);
     vyskaTerenu = (x, z) => {
       const d = Math.hypot(x, z), ostrov = 1 - smooth(500, 1400, d);
       const zaklad = (fbm(x * 0.003 + o, z * 0.003 + o) - 0.42) * 90 - lv.more;
@@ -143,7 +162,9 @@ export function vytvorLet(ctx, varianta = 'let') {
     }
     const druhy = (lv.kanon
       ? [['cactus_tall', 13], ['tree_palmTall', 16], ['rock_tallB', 7, { dirt: '#c96f3c', grass: '#e0a060', _defaultMat: '#b05a30' }]]
-      : [['tree_default', 15], ['tree_oak', 12], ['tree_pineRoundA', 16], ['tree_detailed', 13], ['tree_plateau_fall', 13]])
+      : [['tree_default', 15], ['tree_oak', 12], ['tree_pineRoundA', 16], ['tree_detailed', 13], ['tree_plateau_fall', 13],
+         // barevné koruny pro veselejší krajinu (podle Sky Pecku): růžová, tyrkysová, oranžová
+         ['tree_default', 14, { leafsGreen: '#ff8fc4' }], ['tree_oak', 12, { leafsGreen: '#4fd6c4' }], ['tree_detailed', 13, { leafsGreen: '#ffb03f' }]])
       .map(([n, vys, barvy]) => ({ dily: dilyProInstance(n, barvy || null), vys })).filter(d => d.dily);
     if (druhy.length) {
       const sady = druhy.map(d => ({ ...d, mista: [] }));
@@ -232,10 +253,115 @@ export function vytvorLet(ctx, varianta = 'let') {
   }
   const kruhGeo = new THREE.TorusGeometry(9, 1.0, 10, 36);
 
+  // NEON: tmavá noc, svítící mřížka na zemi, po stranách trati červené svítící dráhy a sloupky
+  function postavNeon(lv) {
+    const o = lv.posun, f = 0.55 + (o % 7) * 0.05;
+    vyskaTerenu = () => -40;
+    drahaX = z => lv.amp * Math.sin(z * 0.009 * f + o) + lv.amp * 0.5 * Math.sin(z * 0.021 + o * 2);
+    drahaY = z => Math.max(lv.vyska + lv.vlny * Math.sin(z * 0.012 * (lv.strmost || 1) + o), 18);
+    const podlaha = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshBasicMaterial({ color: '#0a0018' }));
+    podlaha.rotation.x = -Math.PI / 2; podlaha.position.y = -0.2; svetSkupina.add(podlaha);
+    const mrizka = new THREE.GridHelper(4000, 200, '#4ff3ff', '#2a8cff'); mrizka.material.transparent = true; mrizka.material.opacity = 0.55; svetSkupina.add(mrizka);
+    const roztec = 85, z0 = 650, zKonec = z0 - lv.kruhu * roztec - 300;
+    const draha = new THREE.MeshBasicMaterial({ color: '#ff2a4a' }), draha2 = new THREE.MeshBasicMaterial({ color: '#ff6a2a', transparent: true, opacity: 0.35 });
+    for (const sx of [-1, 1]) {
+      const body = []; for (let z = z0 + 200; z >= zKonec; z -= 12) body.push(new THREE.Vector3(drahaX(z) + sx * 26, drahaY(z) - 8 + Math.sin(z * 0.03) * 3, z));
+      const k = new THREE.CatmullRomCurve3(body);
+      svetSkupina.add(new THREE.Mesh(new THREE.TubeGeometry(k, body.length * 2, 0.7, 6, false), draha));
+      svetSkupina.add(new THREE.Mesh(new THREE.TubeGeometry(k, body.length * 2, 2.2, 6, false), draha2));   // záře kolem
+    }
+    const sloupek = new THREE.BoxGeometry(2, 1, 2);
+    for (let z = z0 + 150, i = 0; z > zKonec; z -= 60, i++) for (const sx of [-1, 1]) {
+      const v = nahoda(30, 120), m = new THREE.Mesh(sloupek, new THREE.MeshBasicMaterial({ color: i % 2 ? '#ff3dd2' : '#4ff3ff' }));
+      m.scale.y = v; m.position.set(drahaX(z) + sx * nahoda(45, 90), v / 2, z); svetSkupina.add(m);
+    }
+    // trať: kruhy a cíl stejně jako jinde
+    for (let i = 0; i < lv.kruhu; i++) {
+      const z = z0 - i * roztec, x = drahaX(z), y = drahaY(z);
+      const smer = new THREE.Vector3(drahaX(z - 5) - drahaX(z + 5), drahaY(z - 5) - drahaY(z + 5), -10).normalize();
+      const m = new THREE.Mesh(kruhGeo, svit('#ffc928', 0.5)); m.position.set(x, y, z); m.lookAt(m.position.clone().add(smer));
+      svetSkupina.add(m); kruhy.push({ mesh: m, smer, stav: 0, predchozi: null, zaklad: m.position.clone(), faze: i * 1.7 });
+    }
+    zCil = z0 - (lv.kruhu - 1) * roztec - 110;
+    cilBrana = postavCil(zCil); svetSkupina.add(cilBrana);
+  }
+
+  // bílé vlnky na vodě (jako ve Sky Pecku): pár set plochých kousků kolem hráče, pomalu se nadouvají
+  const VLNEK = 260, vlnky = new THREE.InstancedMesh(new THREE.PlaneGeometry(3.2, 0.7).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.8 }), VLNEK);
+  vlnky.frustumCulled = false; scene.add(vlnky);
+  const vlnkyPos = Array.from({ length: VLNEK }, () => ({ x: 1e9, z: 1e9, r: Math.random() * 6.28, f: Math.random() * 6.28, ok: false }));
+  const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _osa = new THREE.Vector3(0, 1, 0);
+  function aktualizujVlnky() {
+    if (!vlnky.visible) return;
+    for (let i = 0; i < VLNEK; i++) {
+      const w = vlnkyPos[i];
+      if (Math.abs(w.x - hrac.pos.x) > 320 || Math.abs(w.z - hrac.pos.z) > 320) {
+        // nové místo kolem hráče, jen nad vodou
+        for (let pokus = 0; pokus < 6; pokus++) { w.x = hrac.pos.x + nahoda(-300, 300); w.z = hrac.pos.z + nahoda(-300, 300); if (vyskaTerenu(w.x, w.z) < -1.5) break; }
+        w.ok = vyskaTerenu(w.x, w.z) < -1.5;
+      }
+      const k = w.ok ? 0.6 + 0.6 * Math.max(0, Math.sin(cas * 1.3 + w.f)) : 0;
+      _q.setFromAxisAngle(_osa, w.r); _m4.compose(_p.set(w.x, 0.25, w.z), _q, _s.set(k, 1, k)); vlnky.setMatrixAt(i, _m4);
+    }
+    vlnky.instanceMatrix.needsUpdate = true;
+  }
+
   // ---- hráč ----
   const hrac = { pos: new THREE.Vector3(), yaw: 0, vy: 0, rychlost: 30, naklon: 0, turbo: 0, otres: 0 };
   const vstup = { vzlet: 0, naklon: 0, plachti: false, strmhlav: false, kridla: 0.1, mavT: 0, smer: 0 };
   const dopredu = () => new THREE.Vector3(-Math.sin(hrac.yaw), 0, -Math.cos(hrac.yaw));
+  const KLIDNY = () => !KOSTE && api.klidny;      // klidný let (volba na obrazovce levelů): pomalejší, drží výšku, víc pomáhá
+
+  // ---- HONIČKA: v některých levelech tě kus trati honí dravec ----
+  // Letí o kousek rychleji než ty v klidu, takže mu uletíš máváním, střemhlavem nebo turbem.
+  // Když tě dožene, zpomalí tě a odletí kus dozadu. Na výhru to nemá vliv, jen to zdrží.
+  const dr = { stav: 'ne', vzad: 60, model: null, t: 0, barva: 0 };
+  function pripravDravce(idHrace) {
+    if (dr.model) scene.remove(dr.model.g);
+    dr.model = null; dr.stav = 'ne';
+    if (!level.dravec || KLIDNY()) return;
+    // vždycky orel (ztmavený do červena, takže se od hráčova orla liší); vážka nebo drak by vypadali divně
+    const sablona = SKINY.find(s => s.id === 'orel') || SKINY[0];
+    dr.model = sablona.vytvor(); dr.model.g.scale.multiplyScalar(1.3); dr.model.g.visible = false; scene.add(dr.model.g);
+    dr.barva = 0;
+  }
+  function aktualizujDravce(dt) {
+    if (!dr.model) return;
+    const [od, po] = level.dravec;
+    if (dr.stav === 'ne' && dalsiKruh >= od && konecT < 0) { dr.stav = 'honi'; dr.vzad = 70; ctx.banner('⚠ 🦅', '#ff4d5e'); SFX.zasah(); }
+    if (dr.stav === 'honi' && (dalsiKruh >= po || konecT >= 0)) { dr.stav = 'pryc'; dr.t = 0; }
+    dr.model.g.visible = dr.stav !== 'ne' && !(dr.stav === 'pryc' && dr.t > 4);
+    if (!dr.model.g.visible) return;
+    // přebarvení na tmavého dravce (modely ze souboru se načítají později, proto opakovaně)
+    dr.barva -= dt;
+    if (dr.barva <= 0) {
+      dr.barva = 0.5;
+      dr.model.g.traverse(o => {
+        if (!o.isMesh || o.userData.dravec || o.userData.bezObrysu) return;
+        o.userData.dravec = true;
+        o.material = [].concat(o.material).map(m => { const c = m.clone(); if (c.color) { if (c.vertexColors) c.color.set('#b8405a'); else c.color.lerp(new THREE.Color('#8a0a22'), 0.6); } return c; });   // barvy z vrcholů se násobí barvou materiálu
+        if (o.material.length === 1) o.material = o.material[0];
+      });
+    }
+    dr.t += dt;
+    if (dr.stav === 'honi') {
+      const rychlostDravce = (level.rychlost || 30) * 1.12;
+      dr.vzad = Math.min(95, dr.vzad - (rychlostDravce - hrac.rychlost) * dt);
+      if (dr.vzad < 3) {
+        dr.vzad = 55; hrac.rychlost *= 0.55; hrac.otres = 0.5;
+        SFX.zasah(); ctx.zasah(); ctx.banner('🦅 !!!', '#ff4d5e');
+        jiskry.vystrel(hrac.pos.clone(), '#ffffff', 30, 8, 0.8);
+      }
+    } else dr.vzad += 25 * dt;
+    const f = dopredu(), bok = new THREE.Vector3(-f.z, 0, f.x);
+    // kamera je 17 za hráčem: dravec letící „přes kameru“ by zakryl celou obrazovku. Proto: dokud je dál než 12 m,
+    // drží se za kamerou (je vidět jen v ukazateli 🦅 m); blíž se objeví vedle ptáka 3–8 m za ním.
+    const viz = dr.vzad > 12 || dr.stav === 'pryc' ? dr.vzad + 12 : 3 + (dr.vzad - 3) * (5 / 9);
+    dr.model.g.position.copy(hrac.pos).addScaledVector(f, -viz).addScaledVector(bok, 6 + Math.sin(dr.t * 1.3) * 2)
+      .add(new THREE.Vector3(0, 3 + Math.sin(dr.t * 2) * 1.2 + (dr.stav === 'pryc' ? dr.t * 12 : 0), 0));
+    dr.model.g.rotation.set(-0.1, hrac.yaw, Math.sin(dr.t * 1.3) * 0.2);
+    dr.model.kridla(Math.sin(dr.t * 11) * 0.9, cas);
+  }
   const sipka = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.2, 4), svit('#4ff3ff', 0.8));
   sipka.geometry.rotateX(-Math.PI / 2); scene.add(sipka);
   const kamPos = new THREE.Vector3();
@@ -292,7 +418,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
     }
     if (hulka) vstup.smer = 0;          // při kouzlu koště drží výšku
     const cilN = Math.abs(n) < 0.1 ? 0 : omez((n - Math.sign(n) * 0.1) / 0.9, -1, 1);
-    vstup.naklon += (cilN - vstup.naklon) * 0.3;
+    vstup.naklon += (cilN - vstup.naklon) * omez(0.3 + Math.abs(cilN - vstup.naklon) * 1.1, 0.3, 0.85);
     poza.stav = hulka ? 'pose.spell' : vstup.smer > 0.3 ? 'pose.up' : vstup.smer < -0.3 ? 'pose.down' : 'pose.broom';
   }
   function analyzuj(L, dt) {
@@ -324,7 +450,9 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       n += ((L[12].y - L[11].y) / sw) * 2.6;
       // malé chvění těla nic nedělá a náklon se mění plynule (dřív cukal hned doprava/doleva)
       const cilN = Math.abs(n) < 0.12 ? 0 : omez((n - Math.sign(n) * 0.12) / 0.88, -1, 1);
-      vstup.naklon += (cilN - vstup.naklon) * 0.25;
+      // vyhlazení podle rychlosti pohybu (26. 11.): velký rychlý náklon platí skoro hned, malé chvění se vyhladí.
+      // Dřív pevně 0.25 za snímek kamery + další pomalé dorovnání v letu = zatáčka se ozvala až po ~0,5 s.
+      vstup.naklon += (cilN - vstup.naklon) * omez(0.3 + Math.abs(cilN - vstup.naklon) * 1.1, 0.3, 0.85);
       const sirka = Math.abs(L[iL].x - L[iR].x) / sw;
       vstup.plachti = sirka > (iL === 15 ? 2.2 : 1.5) && Math.abs(poza.zdvih) < 0.7;
       // ruce dole u těla = odpočinek: pták klesá (ne střemhlav jako dřív), dítě si může ruce spustit
@@ -454,13 +582,13 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       vyhraTed = vyhK;
       if (vyhK) { SFX.vyhra(); jiskry.vystrel(hrac.pos.clone(), '#ffd23f', 50, 10, 1.3); } else SFX.prohra();
       const mince = sebrano + balonkuSebrano * 2 + ([10, 6, 3][misto - 1] || 0);
-      cekaVysledek = { data: { vyhra: vyhK, mince, kruhy: sebrano, hvezdy: vyhK ? Math.max(1, 4 - misto) : 0, misto, hracu: souperi.length + 1, balonky: balonkuSebrano }, za: vyhK ? 2.8 : 1.0 };
+      cekaVysledek = { data: { vyhra: vyhK, mince, kruhy: sebrano, hvezdy: vyhK ? Math.max(1, 4 - misto) : 0, misto, hracu: souperi.length + 1, balonky: balonkuSebrano, cas: Math.round(casLevelu * 10) / 10 }, za: vyhK ? 2.8 : 1.0 };
       return;
     }
     const zbytek = pocet - level.potreba;
     const hvezdy = !vyh ? 0 : sebrano >= pocet ? 3 : sebrano >= level.potreba + Math.ceil(zbytek / 2) ? 2 : 1;
     // výhra: chvíli ohňostroj a postavička udělá kotrmelec, pak teprve obrazovka s výsledkem
-    cekaVysledek = { data: { vyhra: vyh, mince: sebrano * 2, kruhy: sebrano, hvezdy }, za: vyh && level.typ !== 'volny' ? 2.8 : 1.0 };
+    cekaVysledek = { data: { vyhra: vyh, mince: sebrano * 2, kruhy: sebrano, hvezdy, cas: level.typ === 'volny' ? 0 : Math.round(casLevelu * 10) / 10, stopa: level.typ === 'volny' ? null : zaznam }, za: vyh && level.typ !== 'volny' ? 2.8 : 1.0 };
   }
   function rachejtle() {
     const barvy = ['#ffd23f', '#ff4d8d', '#4ff3ff', '#7dff6b', '#ff8a1f', '#b06bff'];
@@ -474,8 +602,19 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
   const api = {
     scene, camera, analyzuj, poza, vstup, pocty, trenink: false,
     nastavPostavu(id) { if (postava) scene.remove(postava.g); postava = (SKINY.find(l => l.id === id) || SKINY[0]).vytvor(); scene.add(postava.g); },
+    // duch = tvůj nejlepší let v tomhle levelu (stopa: [x, y, z, yaw, náklon, křídla] po 0,1 s); null = žádný
+    nastavDucha(stopa, idPostavy, cas = 0) {
+      if (duch) { scene.remove(duch.g); duch = null; }
+      duchStopa = stopa && stopa.length > 5 ? stopa : null; nejlepsi = cas || 0;
+      if (!duchStopa || KOSTE) return;
+      duch = (SKINY.find(l => l.id === idPostavy) || SKINY[0]).vytvor();
+      zduchovat(duch.g); scene.add(duch.g); duchKontrola = 0;
+    },
+    // pro šipku na obrazovce: kde je další kruh
+    dalsiCil() { const k = level.typ === 'volny' ? null : kruhy[dalsiKruh]; return k && konecT < 0 ? { cil: k.mesh.position, hrac: hrac.pos } : null; },
     pripravit(lv, idPostavy, rz) {
       level = lv; rezim = rz; konecT = -1; cekaVysledek = null; sebrano = 0; dalsiKruh = 0; balonkuSebrano = 0; kouzloT = 0;
+      casLevelu = 0; zaznam = []; zaznamT = 0; api.nastavDucha(null);
       strely.forEach(st => scene.remove(st.m)); strely.length = 0; souperi.length = 0; balonky.length = 0;
       postavSvet(lv); api.nastavPostavu(idPostavy); jiskry.skryj();
       if (lv.typ === 'volny') {
@@ -488,6 +627,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       }
       Object.assign(hrac, { vy: 0, rychlost: lv.rychlost || 30, naklon: 0, turbo: 0, otres: 0 });
       vitrTed = 0; vitrSmer = Math.random() < 0.5 ? -1 : 1; vitrZmena = 7;
+      pripravDravce(idPostavy);
       proudky.forEach(m => { m.visible = !!lv.vitr; if (lv.vitr) umistiProudek(m, true); });
       Object.assign(vstup, { vzlet: 0, naklon: 0, plachti: true, strmhlav: false, kridla: 0.1, smer: 0 });
       kamPos.copy(hrac.pos).add(new THREE.Vector3(0, 9, 17));
@@ -505,10 +645,10 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
     hud() {
       if (KOSTE && level.typ !== 'volny') {
         const m = konecT >= 0 && mistoVCili ? mistoVCili : mistoTed();
-        return { vlevo: '🏁 ' + m + '. / ' + (souperi.length + 1), stred: m + '.', stredPopis: t('hud.place'), mince: sebrano + balonkuSebrano * 2, postup: dalsiKruh / level.kruhu };
+        return { vlevo: '🏁 ' + m + '. / ' + (souperi.length + 1), stred: m + '.', stredPopis: t('hud.place'), mince: sebrano + balonkuSebrano * 2, postup: dalsiKruh / level.kruhu, cas: casLevelu, nejlepsi };
       }
       if (level.typ === 'volny') return { vlevo: '◯ ' + sebrano, stred: sebrano, stredPopis: t('hud.rings'), mince: sebrano * 2, postup: null };
-      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: t('hud.need', { n: level.potreba }), mince: sebrano * 2, postup: dalsiKruh / level.kruhu };
+      return { vlevo: '◯ ' + sebrano + ' / ' + level.kruhu, stred: sebrano + ' / ' + level.kruhu, stredPopis: t('hud.need', { n: level.potreba }), mince: sebrano * 2, postup: dalsiKruh / level.kruhu, cas: casLevelu, nejlepsi, dravec: dr.stav === 'honi' ? Math.max(0, Math.round(dr.vzad)) : null };
     },
     ukoncit() { if (level.typ === 'volny') vysledek(true); },
     // jen pro zkoušení: přeskoč na místo z (a nastav počet sebraných kruhů)
@@ -559,30 +699,37 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
         if (hrac.turbo > 0) jiskry.vystrel(hrac.pos.clone().addScaledVector(dopredu(), -2), '#4ff3ff', 2, 2, 0.4);
       }
       if (stav === 'hra' && konecT < 0 && !api.trenink) {
+        casLevelu += dt; zaznamT += dt;
+        if (zaznamT >= KROK_ZAZNAMU && zaznam.length < 3000) {
+          zaznamT -= KROK_ZAZNAMU;
+          const r = x => Math.round(x * 10) / 10;
+          zaznam.push([r(hrac.pos.x), r(hrac.pos.y), r(hrac.pos.z), Math.round(hrac.yaw * 100) / 100, Math.round(hrac.naklon * 100) / 100, Math.round(vstup.kridla * 10) / 10]);
+        }
         const vz = Math.min(vstup.vzlet, 30); vstup.vzlet = 0;
         if (KOSTE) hrac.vy += (vstup.smer * 17 - hrac.vy) * Math.min(1, dt * 3);   // koště drží výšku samo
         else {
           hrac.vy += vz; hrac.rychlost += vz * 0.12;
-          hrac.vy -= TIZE * dt;
+          hrac.vy -= TIZE * (KLIDNY() ? 0.55 : 1) * dt;          // klidný let: pták padá skoro o polovinu pomaleji
           if (vstup.strmhlav) { hrac.vy += (DOLU - hrac.vy) * Math.min(1, dt * 3); hrac.rychlost += 8 * dt; }
-          else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, PLACHTI);
+          else if (vstup.plachti) hrac.vy = Math.max(hrac.vy, KLIDNY() ? 0 : PLACHTI);   // klidný let: roztažené ruce drží výšku
         }
         hrac.vy = omez(hrac.vy, -30, 24);
         hrac.turbo = Math.max(0, hrac.turbo - dt);
-        hrac.rychlost += ((level.rychlost || 30) - hrac.rychlost) * dt * (hrac.turbo > 0 ? 0.05 : 0.45);
+        hrac.rychlost += ((level.rychlost || 30) * (KLIDNY() ? 0.85 : 1) - hrac.rychlost) * dt * (hrac.turbo > 0 ? 0.05 : 0.45);
         hrac.rychlost = Math.min(62, hrac.rychlost);
-        hrac.naklon += (vstup.naklon - hrac.naklon) * Math.min(1, dt * 2.5);
-        hrac.yaw -= hrac.naklon * 1.0 * dt;
+        hrac.naklon += (vstup.naklon - hrac.naklon) * Math.min(1, dt * (rezim === 'kamera' ? 6 : 2.5));   // kamera: rychlejší odezva (dřív 2,5 = zpoždění ~0,4 s)
+        hrac.yaw -= hrac.naklon * 1.1 * dt;
         // jemná pomoc k dalšímu kruhu (děti)
         const cilK = level.typ === 'volny' ? null : kruhy[dalsiKruh];
         if (cilK) {
           const d = cilK.mesh.position.clone().sub(hrac.pos);
           let rozdil = Math.atan2(-d.x, -d.z) - hrac.yaw; rozdil = Math.atan2(Math.sin(rozdil), Math.cos(rozdil));
-          if (Math.abs(rozdil) < 1.2) hrac.yaw += rozdil * 1.2 * level.pomoc * dt;
+          const pomoc = KLIDNY() ? Math.min(1, level.pomoc + 0.35) : level.pomoc;
+          if (Math.abs(rozdil) < 1.2) hrac.yaw += rozdil * 1.2 * pomoc * dt;
           if (Math.abs(rozdil) > 1.6) hrac.yaw += Math.sign(rozdil) * 0.6 * dt;   // když letí úplně jinam, stočí ho zpátky
           // výškový magnet: u blížícího se kruhu ho jemně přitáhne do jeho výšky
           const vzd = Math.hypot(d.x, d.z);
-          if (vzd < 230) hrac.pos.y += omez(d.y / 15, -1, 1) * (KOSTE && !vstup.smer ? 15 : 9) * level.pomoc * (1 - vzd / 260) * dt;
+          if (vzd < 230) hrac.pos.y += omez(d.y / 15, -1, 1) * (KOSTE && !vstup.smer ? 15 : 9) * pomoc * (1 - vzd / 260) * dt;
         } else if (level.typ === 'volny' && Math.hypot(hrac.pos.x, hrac.pos.z) > 1250) {
           let rozdil = Math.atan2(hrac.pos.x, hrac.pos.z) - hrac.yaw; rozdil = Math.atan2(Math.sin(rozdil), Math.cos(rozdil));
           hrac.yaw += omez(rozdil, -1, 1) * 0.9 * dt;
@@ -678,6 +825,19 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
       if (cekaVysledek && konecT >= cekaVysledek.za) { const v = cekaVysledek.data; cekaVysledek = null; ctx.konec(v); }
       if (cilBrana) cilBrana.children.forEach(o => { if (o.userData.vlajka) o.rotation.y = Math.sin(cas * 4 + o.userData.vlajka) * 0.35; });
       ohnostroj.aktualizuj(dt, 0);
+      if (stav === 'hra' && !api.trenink) aktualizujDravce(dt);
+      aktualizujVlnky();
+      if (duch) {
+        // duch letí podle záznamu; ukáže se až po startu a zmizí na konci své dráhy
+        const i = casLevelu / KROK_ZAZNAMU, a = duchStopa[Math.min(duchStopa.length - 1, Math.floor(i))], b = duchStopa[Math.min(duchStopa.length - 1, Math.floor(i) + 1)], k = i - Math.floor(i);
+        duch.g.visible = stav === 'hra' && !api.trenink && i < duchStopa.length - 1;
+        if (duch.g.visible) {
+          duch.g.position.set(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k);
+          duch.g.rotation.set(-0.05, a[3] + (b[3] - a[3]) * k, -(a[4] + (b[4] - a[4]) * k) * 0.7);
+          duch.kridla(a[5], cas);
+        }
+        duchKontrola -= dt; if (duchKontrola <= 0) { duchKontrola = 0.5; zduchovat(duch.g); }   // modely z souboru se načítají později
+      }
       if (KOSTE) {
         aktualizujSoupere(dt, stav === 'hra' && !api.trenink);
         aktualizujStrely(dt);
@@ -715,7 +875,7 @@ const MAV = { prah: 0.35, zaklad: 16, zaKus: 6, navrat: 0.3 };
         const bok = new THREE.Vector3(-f.z, 0, f.x), k = Math.min(1, konecT / 1.2);
         cilKam = hrac.pos.clone().addScaledVector(f, -17 + 15 * k).addScaledVector(bok, 25 * k).add(new THREE.Vector3(0, 9 - 3 * k, 0));
       }
-      kamPos.lerp(cilKam, 1 - Math.exp(-4 * dt));
+      kamPos.lerp(cilKam, 1 - Math.exp(-5.5 * dt));   // kamera za letcem dotahuje rychleji, zatáčka je vidět dřív
       // kamera nesmí vyjet ze stěny trubice
       for (const t of tunely) if (kamPos.z < t.zA && kamPos.z > t.zB) {
         const cx = drahaX(kamPos.z), cy = drahaY(kamPos.z), dx = kamPos.x - cx, dy = kamPos.y - cy, r = Math.hypot(dx, dy);

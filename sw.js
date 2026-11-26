@@ -22,6 +22,7 @@ const SHELL_URLS = [
   './js/priroda.js',
   './js/letci.js',
   './js/bezci.js',
+  './js/nahravani.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-512-maskable.png',

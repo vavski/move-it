@@ -6,6 +6,7 @@ export const JAZYKY = { en: 'English', cs: 'Čeština', de: 'Deutsch', es: 'Espa
 
 const SLOVNIK = {
   en: {
+    'rec.on': '📹 Record video: ON', 'rec.off': '📹 Record video: OFF', 'rec.tip': 'Records a vertical video of you and the game. It stays on this device.', 'rec.save': '📹 Save video', 'calm.on': '🪶 Calm flight: ON', 'calm.off': '🪶 Calm flight: OFF', 'res.newBest': 'NEW BEST TIME!', 'res.who': 'Who flew?',
     'meta.title': 'Move It – play with your whole body',
     'meta.desc': 'A motion game for kids: play with your whole body in front of your laptop camera. Dodge, jump, fly.',
     'logo.sub': 'PLAY WITH YOUR WHOLE BODY',
@@ -54,6 +55,7 @@ const SLOVNIK = {
     'hud.points': 'POINTS', 'hud.goal': 'GOAL {n} m', 'hud.rings': 'RINGS', 'hud.need': 'YOU NEED {n}',
   },
   cs: {
+    'rec.on': '📹 Nahrávat video: ZAP', 'rec.off': '📹 Nahrávat video: VYP', 'rec.tip': 'Nahraje svislé video tebe a hry. Zůstane jen v tomhle zařízení.', 'rec.save': '📹 Uložit video', 'calm.on': '🪶 Klidný let: ZAP', 'calm.off': '🪶 Klidný let: VYP', 'res.newBest': 'NOVÝ NEJLEPŠÍ ČAS!', 'res.who': 'Kdo letěl?',
     'meta.title': 'Move It – hraje se celým tělem',
     'meta.desc': 'Pohybová hra pro děti: hraje se celým tělem před kamerou notebooku. Uhýbej, skákej, leť.',
     'logo.sub': 'HRAJE SE CELÝM TĚLEM',

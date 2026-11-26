@@ -184,6 +184,36 @@
   .instalovat { background:var(--panel); font-size:16px; padding:8px 16px; border:2px solid rgba(184,253,4,.45); color:#eaff9a; }
   .instalovat:hover { border-color:#b8fd04; }
   @media (max-width:700px) { .levelySeznam { grid-template-columns:repeat(3,1fr); } .rezim { width:100%; padding:8px 14px; display:grid; grid-template-columns:auto 1fr; column-gap:14px; align-items:center; text-align:left; } .rezim .ikona { font-size:42px; grid-row:span 2; } .rezim .nazev { font-size:30px; } .rezim .popis { font-size:14px; } .horni h2 { font-size:34px; } }
+
+  /* čas levelu, žebříček, značka k dalšímu kruhu, nahrávání (26. 11.) */
+  #hudCas { position:fixed; top:104px; left:50%; transform:translateX(-50%); background:rgba(10,12,30,.72); padding:4px 16px; border-radius:12px; font-size:22px; font-weight:800; white-space:nowrap; pointer-events:none; }
+  #hudCas .pomalu { opacity:.55; }
+  #hudDravec { position:fixed; top:146px; left:50%; transform:translateX(-50%); background:rgba(60,0,12,.75); color:#ffb3bb; padding:2px 14px; border-radius:12px; font-size:20px; font-weight:800; pointer-events:none; }
+  #hudDravec.blizko { color:#fff; background:#d0142c; animation:blik .5s steps(2) infinite; }
+  body.tv #hudDravec { top:196px; font-size:30px; }
+  body.tv #hudCas { top:146px; font-size:32px; }
+  #znacka { position:fixed; left:0; top:0; pointer-events:none; display:flex; flex-direction:column; align-items:center; margin:-18px 0 0 -40px; width:80px; z-index:2; }
+  #znacka i { font-style:normal; font-size:30px; color:#ff3b4e; text-shadow:0 2px 0 #7a0010; display:none; line-height:1; }
+  #znacka.mimo i { display:block; }
+  #znacka span { background:rgba(10,12,30,.72); border-radius:999px; padding:1px 10px; font-size:17px; font-weight:800; }
+  body.tv #znacka span { font-size:26px; } body.tv #znacka i { font-size:44px; }
+  #nahravam { position:fixed; top:62px; left:16px; color:#ff3b4e; background:rgba(10,12,30,.72); padding:2px 12px; border-radius:999px; font-weight:800; font-size:16px; z-index:5; animation:blik 1s steps(2) infinite; }
+  @keyframes blik { 50% { opacity:.35; } }
+  .lvl .casLvl { position:absolute; top:4px; right:6px; font-size:12px; font-weight:800; opacity:.9; }
+  #vysCasy { margin:4px 0; }
+  #vysCas { font-size:26px; font-weight:800; }
+  .rekordCasu { color:var(--zluta); font-size:20px; margin-left:6px; }
+  #vysZebricek { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; font-size:18px; font-weight:800; opacity:.95; margin-top:2px; }
+  #vysZebricek .ted { color:var(--zluta); }
+  #vysKdo { display:flex; gap:4px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:6px; font-size:15px; }
+  #vysKdo span { margin-right:4px; opacity:.85; }
+  #vysKdo button { font-size:22px; padding:2px 6px; border-radius:10px; background:var(--panel-svetly); }
+  #vysKdo button.aktivni { background:var(--zluta); }
+  #vysVideo { margin-top:10px; }
+  .volby { display:flex; gap:6px; margin-top:6px; justify-content:center; flex-wrap:wrap; }
+  .volba { font-size:15px; padding:6px 10px; background:var(--panel-svetly); border-radius:12px; }
+  .volba.aktivni { background:var(--zluta); color:#3a2300; }
+  @media (max-height:520px) and (orientation:landscape) { .volba { font-size:12px; padding:4px 8px; } #hudCas { top:70px; font-size:16px; } }
 </style>
 <script type="importmap">
 { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
@@ -245,6 +275,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
     <div class="karta">
       <div class="malyText" data-i18n="controls.title">CONTROLS</div>
       <div class="ovladaniPrepinac"><button id="ovlKamera" class="aktivni" data-i18n="controls.camera">📷 Camera</button><button id="ovlKlavesy" data-i18n="controls.keys">⌨️ Keyboard</button></div>
+      <div class="volby"><button id="btnNahravat" class="volba" title="" data-i18n-title="rec.tip"></button><button id="btnKlidny" class="volba"></button></div>
       <div class="malyText" id="ovlChyba" style="color:#ffc2c2;max-width:260px"></div>
     </div>
   </div>
@@ -271,6 +302,8 @@ window.addEventListener('beforeinstallprompt', function (e) {
     <p id="vysDetail"></p>
     <div class="ziskano">+<span id="vysMince">0</span> <span class="minc"></span></div>
     <p id="vysRekord" style="color:var(--modra);font-weight:800"></p>
+    <div id="vysCasy" class="skryt"><div id="vysCas"></div><div id="vysZebricek"></div><div id="vysKdo"></div></div>
+    <div id="vysVideo" class="skryt"><button class="tl tl-zelene" id="btnVideo" data-i18n="rec.save">📹 Save video</button></div>
     <div class="tlacitka">
       <button class="tl tl-zlute" id="btnDalsi" data-i18n="res.next">▶ Next</button>
       <button class="tl tl-svetle" id="btnZnovu" data-i18n="res.again">↻ Again</button>
@@ -284,6 +317,10 @@ window.addEventListener('beforeinstallprompt', function (e) {
 <!-- HUD -->
 <div id="hud" class="skryt stin-text"><div id="hudVlevo"></div><div id="hudStred">0<small></small></div><div style="width:120px"></div></div>
 <div id="postup" class="skryt"><div></div></div>
+<div id="hudCas" class="skryt"></div>
+<div id="hudDravec" class="skryt"></div>
+<div id="znacka" class="skryt"><i>▲</i><span></span></div>
+<div id="nahravam" class="skryt">● REC</div>
 <button id="konecHry" class="skryt" title="Quit (Esc)" data-i18n-title="quit">✕</button>
 <div id="napoveda" class="skryt"></div>
 <div id="banner" class="stin-text"></div>

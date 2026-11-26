@@ -2,6 +2,7 @@
 // Přeložil Claude 21. 11. 2026, rodilý mluvčí to zatím nekontroloval. Chybějící klíč = angličtina.
 export const DALSI_SLOVNIK = {
   de: {
+    'rec.on': '📹 Video aufnehmen: AN', 'rec.off': '📹 Video aufnehmen: AUS', 'rec.tip': 'Nimmt ein Hochkant-Video von dir und dem Spiel auf. Es bleibt auf diesem Gerät.', 'rec.save': '📹 Video speichern', 'calm.on': '🪶 Ruhiger Flug: AN', 'calm.off': '🪶 Ruhiger Flug: AUS', 'res.newBest': 'NEUE BESTZEIT!', 'res.who': 'Wer ist geflogen?',
     'meta.title': 'Move It – spiel mit dem ganzen Körper',
     'meta.desc': 'Ein Bewegungsspiel für Kinder: Spiel mit dem ganzen Körper vor der Laptop-Kamera. Ausweichen, springen, fliegen.',
     'logo.sub': 'SPIEL MIT DEM GANZEN KÖRPER',
@@ -50,6 +51,7 @@ export const DALSI_SLOVNIK = {
     'settings': 'Einstellungen', 'settings.lang': 'Sprache',
   },
   es: {
+    'rec.on': '📹 Grabar vídeo: SÍ', 'rec.off': '📹 Grabar vídeo: NO', 'rec.tip': 'Graba un vídeo vertical de ti y del juego. Se queda en este dispositivo.', 'rec.save': '📹 Guardar vídeo', 'calm.on': '🪶 Vuelo tranquilo: SÍ', 'calm.off': '🪶 Vuelo tranquilo: NO', 'res.newBest': '¡NUEVO MEJOR TIEMPO!', 'res.who': '¿Quién voló?',
     'meta.title': 'Move It – juega con todo el cuerpo',
     'meta.desc': 'Un juego de movimiento para niños: juega con todo el cuerpo frente a la cámara del portátil. Esquiva, salta, vuela.',
     'logo.sub': 'JUEGA CON TODO EL CUERPO',
@@ -98,6 +100,7 @@ export const DALSI_SLOVNIK = {
     'settings': 'Ajustes', 'settings.lang': 'Idioma',
   },
   fr: {
+    'rec.on': '📹 Enregistrer la vidéo : OUI', 'rec.off': '📹 Enregistrer la vidéo : NON', 'rec.tip': 'Enregistre une vidéo verticale de toi et du jeu. Elle reste sur cet appareil.', 'rec.save': '📹 Enregistrer la vidéo', 'calm.on': '🪶 Vol tranquille : OUI', 'calm.off': '🪶 Vol tranquille : NON', 'res.newBest': 'NOUVEAU MEILLEUR TEMPS !', 'res.who': 'Qui a volé ?',
     'meta.title': 'Move It – joue avec tout ton corps',
     'meta.desc': 'Un jeu de mouvement pour enfants : joue avec tout ton corps devant la caméra de l’ordinateur. Esquive, saute, vole.',
     'logo.sub': 'JOUE AVEC TOUT TON CORPS',

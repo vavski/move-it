@@ -151,10 +151,10 @@ export function castice(scene, max = 120, velikost = 0.12, gravitace = 6) {
 
 // ================= ULOŽENÍ POSTUPU =================
 const KLIC = 'uhni-a-let-v1';
-const vychozi = () => ({ mince: 0, skiny: ['karate', 'karatistka', 'orel'], vybrany: { beh: 'karate', let: 'orel', koste: 'ko-carodejnice' }, odemceno: { beh: 1, let: 1, koste: 1 }, hvezdy: { beh: [], let: [], koste: [] }, rekord: { beh: 0, let: 0, koste: 0 }, ovladani: null, zvuk: true, tv: false });
+const vychozi = () => ({ mince: 0, skiny: ['karate', 'karatistka', 'orel'], vybrany: { beh: 'karate', let: 'orel', koste: 'ko-carodejnice' }, odemceno: { beh: 1, let: 1, koste: 1 }, hvezdy: { beh: [], let: [], koste: [] }, rekord: { beh: 0, let: 0, koste: 0 }, casy: { let: [], koste: [] }, kdo: '🧒', ovladani: null, zvuk: true, tv: false, klidny: false, nahravat: false });
 export const ulozene = (() => {
   let d = vychozi();
-  try { const s = JSON.parse(localStorage.getItem(KLIC)); if (s) d = { ...d, ...s, vybrany: { ...d.vybrany, ...s.vybrany }, odemceno: { ...d.odemceno, ...s.odemceno }, hvezdy: { ...d.hvezdy, ...s.hvezdy }, rekord: { ...d.rekord, ...s.rekord } }; } catch {}
+  try { const s = JSON.parse(localStorage.getItem(KLIC)); if (s) d = { ...d, ...s, vybrany: { ...d.vybrany, ...s.vybrany }, odemceno: { ...d.odemceno, ...s.odemceno }, hvezdy: { ...d.hvezdy, ...s.hvezdy }, rekord: { ...d.rekord, ...s.rekord }, casy: { ...d.casy, ...s.casy } }; } catch {}
   // vyřazené postavy (22. 11.): kdo je koupil, dostane mince zpátky a vybere se mu výchozí postava
   const VYRAZENE = { zombik: 600, alien: 1400, mech: 1500, mech2: 1800, robo: 250 };   // koupené vyřazené postavy = mince zpátky
   for (const [id, cena] of Object.entries(VYRAZENE)) if (d.skiny.includes(id)) { d.skiny = d.skiny.filter(x => x !== id); d.mince += cena; }
@@ -162,6 +162,12 @@ export const ulozene = (() => {
   return d;
 })();
 export function uloz() { try { localStorage.setItem(KLIC, JSON.stringify(ulozene)); } catch {} }
+// Nejlepší dráhy pro „ducha“ jsou zvlášť (jsou velké, ať se kvůli nim nezpomaluje ukládání postupu).
+const KLIC_DUCHU = 'moveit-duchove';
+export function nactiDucha(klic) { try { return (JSON.parse(localStorage.getItem(KLIC_DUCHU)) || {})[klic] || null; } catch { return null; } }
+export function ulozDucha(klic, zaznam) {
+  try { const v = JSON.parse(localStorage.getItem(KLIC_DUCHU)) || {}; v[klic] = zaznam; localStorage.setItem(KLIC_DUCHU, JSON.stringify(v)); } catch {}
+}
 
 // ================= ZVUK =================
 let ac = null, hlavni = null;
@@ -170,6 +176,13 @@ export function audio() {
   if (ac.state === 'suspended') ac.resume();
   if (chtena && !hraje) pouzijHudbu();
   return ac;
+}
+// zvuk hry jako stopa pro nahrávání videa (hudba i zvuky); null, když zvuk ještě není povolený
+let zvukDoVidea = null;
+export function zvukovaStopa() {
+  if (!ac) return null;
+  if (!zvukDoVidea) { zvukDoVidea = ac.createMediaStreamDestination(); hlavni.connect(zvukDoVidea); }
+  return zvukDoVidea.stream.getAudioTracks()[0] || null;
 }
 export function prepniZvuk() {
   ulozene.zvuk = !ulozene.zvuk; uloz();
@@ -419,6 +432,7 @@ export const kamera = {
     posledniCas = video.currentTime;
     const r = landmarker.detectForVideo(video, performance.now());
     const L = r.landmarks && r.landmarks[0] || null;
+    kamera.posledniL = L;            // pro nahrávání videa (čáry kostry přes obraz z kamery)
     if (L) {
       kctx.lineWidth = 4; kctx.strokeStyle = '#4ff3ff'; kctx.fillStyle = '#ffd23f';
       for (const [a, b] of SPOJENI) {
@@ -435,7 +449,7 @@ export const kamera = {
 };
 async function spustStream(deviceId) {
   const novy = await navigator.mediaDevices.getUserMedia({
-    video: deviceId ? { deviceId: { exact: deviceId }, width: 640, height: 480 } : { width: 640, height: 480, facingMode: 'user' }, audio: false
+    video: deviceId ? { deviceId: { exact: deviceId }, width: 640, height: 480, frameRate: { ideal: 60 } } : { width: 640, height: 480, facingMode: 'user', frameRate: { ideal: 60 } }, audio: false   // 60 snímků, když to kamera umí = menší zpoždění pohybu
   });
   if (stream) stream.getTracks().forEach(t => t.stop());
   stream = novy; video.srcObject = stream; await video.play();
