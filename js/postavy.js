@@ -125,6 +125,8 @@ export const BEZCI = [
     ['carodej', 'Čaroděj', 1000, 'Wizard', CLOVEK],
     ['carodejnice', 'Čarodějnice', 1100, 'Witch', CLOVEK],
     ['rytir', 'Zlatý rytíř', 1200, 'Knight_Golden_Male', { ...CLOVEK, barvy: { ...CLOVEK.barvy, Armor: '#f7b51e', Armor_Dark: '#b8740c', Detail: '#d8323a', Red: '#d8323a' } }],
+    // Yeti (23. 11.): vlastní postava – obrázek a 3D model z 3D AI Studia, kostra a pohyby z Mixama
+    ['yeti', 'Yeti', 900, 'Yeti', { vyska: 2.6, jas: 1.35, mapa: { crouch: 'Crouch' } }],
     ['para', 'Parasaurus', 1300, 'Parasaurolophus', { vyska: 2.5, barvy: { Green: '#f08a2c', LightGreen: '#ffd38a', LightYellow: '#fff0c8', Red: '#c2331e' } }],
     // Drak = nejlepší postava: létá nízko nad cestou a mává křídly. Oči tmavé (bílé bez zorniček působily strašidelně).
     ['drak', 'Drak', 2500, 'Dragon', { vyska: 2.3, vznasi: 0.7, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }],

@@ -11,3 +11,9 @@ Modely v této složce: licence CC0 1.0 (volné dílo, i komerčně, bez uvádě
 - M_Pigeon, M_Armabee, M_Ghost, M_Dragon_Evolved (letci), M_Dino, M_Alien (běžci): "Ultimate Monsters", zrcadlo mlflabs/brain (licence v balíku: CC0).
 - RobotExpressive: Tomás Laulhé (Quaternius), úpravy Don McCurdy, z ukázek three.js r160.
 Převedeno do GLB (21. 11. 2026): ponechány jen potřebné animace, textury mechů zmenšeny na 1024 px. Barvy nastavuje hra.
+
+Výjimka – Yeti.glb (23. 11. 2026): vlastní postava, ne od Quaternia.
+- Obrázek a 3D model vyrobeny v 3D AI Studiu (placený účet provozovatele hry, výstupy patří jemu).
+- Kostra a pohyby (Happy Idle, Running, Jump, Standing To Crouched): Adobe Mixamo, ve hrách použitelné zdarma,
+  i komerčně; samotné soubory s pohyby se nesmějí šířit odděleně od hry.
+- Převedeno z FBX do GLB přes three.js (FBXLoader + GLTFExporter), pánev v pohybech posunuta na klidovou polohu modelu.
