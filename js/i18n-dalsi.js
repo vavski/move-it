@@ -161,7 +161,7 @@ export const DALSI_JMENA = {
     'Tančící kruhy': 'Tanzende Ringe', 'Malé kruhy': 'Kleine Ringe', 'Bouře': 'Gewitter', 'Volný let': 'Freier Flug', 'Fialový drak': 'Lila Drache',
     'Kouzelná louka': 'Zauberwiese', 'Jezerní závod': 'Seerennen', 'Kamenné sloupy': 'Steinsäulen', 'Větrná pláň': 'Windige Ebene', 'Bouřkový kaňon': 'Gewitterschlucht', 'Velké finále': 'Großes Finale', 'Volné létání': 'Freies Fliegen', 'Ohnivé koště': 'Feuerbesen',
     'Dino': 'Dino', 'Lávový dino': 'Lava-Dino', 'Zlatý robot': 'Goldroboter', 'Drak': 'Drache',
-    'Orel': 'Adler', 'Vážka': 'Libelle', 'Papoušek': 'Papagei', 'Fénix': 'Phönix', 'Netopýr': 'Fledermaus',
+    'Orel': 'Adler', 'Vážka': 'Libelle', 'Papoušek': 'Papagei', 'Fénix': 'Phönix', 'Netopýr': 'Fledermaus', 'Kolibřík': 'Kolibri',
     'Sněžná sova': 'Schneeeule', 'Létající drak': 'Flugdrache', 'Zlatý drak': 'Golddrache',
   },
   es: {
@@ -173,7 +173,7 @@ export const DALSI_JMENA = {
     'Tančící kruhy': 'Aros bailarines', 'Malé kruhy': 'Aros pequeños', 'Bouře': 'Tormenta', 'Volný let': 'Vuelo libre', 'Fialový drak': 'Dragón morado',
     'Kouzelná louka': 'Prado mágico', 'Jezerní závod': 'Carrera del lago', 'Kamenné sloupy': 'Columnas de piedra', 'Větrná pláň': 'Llanura ventosa', 'Bouřkový kaňon': 'Cañón tormentoso', 'Velké finále': 'Gran final', 'Volné létání': 'Vuelo libre', 'Ohnivé koště': 'Escoba de fuego',
     'Lávový dino': 'Dino de lava', 'Zlatý robot': 'Robot dorado', 'Drak': 'Dragón',
-    'Orel': 'Águila', 'Vážka': 'Libélula', 'Papoušek': 'Loro', 'Fénix': 'Fénix', 'Netopýr': 'Murciélago',
+    'Orel': 'Águila', 'Vážka': 'Libélula', 'Papoušek': 'Loro', 'Fénix': 'Fénix', 'Netopýr': 'Murciélago', 'Kolibřík': 'Colibrí',
     'Sněžná sova': 'Búho nival', 'Létající drak': 'Dragón volador', 'Zlatý drak': 'Dragón dorado',
   },
   fr: {
@@ -185,7 +185,7 @@ export const DALSI_JMENA = {
     'Tančící kruhy': 'Anneaux dansants', 'Malé kruhy': 'Petits anneaux', 'Bouře': 'Orage', 'Volný let': 'Vol libre', 'Fialový drak': 'Dragon violet',
     'Kouzelná louka': 'Prairie magique', 'Jezerní závod': 'Course du lac', 'Kamenné sloupy': 'Colonnes de pierre', 'Větrná pláň': 'Plaine venteuse', 'Bouřkový kaňon': 'Canyon orageux', 'Velké finále': 'Grande finale', 'Volné létání': 'Vol libre', 'Ohnivé koště': 'Balai de feu',
     'Lávový dino': 'Dino de lave', 'Zlatý robot': 'Robot doré', 'Drak': 'Dragon',
-    'Orel': 'Aigle', 'Vážka': 'Libellule', 'Papoušek': 'Perroquet', 'Fénix': 'Phénix', 'Netopýr': 'Chauve-souris',
+    'Orel': 'Aigle', 'Vážka': 'Libellule', 'Papoušek': 'Perroquet', 'Fénix': 'Phénix', 'Netopýr': 'Chauve-souris', 'Kolibřík': 'Colibri',
     'Sněžná sova': 'Harfang des neiges', 'Létající drak': 'Dragon volant', 'Zlatý drak': 'Dragon doré',
   },
 };

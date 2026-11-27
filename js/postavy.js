@@ -220,12 +220,14 @@ export const LETCI = [
   // Letci (22. 11., verze 3): Orel zpátky, Holoubek vyřazen. Postavy s hotovou animací zvětšené aspoň na velikost Vážky.
   { id: 'orel', jmeno: 'Orel', cena: 0, vytvor: () => ptak2({ telo: '#5a3a1e', bricho: '#8a5c34', hlava: '#f6f2ea', zobak: '#f5b41a', kryt: '#6b4628', letka: '#4a2e16', spicka: '#1e1208', ocas: '#f6f2ea', oboci: '#3a2410' }) },
   { id: 'vazka', jmeno: 'Vážka', cena: 150, vytvor: () => vazka2() },
-  { id: 'vcela', jmeno: 'Včelka', cena: 250, vytvor: () => letecModel('M_Armabee', { vyska: 4.6 }) },
-  { id: 'duch', jmeno: 'Duch', cena: 400, vytvor: () => letecModel('M_Ghost', { vyska: 5.4, jas: 2.4 }) },
-  { id: 'netopyr', jmeno: 'Netopýr', cena: 550, vytvor: () => letecModel('Bat', { vyska: 5.5, mapa: { idle: 'Bat_Flying', sprint: 'Bat_Flying', jump: null }, barvy: { Main: '#6a58a0', Belly: '#d8b8f4', Eyes: '#1a1430', Black: '#2a2040' } }) },
+  // Letci ze Sketchfabu (27. 11.): hotová animace letu, licence CC BY (autoři v modely/LICENCE.txt).
+  // Nahradili kulaté příšerky z balíčku (Včelka, Duch, Dráček, starý Netopýr) — kdo je koupil, dostal mince zpět.
+  // Fénix, Sovička a Gryf vyřazeni před přidáním: u prvních dvou nejasný původ modelu (licence nemusí platit), gryf má malá křídla.
+  // kolibřík se v modelu vznáší svisle; po = nakloní ho do letu
+  { id: 'kolibrik', jmeno: 'Kolibřík', cena: 400, vytvor: () => letecModel('Kolibrik', { vyska: 10, po: m => { m.rotation.x = 0.75; }, mapa: { idle: 'ArmatureAction.002', sprint: 'ArmatureAction.002', jump: null } }) },
+  { id: 'netopyr', jmeno: 'Netopýr', cena: 550, vytvor: () => letecModel('Netopyr2', { vyska: 4.4, otoc: Math.PI / 2, mapa: { idle: 'flapping', sprint: 'flapping', jump: null } }) },
   { id: 'ptero', jmeno: 'Pterodaktyl', cena: 700, vytvor: () => drak2({ ptero: true, telo: '#3a9ad9', bricho: '#cdeeff', blana: '#8fd8ff', blana2: '#2a6fb0', kosti: '#1f5f9a', oci: '#ffe14d', zobak: '#ffc93a', hrebinek: '#ff7a2a' }) },
   { id: 'draklet', jmeno: 'Létající drak', cena: 1000, vytvor: () => drak2({ telo: '#2fbf6f', bricho: '#f2e07a', blana: '#9a5cff', blana2: '#4a1fa8', kosti: '#1f8a4f', rohy: '#ffd23f', ostny: '#ff7a1a', oci: '#ffe14d', stopa: '#ff7a1a' }) },
-  { id: 'dracek', jmeno: 'Dráček', cena: 1200, vytvor: () => letecModel('M_Dragon_Evolved', { vyska: 5.4 }) },
   // Fialový drak (22. 11., podle videa od Vasilije): štíhlý, dlouhý krk, hřebínek z ostnů, blanitá křídla, ocas s hrotem
   { id: 'fialovydrak', jmeno: 'Fialový drak', cena: 1300, vytvor: () => drak2({ dlouhyKrk: true, hreben: '#e6d6ff', telo: '#7d52d6', bricho: '#cdb9f5', blana: '#e3a8dc', blana2: '#6a3cb8', kosti: '#5b36a6', rohy: '#efe4ff', ostny: '#4e2c96', oci: '#ffe14d', stopa: '#c58cff' }) },
   { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 1500, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },

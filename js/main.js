@@ -333,7 +333,7 @@ function obnovZnacku() {
   z.classList.remove('skryt'); z.classList.toggle('mimo', !naObrazovce);
   let x, y, uhel = 0;
   if (naObrazovce) { x = (_v.x + 1) / 2 * W; y = (1 - _v.y) / 2 * H + Math.min(70, 2600 / Math.max(vzd, 1)); }
-  else { uhel = Math.atan2(_v.y, _v.x); x = W / 2 + Math.cos(uhel) * W * 0.42; y = Math.min(H - 90, Math.max(190, H / 2 - Math.sin(uhel) * H * 0.38)); }   // ne přes ukazatele nahoře
+  else { uhel = Math.atan2(_v.y, _v.x); x = W / 2 + Math.cos(uhel) * W * 0.42; y = Math.min(H - 140, Math.max(190, H / 2 - Math.sin(uhel) * H * 0.38)); }   // ne přes ukazatele nahoře
   z.style.transform = `translate(${x}px, ${y}px)`;
   z.firstElementChild.style.transform = `rotate(${-uhel + Math.PI / 2}rad)`;
   z.lastElementChild.textContent = vzd + ' m';

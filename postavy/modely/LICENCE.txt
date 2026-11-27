@@ -17,3 +17,8 @@ Výjimka – Yeti.glb (23. 11. 2026): vlastní postava, ne od Quaternia.
 - Kostra a pohyby (Happy Idle, Running, Jump, Standing To Crouched): Adobe Mixamo, ve hrách použitelné zdarma,
   i komerčně; samotné soubory s pohyby se nesmějí šířit odděleně od hry.
 - Převedeno z FBX do GLB přes three.js (FBXLoader + GLTFExporter), pánev v pohybech posunuta na klidovou polohu modelu.
+
+Výjimka – letci ze Sketchfabu (27. 11. 2026), licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), použití i komerčně, nutné uvést autora:
+- Kolibrik.glb: „LowPoly humming-bird animated“ od alexi.smnd – https://sketchfab.com/3d-models/lowpoly-humming-bird-animated-abc35c5c30fc44c282188c3065a6daf0
+- Netopyr2.glb: „Bat“ od matisosanimation – https://sketchfab.com/3d-models/bat-28af38de4d2c401d809148c7f63a73f9
+Upraveno: velikost a natočení ve hře, materiály převedeny na kreslený (toon) styl.
