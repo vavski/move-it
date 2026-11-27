@@ -57,7 +57,9 @@ function zare(barva, velikost) {
 
 // ================= PTÁK =================
 // o: telo, bricho, hlava, zobak, kryt (krycí pera), letka (letky u kořene), spicka (špičky), ocas, oci,
-//    fenix (ohnivý: chocholka, dlouhé ocasní pera, záře), oboci (přísný pohled orla), stopa
+//    fenix (ohnivý: chocholka, dlouhé ocasní pera, záře), oboci (přísný pohled orla), stopa,
+//    rozpeti (1 = normální křídla, víc = větší), sova (soví obličej: velká hlava a oči, obličejový terč, ušní chomáčky),
+//    ohen (víc jisker ve stopě), terc (barva obličejového terče sovy), chomacky (barva ušních chomáčků)
 export function ptak2(o) {
   const g = new THREE.Group();
   const sv = o.fenix ? 0.35 : 0;
@@ -70,16 +72,31 @@ export function ptak2(o) {
   const hlavaGeo = new THREE.SphereGeometry(0.46, 18, 14); hlavaGeo.scale(0.92, 0.9, 1.08);
   prechod(hlavaGeo, 'y', o.bricho === o.telo ? o.hlava : o.hlava, o.hlava);
   const hlava = new THREE.Mesh(hlavaGeo, matBarvy(sv)); hlava.position.set(0, 0.32, -1.5); g.add(hlava);
+  if (o.sova) {
+    hlava.scale.setScalar(1.3); hlava.position.set(0, 0.42, -1.45);
+    // obličejový terč: dva světlé ploché kruhy kolem očí
+    for (const sx of [-1, 1]) { const t = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 12), toon(o.terc || '#ffffff')); t.scale.set(1, 1, 0.35); t.position.set(sx * 0.24, 0.5, -1.92); g.add(t); }
+    // ušní chomáčky
+    for (const sx of [-1, 1]) { const ch = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.42, 6), toon(o.chomacky || o.kryt)); ch.position.set(sx * 0.33, 1.02, -1.42); ch.rotation.z = -sx * 0.35; g.add(ch); }
+  }
   // zobák: horní zahnutý a dolní menší
+  if (o.sova) {
+    // sova: malý zahnutý zobáček mezi očima
+    const zs = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.28, 8), toon(o.zobak)); zs.rotation.x = -Math.PI / 2 - 0.5; zs.position.set(0, 0.36, -2.08); g.add(zs);
+  } else {
   const hz = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.62, 10), toon(o.zobak)); hz.rotation.x = -Math.PI / 2 + 0.32; hz.position.set(0, 0.26, -2.02); g.add(hz);
   const hs = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), toon(o.zobak)); hs.position.set(0, 0.12, -2.22); hs.scale.set(0.8, 0.7, 1); g.add(hs);
   const dz = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.38, 8), toon(o.zobak)); dz.rotation.x = -Math.PI / 2 - 0.15; dz.position.set(0, 0.12, -1.9); g.add(dz);
+  }
   // oči: bělmo, zornice, odlesk — velké a laskavé, u orla s obočím
   for (const sx of [-1, 1]) {
-    const bel = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), toon('#ffffff')); bel.position.set(sx * 0.27, 0.45, -1.78); g.add(bel);
-    const zor = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), toon(o.oci || '#1a1020')); zor.position.set(sx * 0.31, 0.46, -1.88); g.add(zor);
-    const odl = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 5), new THREE.MeshBasicMaterial({ color: '#ffffff' })); odl.position.set(sx * 0.33, 0.5, -1.94); odl.userData.bezObrysu = true; g.add(odl);
-    if (o.oboci) { const ob = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.12), toon(o.oboci)); ob.position.set(sx * 0.27, 0.59, -1.8); ob.rotation.z = sx * -0.35; g.add(ob); }
+    // sova: velké oči v terči (duhovka barvy oci, velká černá zornička), ostatní ptáci jako dřív
+    const k = o.sova ? 1.7 : 1, ex = o.sova ? 0.24 : 0.27, ey = o.sova ? 0.5 : 0.45, ez = o.sova ? -2.0 : -1.78;
+    const bel = new THREE.Mesh(new THREE.SphereGeometry(0.13 * k, 14, 12), toon(o.sova ? o.oci : '#ffffff')); bel.position.set(sx * ex, ey, ez); g.add(bel);
+    const zor = new THREE.Mesh(new THREE.SphereGeometry(0.075 * k, 12, 10), toon(o.sova ? '#140c18' : o.oci || '#1a1020')); zor.position.set(sx * (ex + 0.04), ey + 0.01, ez - 0.1 * k); g.add(zor);
+    const odl = new THREE.Mesh(new THREE.SphereGeometry(0.025 * k, 6, 5), new THREE.MeshBasicMaterial({ color: '#ffffff' })); odl.position.set(sx * (ex + 0.06), ey + 0.05 * k, ez - 0.16 * k); odl.userData.bezObrysu = true; g.add(odl);
+    // obočí skoro rovně = přátelský pohled (27. 11.: dřív šly vnitřní konce nahoru a orel vypadal smutně)
+    if (o.oboci) { const ob = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.12), toon(o.oboci)); ob.position.set(sx * 0.27, 0.62, -1.8); ob.rotation.z = sx * 0.06; g.add(ob); }
   }
   // chocholka (Fénix): tři svítící pera nahoru dozadu
   const chocholka = [];
@@ -95,7 +112,7 @@ export function ptak2(o) {
   // --- křídla: rameno → loket → dlaň, na každém pera ---
   const kr = {};
   for (const [strana, sx] of [['L', -1], ['P', 1]]) {
-    const rameno = new THREE.Group(); rameno.position.set(sx * 0.42, 0.2, -0.35); g.add(rameno);
+    const rameno = new THREE.Group(); rameno.position.set(sx * 0.42, 0.2, -0.35); rameno.scale.setScalar(o.rozpeti || 1); g.add(rameno);
     const loket = new THREE.Group(); loket.position.set(sx * 1.05, 0, 0.05); rameno.add(loket);
     const dlan = new THREE.Group(); dlan.position.set(sx * 1.0, 0, 0.08); loket.add(dlan);
     const kost = (delka, r) => { const k = new THREE.CapsuleGeometry(r, delka, 4, 8); k.rotateZ(Math.PI / 2); k.translate(sx * delka / 2, 0.02, 0); return prechod(k, 'y', o.kryt, o.kryt); };
@@ -140,7 +157,7 @@ export function ptak2(o) {
   g.scale.setScalar(1.35); g.rotation.order = 'YXZ';
   let slozeniPlyn = 0;
   return {
-    g, stopa: o.stopa || null,
+    g, stopa: o.stopa || null, ohen: !!o.ohen,
     kridla(u, cas = 0) {
       const cil = Math.min(1, Math.max(0, (-u - 0.4) / 0.45)) * 0.45;   // ruce u těla = křídla trochu složená dozadu
       slozeniPlyn += (cil - slozeniPlyn) * 0.08; const slozeni = slozeniPlyn;

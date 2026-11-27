@@ -223,6 +223,8 @@ export const LETCI = [
   // Letci ze Sketchfabu (27. 11.): hotová animace letu, licence CC BY (autoři v modely/LICENCE.txt).
   // Nahradili kulaté příšerky z balíčku (Včelka, Duch, Dráček, starý Netopýr) — kdo je koupil, dostal mince zpět.
   // Fénix, Sovička a Gryf vyřazeni před přidáním: u prvních dvou nejasný původ modelu (licence nemusí platit), gryf má malá křídla.
+  // Sovička a Fénix (27. 11.): vlastní, postavení v kódu jako Orel, s větším rozpětím křídel
+  { id: 'sovicka', jmeno: 'Sovička', cena: 250, vytvor: () => ptak2({ sova: true, rozpeti: 1.3, telo: '#4a6fd8', bricho: '#cfdcff', hlava: '#5a80e6', zobak: '#ffb000', kryt: '#3a58b8', letka: '#6a8cff', spicka: '#1f2f7a', ocas: '#3a58b8', oci: '#ffc928', terc: '#e8eeff', chomacky: '#2f4aa0' }) },
   // kolibřík se v modelu vznáší svisle; po = nakloní ho do letu
   { id: 'kolibrik', jmeno: 'Kolibřík', cena: 400, vytvor: () => letecModel('Kolibrik', { vyska: 10, po: m => { m.rotation.x = 0.75; }, mapa: { idle: 'ArmatureAction.002', sprint: 'ArmatureAction.002', jump: null } }) },
   { id: 'netopyr', jmeno: 'Netopýr', cena: 550, vytvor: () => letecModel('Netopyr2', { vyska: 4.4, otoc: Math.PI / 2, mapa: { idle: 'flapping', sprint: 'flapping', jump: null } }) },
@@ -232,6 +234,7 @@ export const LETCI = [
   { id: 'fialovydrak', jmeno: 'Fialový drak', cena: 1300, vytvor: () => drak2({ dlouhyKrk: true, hreben: '#e6d6ff', telo: '#7d52d6', bricho: '#cdb9f5', blana: '#e3a8dc', blana2: '#6a3cb8', kosti: '#5b36a6', rohy: '#efe4ff', ostny: '#4e2c96', oci: '#ffe14d', stopa: '#c58cff' }) },
   { id: 'zlatydrak', jmeno: 'Zlatý drak', cena: 1500, vytvor: () => drak2({ telo: '#f2b600', bricho: '#fff1b0', blana: '#ff5a3a', blana2: '#a8140a', kosti: '#c48a00', rohy: '#ffffff', ostny: '#ff3dd2', oci: '#4ff3ff', stopa: '#ffd23f' }) },
   { id: 'velkydrak', jmeno: 'Ohnivý drak', cena: 2000, vytvor: () => { const p = letecModel('Dragon', { vyska: 5.6, mapa: { idle: 'Dragon_Flying', sprint: 'Dragon_Flying', jump: null }, barvy: { Main: '#d8322a', Belly: '#ffcf4a', Wings: '#ff8a2a', Claws: '#fff3d6', Eyes: '#1a1010' } }); p.stopa = '#ff7a1a'; return p; } },
+  { id: 'fenix', jmeno: 'Fénix', cena: 2200, vytvor: () => ptak2({ fenix: true, rozpeti: 1.4, ohen: true, telo: '#ff4a1a', bricho: '#ffb02e', hlava: '#ff7a1f', zobak: '#fff1b0', kryt: '#ff6a1f', letka: '#ff3a1a', spicka: '#ffe65a', ocas: '#ff5a1f', oci: '#4a0c00', stopa: '#ffb000' }) },
 ];
 // ================= KOŠTĚ =================
 // Jezdci na koštěti: lidé z běhu posazení na koště z kódu. Liší se postavou, barvou koštěte a stopou.

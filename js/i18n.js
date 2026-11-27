@@ -125,7 +125,7 @@ const JMENA_EN = {
   'Zlatý rytíř': 'Golden Knight', 'Mech Stan': 'Mech Stan', 'Mech Mike': 'Mech Mike',
   'Holoubek': 'Pigeon', 'Včelka': 'Bee', 'Duch': 'Ghost', 'Pterodaktyl': 'Pterodactyl', 'Dráček': 'Little Dragon', 'Ohnivý drak': 'Fire Dragon',
   'Orel': 'Eagle', 'Vážka': 'Dragonfly', 'Fénix': 'Phoenix', 'Létající drak': 'Flying Dragon',
-  'Papoušek': 'Parrot', 'Netopýr': 'Bat', 'Kolibřík': 'Hummingbird', 'Sněžná sova': 'Snowy Owl', 'Zlatý drak': 'Golden Dragon',
+  'Papoušek': 'Parrot', 'Netopýr': 'Bat', 'Kolibřík': 'Hummingbird', 'Sovička': 'Owlet', 'Sněžná sova': 'Snowy Owl', 'Zlatý drak': 'Golden Dragon',
 };
 // jména v jednotlivých jazycích (chybějící = angličtina); světy jsou v kódu velkými písmeny
 const velka = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k.toUpperCase(), v.toUpperCase()]));
